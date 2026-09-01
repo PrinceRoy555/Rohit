@@ -1,0 +1,38 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+
+    // Helper functions
+    function isValidSize() {
+      return request.resource.size <= 15 * 1024 * 1024; // 15MB
+    }
+
+    function isAllowedType() {
+      return request.resource.contentType.matches('application/pdf')
+          || request.resource.contentType.matches('image/jpeg')
+          || request.resource.contentType.matches('image/png')
+          || request.resource.contentType.matches('image/webp')
+          || request.resource.contentType.matches('application/msword')
+          || request.resource.contentType.matches('application/vnd.openxmlformats-officedocument.wordprocessingml.document')
+          || request.resource.contentType.matches('application/zip')
+          || request.resource.contentType.matches('application/x-zip-compressed');
+    }
+
+    // Allow uploads to project-briefs directory
+    match /project-briefs/{year}/{month}/{fileName} {
+      allow create: if isValidSize() && isAllowedType();
+      allow read, update, delete: if false;
+    }
+
+    // Allow authenticated admins to upload and read CMS media assets
+    match /cms-media/{userId}/{fileName} {
+      allow read: if true;
+      allow write: if request.auth != null && isValidSize() && isAllowedType();
+    }
+
+    // Default deny all other paths
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+}

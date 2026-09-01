@@ -1,0 +1,213 @@
+{
+  "entities": {
+    "ContactEnquiry": {
+      "title": "Contact Enquiry",
+      "description": "Customer inquiry submitted through the contact brief form",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string", "minLength": 2, "maxLength": 100 },
+        "email": { "type": "string", "format": "email", "minLength": 5, "maxLength": 200 },
+        "businessName": { "type": "string", "maxLength": 150 },
+        "phone": { "type": "string", "maxLength": 30 },
+        "selectedService": { "type": "string", "minLength": 2, "maxLength": 100 },
+        "budgetRange": { "type": "string", "maxLength": 100 },
+        "deadline": { "type": "string", "maxLength": 100 },
+        "projectDescription": { "type": "string", "minLength": 10, "maxLength": 5000 },
+        "attachmentUrl": { "type": "string", "maxLength": 2000 },
+        "attachmentName": { "type": "string", "maxLength": 150 },
+        "attachmentStatus": { "type": "string", "maxLength": 50 },
+        "consentAccepted": { "type": "boolean" },
+        "source": { "type": "string", "enum": ["website-contact-form", "firebase-verification-test"] },
+        "status": { "type": "string", "enum": ["new", "test", "in-progress", "completed", "archived"] },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "pageUrl": { "type": "string", "maxLength": 2000 },
+        "userAgent": { "type": "string", "maxLength": 500 }
+      },
+      "required": ["name", "email", "selectedService", "projectDescription", "consentAccepted", "source", "status", "createdAt"]
+    },
+    "ChatbotLead": {
+      "title": "Chatbot Lead",
+      "description": "Prospective lead generated via Uni AI chat assistant",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string", "minLength": 1, "maxLength": 100 },
+        "email": { "type": "string", "format": "email", "minLength": 5, "maxLength": 200 },
+        "businessName": { "type": "string", "maxLength": 150 },
+        "phone": { "type": "string", "maxLength": 30 },
+        "requiredService": { "type": "string", "maxLength": 100 },
+        "projectDescription": { "type": "string", "maxLength": 5000 },
+        "preferredStyle": { "type": "string", "maxLength": 200 },
+        "targetAudience": { "type": "string", "maxLength": 200 },
+        "budgetRange": { "type": "string", "maxLength": 100 },
+        "deadline": { "type": "string", "maxLength": 100 },
+        "conversationSummary": { "type": "string", "maxLength": 8000 },
+        "source": { "type": "string", "enum": ["uni-ai-chatbot"] },
+        "status": { "type": "string", "enum": ["new", "contacted", "converted", "closed"] },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "pageUrl": { "type": "string", "maxLength": 2000 }
+      },
+      "required": ["name", "email", "source", "status", "createdAt"]
+    },
+    "QuoteRequest": {
+      "title": "Quote Request",
+      "description": "Package or custom quote request from pricing section",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string", "minLength": 2, "maxLength": 100 },
+        "email": { "type": "string", "format": "email", "minLength": 5, "maxLength": 200 },
+        "businessName": { "type": "string", "maxLength": 150 },
+        "phone": { "type": "string", "maxLength": 30 },
+        "packageName": { "type": "string", "maxLength": 100 },
+        "requiredService": { "type": "string", "maxLength": 100 },
+        "projectDescription": { "type": "string", "maxLength": 5000 },
+        "budgetRange": { "type": "string", "maxLength": 100 },
+        "deadline": { "type": "string", "maxLength": 100 },
+        "source": { "type": "string", "enum": ["website-pricing"] },
+        "status": { "type": "string", "enum": ["new", "reviewed", "quoted"] },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["name", "email", "source", "status", "createdAt"]
+    },
+    "NewsletterSubscriber": {
+      "title": "Newsletter Subscriber",
+      "description": "Email subscriber record",
+      "type": "object",
+      "properties": {
+        "email": { "type": "string", "format": "email", "minLength": 5, "maxLength": 200 },
+        "emailNormalised": { "type": "string", "minLength": 5, "maxLength": 200 },
+        "status": { "type": "string", "enum": ["active", "unsubscribed"] },
+        "source": { "type": "string", "enum": ["website-newsletter"] },
+        "subscribedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["email", "emailNormalised", "status", "source", "subscribedAt"]
+    },
+    "Insight": {
+      "title": "Latest Insight / Blog Article",
+      "description": "Content article published or scheduled in the CMS",
+      "type": "object",
+      "properties": {
+        "title": { "type": "string", "minLength": 3, "maxLength": 250 },
+        "slug": { "type": "string", "minLength": 3, "maxLength": 250, "pattern": "^[a-z0-9-]+$" },
+        "shortDescription": { "type": "string", "minLength": 10, "maxLength": 1000 },
+        "content": { "type": "string", "minLength": 20, "maxLength": 50000 },
+        "featuredImage": { "type": "string", "maxLength": 2000 },
+        "category": { "type": "string", "minLength": 2, "maxLength": 100 },
+        "tags": { "type": "array" },
+        "author": { "type": "string", "minLength": 2, "maxLength": 100 },
+        "publishDate": { "type": "string", "maxLength": 50 },
+        "readingTime": { "type": "string", "maxLength": 50 },
+        "seoTitle": { "type": "string", "minLength": 3, "maxLength": 200 },
+        "seoDescription": { "type": "string", "minLength": 10, "maxLength": 500 },
+        "status": { "type": "string", "enum": ["draft", "review", "scheduled", "published"] },
+        "schedulePublishDate": { "type": "string", "maxLength": 50 },
+        "isAiGenerated": { "type": "boolean" },
+        "viewsCount": { "type": "number" },
+        "createdDate": { "type": "string", "format": "date-time" },
+        "updatedDate": { "type": "string", "format": "date-time" }
+      },
+      "required": ["title", "slug", "shortDescription", "content", "featuredImage", "category", "author", "publishDate", "readingTime", "seoTitle", "seoDescription", "status", "createdDate", "updatedDate"]
+    },
+    "InsightAutomationSettings": {
+      "title": "Insight Automation Configuration",
+      "description": "Controls for automated AI topic generation and publishing",
+      "type": "object",
+      "properties": {
+        "autoPublishEnabled": { "type": "boolean" },
+        "cadence": { "type": "string", "enum": ["daily", "weekly", "bi-weekly", "manual"] },
+        "mode": { "type": "string", "enum": ["auto-publish", "save-as-review", "schedule"] },
+        "targetCategories": { "type": "array" },
+        "lastRunTime": { "type": "string" },
+        "nextScheduledRun": { "type": "string" },
+        "totalGenerated": { "type": "number" }
+      },
+      "required": ["autoPublishEnabled", "cadence", "mode"]
+    },
+    "AdminAuditLog": {
+      "title": "Admin Security Audit Log",
+      "description": "Security events and audit records for the CMS",
+      "type": "object",
+      "properties": {
+        "timestamp": { "type": "string", "format": "date-time" },
+        "action": { "type": "string", "maxLength": 100 },
+        "adminEmail": { "type": "string", "format": "email", "maxLength": 200 },
+        "details": { "type": "string", "maxLength": 500 },
+        "ipAddress": { "type": "string", "maxLength": 100 },
+        "status": { "type": "string", "enum": ["success", "failure", "warning", "info"] }
+      },
+      "required": ["timestamp", "action", "adminEmail", "status"]
+    },
+    "SiteConfigDoc": {
+      "title": "Site Configuration",
+      "description": "Live or Draft full website layout and customization schema",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "version": { "type": "number" },
+        "lastUpdated": { "type": "string" },
+        "branding": { "type": "object" },
+        "theme": { "type": "object" },
+        "seo": { "type": "object" },
+        "sections": { "type": "object" },
+        "portfolio": { "type": "array" },
+        "services": { "type": "array" },
+        "testimonials": { "type": "array" }
+      },
+      "required": ["version", "branding", "theme", "sections"]
+    },
+    "Lead": {
+      "title": "Unified CRM Lead",
+      "description": "Consolidated client lead from contact, chatbot, pricing or modal flows",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string", "minLength": 1, "maxLength": 100 },
+        "email": { "type": "string", "format": "email", "minLength": 5, "maxLength": 200 },
+        "phone": { "type": "string", "maxLength": 30 },
+        "businessName": { "type": "string", "maxLength": 150 },
+        "service": { "type": "string", "maxLength": 100 },
+        "message": { "type": "string", "maxLength": 8000 },
+        "status": { "type": "string", "enum": ["new", "contacted", "in_progress", "completed", "archived", "closed"] },
+        "source": { "type": "string" },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["name", "email", "source", "status", "createdAt"]
+    }
+  },
+  "firestore": {
+    "/siteConfig/{configId}": {
+      "schema": { "$ref": "#/entities/SiteConfigDoc" },
+      "description": "Live and Draft complete CMS website configuration states"
+    },
+    "/leads/{leadId}": {
+      "schema": { "$ref": "#/entities/Lead" },
+      "description": "Canonical unified CRM leads"
+    },
+    "/contactEnquiries/{enquiryId}": {
+      "schema": { "$ref": "#/entities/ContactEnquiry" },
+      "description": "Incoming client proposals and enquiries"
+    },
+    "/chatbotLeads/{leadId}": {
+      "schema": { "$ref": "#/entities/ChatbotLead" },
+      "description": "Interactive chatbot lead collection"
+    },
+    "/quoteRequests/{quoteId}": {
+      "schema": { "$ref": "#/entities/QuoteRequest" },
+      "description": "Package pricing and quote submissions"
+    },
+    "/newsletterSubscribers/{subscriberId}": {
+      "schema": { "$ref": "#/entities/NewsletterSubscriber" },
+      "description": "Newsletter subscriber list"
+    },
+    "/insights/{insightId}": {
+      "schema": { "$ref": "#/entities/Insight" },
+      "description": "Articles, design breakdowns and insights"
+    },
+    "/insightSettings/{configId}": {
+      "schema": { "$ref": "#/entities/InsightAutomationSettings" },
+      "description": "System automation configuration and scheduled interval metadata"
+    },
+    "/adminAuditLogs/{logId}": {
+      "schema": { "$ref": "#/entities/AdminAuditLog" },
+      "description": "Immutable security and audit log entries for administrative actions"
+    }
+  }
+}

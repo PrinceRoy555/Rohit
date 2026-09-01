@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="theme-color" content="#F8F5F2" />
+    
+    <script>
+      (function() {
+        try {
+          var saved = localStorage.getItem('website-theme');
+          var isDark = false;
+          if (saved === 'dark') {
+            isDark = true;
+          } else if (saved === 'light') {
+            isDark = false;
+          } else {
+            isDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+          }
+          var resolved = isDark ? 'dark' : 'light';
+          document.documentElement.setAttribute('data-theme', resolved);
+          document.documentElement.dataset.theme = resolved;
+          if (isDark) {
+            document.documentElement.classList.add('dark');
+          } else {
+            document.documentElement.classList.remove('dark');
+          }
+          var metaThemeColor = document.querySelector('meta[name="theme-color"]');
+          if (metaThemeColor) {
+            metaThemeColor.setAttribute('content', isDark ? '#080607' : '#F8F5F2');
+          }
+        } catch (e) {}
+      })();
+    </script>
+    
+    <!-- Primary SEO Metadata -->
+    <title>Rohit Verma | Graphic Designer & Video Editor in Jaipur, India</title>
+    <meta name="description" content="Portfolio of Rohit Verma, professional Graphic Designer and Video Editor in Jaipur, India. Specializing in branding, logo design, social media creatives, and promotional video editing." />
+    <meta name="keywords" content="Rohit Verma, Graphic Designer Jaipur, Video Editor Jaipur, Graphic Designer Rajasthan, Video Editor Rajasthan, Brand Identity Design, Social Media Creatives, Motion Graphics, Unicivix Solutions" />
+    <meta name="author" content="Rohit Verma" />
+    <meta name="robots" content="index, follow" />
+    <link rel="canonical" href="/" />
+
+    <!-- Open Graph / Facebook Metadata -->
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Rohit Verma | Graphic Designer & Video Editor in Jaipur, India" />
+    <meta property="og:description" content="Explore custom brand design, promotional video editing, motion graphics, and creative digital services by Rohit Verma." />
+    <meta property="og:image" content="/images/rohit-verma-og.jpg" />
+    <meta property="og:url" content="/" />
+    <meta property="og:site_name" content="Rohit Verma Portfolio" />
+
+    <!-- Twitter Card Metadata -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Rohit Verma | Graphic Designer & Video Editor in Jaipur, India" />
+    <meta name="twitter:description" content="Explore custom brand design, promotional video editing, motion graphics, and creative digital services by Rohit Verma." />
+    <meta name="twitter:image" content="/images/rohit-verma-og.jpg" />
+
+    <!-- Favicons -->
+    <link rel="icon" type="image/webp" href="/images/rohit-avatar.webp" />
+
+    <!-- Google Fonts Preconnect & Styles -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+
+    <!-- Structured Data JSON-LD (Verified Person & WebSite Schema) -->
+    <script type="application/ld+json" id="primary-jsonld-schema">
+      {
+        "@context": "https://schema.org",
+        "@graph": [
+          {
+            "@type": "Person",
+            "@id": "/#person",
+            "name": "Rohit Verma",
+            "jobTitle": "Graphic Designer & Video Editor",
+            "description": "Jaipur-based Graphic Designer, Video Editor, Brand Strategist and Founder of Unicivix Solutions with over 5 years of professional creative experience.",
+            "url": "/",
+            "telephone": "+91 9376569027",
+            "email": "workall724038@gmail.com",
+            "sameAs": [
+              "https://www.linkedin.com/in/rohit-verma-487457374",
+              "https://github.com/PrinceRoy555",
+              "https://www.instagram.com/thedesigngeek.rohit/",
+              "https://www.instagram.com/the1rohit__/",
+              "https://www.instagram.com/unicivix_solutions/"
+            ],
+            "worksFor": {
+              "@type": "Organization",
+              "name": "Unicivix Solutions",
+              "role": "Founder",
+              "telephone": "+91 9376569027",
+              "email": "workall724038@gmail.com"
+            },
+            "address": {
+              "@type": "PostalAddress",
+              "addressLocality": "Jaipur",
+              "addressRegion": "Rajasthan",
+              "addressCountry": "India"
+            },
+            "knowsAbout": [
+              "Graphic Design",
+              "Video Editing",
+              "Brand Identity Design",
+              "Logo Design",
+              "Social Media Creatives",
+              "Motion Graphics",
+              "Adobe Photoshop",
+              "Adobe Illustrator",
+              "Adobe Premiere Pro",
+              "Adobe After Effects"
+            ]
+          },
+          {
+            "@type": "WebSite",
+            "@id": "/#website",
+            "url": "/",
+            "name": "Rohit Verma Portfolio",
+            "description": "Official portfolio and creative services website of Rohit Verma — Graphic Designer & Video Editor in Jaipur, India.",
+            "publisher": {
+              "@id": "/#person"
+            },
+            "inLanguage": "en-US"
+          }
+        ]
+      }
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

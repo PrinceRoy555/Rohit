@@ -1,0 +1,8 @@
+{
+  "name": "Rohit Verma Portfolio",
+  "description": "Premium digital portfolio website & CMS Template System with visual customizer, multi-client template engine, section management, and security suite.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

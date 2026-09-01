@@ -1,0 +1,196 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Helper functions
+    function isValidString(val, minLen, maxLen) {
+      return val is string && val.size() >= minLen && val.size() <= maxLen;
+    }
+
+    function isOptionalString(data, field, maxLen) {
+      return !(field in data) || data[field] == null || (data[field] is string && data[field].size() <= maxLen);
+    }
+
+    function isOptionalNumber(data, field) {
+      return !(field in data) || data[field] == null || data[field] is number;
+    }
+
+    function isSuperAdmin() {
+      return request.auth != null && (
+        request.auth.token.email == 'workall724038@gmail.com' ||
+        (exists(/databases/$(database)/documents/adminProfiles/$(request.auth.uid)) &&
+         get(/databases/$(database)/documents/adminProfiles/$(request.auth.uid)).data.role == 'super_admin')
+      );
+    }
+
+    function isAdmin() {
+      return request.auth != null && (
+        request.auth.token.email == 'workall724038@gmail.com' ||
+        exists(/databases/$(database)/documents/admins/$(request.auth.uid)) ||
+        exists(/databases/$(database)/documents/adminProfiles/$(request.auth.uid))
+      );
+    }
+
+    // 1. Site Configuration (Live is public readable; Draft is admin only; writes admin only)
+    match /siteConfig/{docId} {
+      allow get: if docId == 'live' || isAdmin();
+      allow list: if docId == 'live' || isAdmin();
+      allow write: if isAdmin();
+    }
+
+    // 2. Site Revisions (Admin only)
+    match /siteRevisions/{revisionId} {
+      allow read, write: if isAdmin();
+    }
+
+    // 3. Site Templates (Public read, admin write)
+    match /siteTemplates/{templateId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // 4. Canonical Unified Leads Collection (CRM)
+    match /leads/{leadId} {
+      allow create: if request.resource.data.keys().hasAll([
+        'name', 'email', 'source', 'status', 'createdAt'
+      ])
+      && isValidString(request.resource.data.name, 1, 100)
+      && isValidString(request.resource.data.email, 5, 200)
+      && (request.resource.data.status == 'new' || request.resource.data.status == 'contacted')
+      && isOptionalString(request.resource.data, 'businessName', 150)
+      && isOptionalString(request.resource.data, 'phone', 30)
+      && isOptionalString(request.resource.data, 'service', 100)
+      && isOptionalString(request.resource.data, 'packageName', 100)
+      && isOptionalString(request.resource.data, 'message', 8000)
+      && isOptionalString(request.resource.data, 'projectDescription', 8000)
+      && isOptionalString(request.resource.data, 'budget', 100)
+      && isOptionalString(request.resource.data, 'budgetRange', 100)
+      && isOptionalString(request.resource.data, 'deadline', 100)
+      && isOptionalString(request.resource.data, 'attachmentUrl', 2000)
+      && isOptionalString(request.resource.data, 'conversationSummary', 8000);
+
+      allow read, update, delete: if isAdmin();
+    }
+
+    // 5. Contact Enquiries Collection (Legacy compatibility)
+    match /contactEnquiries/{documentId} {
+      allow create: if request.resource.data.keys().hasAll([
+        'name', 'email', 'selectedService', 'projectDescription', 'consentAccepted', 'source', 'status', 'createdAt'
+      ])
+      && isValidString(request.resource.data.name, 2, 100)
+      && isValidString(request.resource.data.email, 5, 200)
+      && isValidString(request.resource.data.selectedService, 2, 100)
+      && isValidString(request.resource.data.projectDescription, 10, 5000)
+      && request.resource.data.consentAccepted == true
+      && (request.resource.data.source == 'website-contact-form' || request.resource.data.source == 'firebase-verification-test')
+      && (request.resource.data.status == 'new' || request.resource.data.status == 'test')
+      && isOptionalString(request.resource.data, 'businessName', 150)
+      && isOptionalString(request.resource.data, 'phone', 30)
+      && isOptionalString(request.resource.data, 'budgetRange', 100)
+      && isOptionalString(request.resource.data, 'deadline', 100)
+      && isOptionalString(request.resource.data, 'attachmentUrl', 2000)
+      && isOptionalString(request.resource.data, 'attachmentName', 150)
+      && isOptionalString(request.resource.data, 'attachmentType', 100)
+      && isOptionalNumber(request.resource.data, 'attachmentSize')
+      && isOptionalString(request.resource.data, 'attachmentPath', 500)
+      && isOptionalString(request.resource.data, 'attachmentStatus', 50)
+      && isOptionalString(request.resource.data, 'pageUrl', 2000)
+      && isOptionalString(request.resource.data, 'userAgent', 500);
+
+      allow read, update, delete: if isAdmin();
+    }
+
+    // 6. Chatbot Leads Collection (Legacy compatibility)
+    match /chatbotLeads/{documentId} {
+      allow create: if request.resource.data.keys().hasAll([
+        'name', 'email', 'source', 'status', 'createdAt'
+      ])
+      && isValidString(request.resource.data.name, 1, 100)
+      && isValidString(request.resource.data.email, 5, 200)
+      && request.resource.data.source == 'uni-ai-chatbot'
+      && request.resource.data.status == 'new'
+      && isOptionalString(request.resource.data, 'businessName', 150)
+      && isOptionalString(request.resource.data, 'phone', 30)
+      && isOptionalString(request.resource.data, 'requiredService', 100)
+      && isOptionalString(request.resource.data, 'projectDescription', 5000)
+      && isOptionalString(request.resource.data, 'conversationSummary', 8000);
+
+      allow read, update, delete: if isAdmin();
+    }
+
+    // 7. Quote Requests Collection (Legacy compatibility)
+    match /quoteRequests/{documentId} {
+      allow create: if request.resource.data.keys().hasAll([
+        'name', 'email', 'source', 'status', 'createdAt'
+      ])
+      && isValidString(request.resource.data.name, 2, 100)
+      && isValidString(request.resource.data.email, 5, 200)
+      && request.resource.data.source == 'website-pricing'
+      && request.resource.data.status == 'new'
+      && isOptionalString(request.resource.data, 'businessName', 150)
+      && isOptionalString(request.resource.data, 'phone', 30)
+      && isOptionalString(request.resource.data, 'packageName', 100)
+      && isOptionalString(request.resource.data, 'requiredService', 100)
+      && isOptionalString(request.resource.data, 'projectDescription', 5000);
+
+      allow read, update, delete: if isAdmin();
+    }
+
+    // 8. Newsletter Subscribers Collection
+    match /newsletterSubscribers/{documentId} {
+      allow create, set: if request.resource.data.keys().hasAll([
+        'email', 'emailNormalised', 'status', 'source', 'subscribedAt'
+      ])
+      && isValidString(request.resource.data.email, 5, 200)
+      && isValidString(request.resource.data.emailNormalised, 5, 200)
+      && (request.resource.data.status == 'active' || request.resource.data.status == 'unsubscribed')
+      && request.resource.data.source == 'website-newsletter';
+
+      allow read, update, delete: if isAdmin();
+    }
+
+    // 9. Insights Collection (CMS)
+    match /insights/{documentId} {
+      allow get: if resource.data.status == 'published' || isAdmin();
+      allow list: if resource.data.status == 'published' || isAdmin();
+      allow create, update, delete: if isAdmin();
+    }
+
+    // 10. Media Library (CMS)
+    match /media/{documentId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // 11. Admin Profiles (RBAC)
+    match /adminProfiles/{userId} {
+      allow read: if request.auth != null && (request.auth.uid == userId || isAdmin());
+      allow write: if isSuperAdmin();
+    }
+
+    // 12. Legacy Admins Collection
+    match /admins/{userId} {
+      allow read: if request.auth != null;
+      allow write: if isAdmin();
+    }
+
+    // 13. Insight Settings & Automation (Admin Only)
+    match /insightSettings/{documentId} {
+      allow read, write: if isAdmin();
+    }
+
+    match /settings/{documentId} {
+      allow read, write: if isAdmin();
+    }
+
+    // 14. Admin Audit Logs Collection
+    match /adminAuditLogs/{logId} {
+      allow read, write: if isAdmin();
+    }
+
+    // Default deny all other paths
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

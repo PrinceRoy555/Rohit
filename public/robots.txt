@@ -1,0 +1,8 @@
+# Robots.txt for Rohit Verma Portfolio
+# Graphic Designer & Video Editor (Jaipur, India)
+
+User-agent: *
+Allow: /
+Disallow: /api/
+
+Sitemap: /sitemap.xml
