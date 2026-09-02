@@ -203,11 +203,21 @@ export default function App() {
       setCurrentRoute('home');
     };
 
+    // Keyboard shortcut to open Admin Panel: Ctrl+Shift+A or Cmd+Shift+A
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.ctrlKey || e.metaKey) && e.shiftKey && (e.key === 'A' || e.key === 'a')) {
+        e.preventDefault();
+        setIsAdminOpen((prev) => !prev);
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
     window.addEventListener('hashchange', handleRouteCheck);
     window.addEventListener('popstate', handleRouteCheck);
     handleRouteCheck();
 
     return () => {
+      window.removeEventListener('keydown', handleKeyDown);
       window.removeEventListener('hashchange', handleRouteCheck);
       window.removeEventListener('popstate', handleRouteCheck);
     };

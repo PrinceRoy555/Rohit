@@ -303,6 +303,26 @@ export default function Footer({ onNavigate }: FooterProps = {}) {
           >
             Terms and Conditions
           </button>
+          <a
+            href="/admin"
+            onClick={(e) => {
+              e.preventDefault();
+              if (onNavigate) {
+                onNavigate('admin');
+              } else {
+                if (window.history && window.history.pushState) {
+                  window.history.pushState(null, '', '/admin');
+                  window.dispatchEvent(new Event('popstate'));
+                } else {
+                  window.location.hash = 'admin';
+                }
+              }
+            }}
+            className="hover:text-accent-primary transition-colors cursor-pointer text-text-secondary/40 hover:text-text-secondary"
+            title="Administrator Portal"
+          >
+            Admin Portal
+          </a>
         </div>
       </div>
 
