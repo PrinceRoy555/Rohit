@@ -62,7 +62,7 @@ function getValidAdminPasswords(): string[] {
     process.env.ADMIN_PASS,
     process.env.ADMIN_SECRET,
     ADMIN_PASSWORD_ENV,
-    'Admin@Rohit2026!'
+    'Verma@9027'
   ];
   for (const raw of rawEnv) {
     if (typeof raw === 'string' && raw.trim().length > 0) {
@@ -536,7 +536,7 @@ interface AdminUserRecord extends AdminUser {
   salt?: string;
 }
 
-const initialSuperAdminPass = ADMIN_PASSWORD_ENV || 'Admin@Rohit2026!';
+const initialSuperAdminPass = ADMIN_PASSWORD_ENV || 'Verma@9027';
 const superAdminHashData = hashPassword(initialSuperAdminPass);
 const editorHashData = hashPassword('Editor@Unicivix2026!');
 

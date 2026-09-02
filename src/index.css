@@ -78,6 +78,12 @@ html.dark {
   --chat-placeholder: rgba(26, 9, 10, 0.42);
 
   --chat-shadow: 0 24px 70px rgba(26, 9, 10, 0.24);
+
+  /* Form Control Tokens */
+  --input-bg: #FFFFFF;
+  --input-text: #1A090A;
+  --input-border: rgba(26, 9, 10, 0.18);
+  --input-placeholder: rgba(26, 9, 10, 0.45);
 }
 
 [data-theme="dark"],
@@ -144,6 +150,12 @@ html.dark {
   --chat-placeholder: rgba(255, 255, 255, 0.42);
 
   --chat-shadow: 0 24px 70px rgba(0, 0, 0, 0.7);
+
+  /* Form Control Tokens */
+  --input-bg: rgba(0, 0, 0, 0.45);
+  --input-text: #FFFFFF;
+  --input-border: rgba(255, 255, 255, 0.14);
+  --input-placeholder: rgba(255, 255, 255, 0.45);
 }
 
 @theme {
@@ -193,6 +205,11 @@ html.dark {
   --color-border: var(--border-color);
   --color-red-border: var(--accent-primary);
   --color-red-glow: var(--shadow-color);
+
+  --color-input-bg: var(--input-bg);
+  --color-input-text: var(--input-text);
+  --color-input-border: var(--input-border);
+  --color-input-placeholder: var(--input-placeholder);
 }
 
 /* Global body styling with dynamic cinematic red glow background */
@@ -2114,5 +2131,732 @@ img, video, canvas, svg {
     padding: 12px 6px !important;
     border-radius: 16px !important;
   }
+}
+
+/* ==========================================================================
+   ADMIN PANEL THEME SYSTEM (LIGHT & DARK MODE SYNCHRONIZATION)
+   ========================================================================== */
+
+/* 1. LIGHT MODE ADMIN ADAPTATIONS */
+[data-theme="light"] #admin-portal-root,
+[data-theme="light"] .admin-panel-container,
+[data-theme="light"] .admin-modal,
+[data-theme="light"] #admin-insights-dashboard,
+html:not(.dark) #admin-portal-root,
+html:not(.dark) .admin-panel-container,
+html:not(.dark) .admin-modal,
+html:not(.dark) #admin-insights-dashboard,
+body:not(.dark) #admin-portal-root,
+body:not(.dark) .admin-panel-container,
+body:not(.dark) .admin-modal,
+body:not(.dark) #admin-insights-dashboard {
+  color-scheme: light;
+  background-color: var(--bg-primary, #F8F5F2) !important;
+  color: var(--text-primary, #1A090A) !important;
+}
+
+/* Main background wells in Light Mode */
+[data-theme="light"] #admin-portal-root main,
+[data-theme="light"] .admin-panel-container main,
+html:not(.dark) #admin-portal-root main,
+html:not(.dark) .admin-panel-container main {
+  background-color: var(--bg-primary, #F8F5F2) !important;
+  color: var(--text-primary, #1A090A) !important;
+}
+
+/* Header & Sidebar in Light Mode */
+[data-theme="light"] #admin-portal-root header,
+[data-theme="light"] .admin-panel-container header,
+[data-theme="light"] #admin-portal-root aside,
+[data-theme="light"] .admin-panel-container aside,
+html:not(.dark) #admin-portal-root header,
+html:not(.dark) .admin-panel-container header,
+html:not(.dark) #admin-portal-root aside,
+html:not(.dark) .admin-panel-container aside {
+  background-color: #FFFFFF !important;
+  border-color: rgba(26, 9, 10, 0.12) !important;
+  color: var(--text-primary, #1A090A) !important;
+}
+
+/* Admin Card Surfaces in Light Mode */
+[data-theme="light"] #admin-portal-root .bg-neutral-900,
+[data-theme="light"] #admin-portal-root .bg-neutral-900\/40,
+[data-theme="light"] #admin-portal-root .bg-neutral-900\/60,
+[data-theme="light"] #admin-portal-root .bg-neutral-900\/80,
+[data-theme="light"] #admin-portal-root .bg-neutral-900\/90,
+[data-theme="light"] #admin-portal-root .bg-neutral-900\/95,
+[data-theme="light"] #admin-portal-root .bg-neutral-950,
+[data-theme="light"] #admin-portal-root .bg-neutral-800,
+[data-theme="light"] #admin-portal-root .bg-zinc-900,
+[data-theme="light"] .admin-panel-container .bg-neutral-900,
+[data-theme="light"] .admin-panel-container .bg-neutral-900\/40,
+[data-theme="light"] .admin-panel-container .bg-neutral-900\/60,
+[data-theme="light"] .admin-panel-container .bg-neutral-900\/80,
+[data-theme="light"] .admin-panel-container .bg-neutral-900\/90,
+[data-theme="light"] .admin-panel-container .bg-neutral-900\/95,
+[data-theme="light"] .admin-panel-container .bg-neutral-950,
+[data-theme="light"] .admin-panel-container .bg-neutral-800,
+[data-theme="light"] .admin-modal .bg-neutral-900,
+[data-theme="light"] .admin-modal .bg-neutral-900\/80,
+[data-theme="light"] .admin-modal,
+html:not(.dark) #admin-portal-root .bg-neutral-900,
+html:not(.dark) #admin-portal-root .bg-neutral-900\/40,
+html:not(.dark) #admin-portal-root .bg-neutral-900\/60,
+html:not(.dark) #admin-portal-root .bg-neutral-900\/80,
+html:not(.dark) #admin-portal-root .bg-neutral-900\/90,
+html:not(.dark) #admin-portal-root .bg-neutral-900\/95,
+html:not(.dark) #admin-portal-root .bg-neutral-950,
+html:not(.dark) #admin-portal-root .bg-neutral-800,
+html:not(.dark) #admin-portal-root .bg-zinc-900,
+html:not(.dark) .admin-panel-container .bg-neutral-900,
+html:not(.dark) .admin-panel-container .bg-neutral-900\/40,
+html:not(.dark) .admin-panel-container .bg-neutral-900\/60,
+html:not(.dark) .admin-panel-container .bg-neutral-900\/80,
+html:not(.dark) .admin-panel-container .bg-neutral-900\/90,
+html:not(.dark) .admin-panel-container .bg-neutral-900\/95,
+html:not(.dark) .admin-panel-container .bg-neutral-950,
+html:not(.dark) .admin-panel-container .bg-neutral-800,
+html:not(.dark) .admin-modal .bg-neutral-900,
+html:not(.dark) .admin-modal .bg-neutral-900\/80,
+html:not(.dark) .admin-modal {
+  background-color: #FFFFFF !important;
+  border-color: rgba(26, 9, 10, 0.12) !important;
+  color: var(--text-primary, #1A090A) !important;
+  box-shadow: 0 4px 20px rgba(26, 9, 10, 0.04);
+}
+
+/* Inset Boxes, Sub-Navigation & Code Wells in Light Mode */
+[data-theme="light"] #admin-portal-root .bg-black\/40,
+[data-theme="light"] #admin-portal-root .bg-black\/50,
+[data-theme="light"] #admin-portal-root .bg-black\/60,
+[data-theme="light"] #admin-portal-root .bg-black\/30,
+[data-theme="light"] #admin-portal-root .bg-black\/20,
+[data-theme="light"] #admin-portal-root .bg-black\/10,
+[data-theme="light"] #admin-portal-root .bg-neutral-950\/40,
+[data-theme="light"] .admin-panel-container .bg-black\/40,
+[data-theme="light"] .admin-panel-container .bg-black\/50,
+[data-theme="light"] .admin-panel-container .bg-black\/60,
+[data-theme="light"] .admin-panel-container .bg-black\/30,
+[data-theme="light"] .admin-panel-container .bg-black\/20,
+[data-theme="light"] .admin-panel-container .bg-black\/10,
+[data-theme="light"] .admin-modal .bg-black\/40,
+[data-theme="light"] .admin-modal .bg-black\/50,
+[data-theme="light"] .admin-modal .bg-black\/30,
+html:not(.dark) #admin-portal-root .bg-black\/40,
+html:not(.dark) #admin-portal-root .bg-black\/50,
+html:not(.dark) #admin-portal-root .bg-black\/60,
+html:not(.dark) #admin-portal-root .bg-black\/30,
+html:not(.dark) #admin-portal-root .bg-black\/20,
+html:not(.dark) #admin-portal-root .bg-black\/10,
+html:not(.dark) #admin-portal-root .bg-neutral-950\/40,
+html:not(.dark) .admin-panel-container .bg-black\/40,
+html:not(.dark) .admin-panel-container .bg-black\/50,
+html:not(.dark) .admin-panel-container .bg-black\/60,
+html:not(.dark) .admin-panel-container .bg-black\/30,
+html:not(.dark) .admin-panel-container .bg-black\/20,
+html:not(.dark) .admin-panel-container .bg-black\/10,
+html:not(.dark) .admin-modal .bg-black\/40,
+html:not(.dark) .admin-modal .bg-black\/50,
+html:not(.dark) .admin-modal .bg-black\/30 {
+  background-color: #F4EDE9 !important;
+  border-color: rgba(26, 9, 10, 0.10) !important;
+  color: var(--text-primary, #1A090A) !important;
+}
+
+/* Secondary / Ghost Buttons & Pills in Light Mode */
+[data-theme="light"] #admin-portal-root .bg-white\/5,
+[data-theme="light"] #admin-portal-root .bg-white\/10,
+[data-theme="light"] #admin-portal-root .bg-white\/15,
+[data-theme="light"] #admin-portal-root .bg-white\/20,
+[data-theme="light"] .admin-panel-container .bg-white\/5,
+[data-theme="light"] .admin-panel-container .bg-white\/10,
+[data-theme="light"] .admin-panel-container .bg-white\/15,
+[data-theme="light"] .admin-panel-container .bg-white\/20,
+[data-theme="light"] .admin-modal .bg-white\/5,
+[data-theme="light"] .admin-modal .bg-white\/10,
+[data-theme="light"] .admin-modal .bg-white\/15,
+html:not(.dark) #admin-portal-root .bg-white\/5,
+html:not(.dark) #admin-portal-root .bg-white\/10,
+html:not(.dark) #admin-portal-root .bg-white\/15,
+html:not(.dark) #admin-portal-root .bg-white\/20,
+html:not(.dark) .admin-panel-container .bg-white\/5,
+html:not(.dark) .admin-panel-container .bg-white\/10,
+html:not(.dark) .admin-panel-container .bg-white\/15,
+html:not(.dark) .admin-panel-container .bg-white\/20,
+html:not(.dark) .admin-modal .bg-white\/5,
+html:not(.dark) .admin-modal .bg-white\/10,
+html:not(.dark) .admin-modal .bg-white\/15 {
+  background-color: rgba(26, 9, 10, 0.06) !important;
+  border-color: rgba(26, 9, 10, 0.12) !important;
+  color: var(--text-primary, #1A090A) !important;
+}
+
+[data-theme="light"] #admin-portal-root .hover\:bg-white\/5:hover,
+[data-theme="light"] #admin-portal-root .hover\:bg-white\/10:hover,
+[data-theme="light"] #admin-portal-root .hover\:bg-white\/15:hover,
+[data-theme="light"] #admin-portal-root .hover\:bg-white\/20:hover,
+[data-theme="light"] .admin-panel-container .hover\:bg-white\/5:hover,
+[data-theme="light"] .admin-panel-container .hover\:bg-white\/10:hover,
+[data-theme="light"] .admin-panel-container .hover\:bg-white\/15:hover,
+[data-theme="light"] .admin-panel-container .hover\:bg-white\/20:hover,
+[data-theme="light"] .admin-modal .hover\:bg-white\/5:hover,
+[data-theme="light"] .admin-modal .hover\:bg-white\/10:hover,
+html:not(.dark) #admin-portal-root .hover\:bg-white\/5:hover,
+html:not(.dark) #admin-portal-root .hover\:bg-white\/10:hover,
+html:not(.dark) #admin-portal-root .hover\:bg-white\/15:hover,
+html:not(.dark) #admin-portal-root .hover\:bg-white\/20:hover,
+html:not(.dark) .admin-panel-container .hover\:bg-white\/5:hover,
+html:not(.dark) .admin-panel-container .hover\:bg-white\/10:hover,
+html:not(.dark) .admin-panel-container .hover\:bg-white\/15:hover,
+html:not(.dark) .admin-panel-container .hover\:bg-white\/20:hover,
+html:not(.dark) .admin-modal .hover\:bg-white\/5:hover,
+html:not(.dark) .admin-modal .hover\:bg-white\/10:hover {
+  background-color: rgba(26, 9, 10, 0.10) !important;
+  color: var(--text-primary, #1A090A) !important;
+}
+
+/* Borders & Dividers in Light Mode */
+[data-theme="light"] #admin-portal-root .border-white\/10,
+[data-theme="light"] #admin-portal-root .border-white\/15,
+[data-theme="light"] #admin-portal-root .border-white\/5,
+[data-theme="light"] #admin-portal-root .border-white\/20,
+[data-theme="light"] .admin-panel-container .border-white\/10,
+[data-theme="light"] .admin-panel-container .border-white\/15,
+[data-theme="light"] .admin-panel-container .border-white\/5,
+[data-theme="light"] .admin-panel-container .border-white\/20,
+[data-theme="light"] .admin-modal .border-white\/10,
+[data-theme="light"] .admin-modal .border-white\/15,
+html:not(.dark) #admin-portal-root .border-white\/10,
+html:not(.dark) #admin-portal-root .border-white\/15,
+html:not(.dark) #admin-portal-root .border-white\/5,
+html:not(.dark) #admin-portal-root .border-white\/20,
+html:not(.dark) .admin-panel-container .border-white\/10,
+html:not(.dark) .admin-panel-container .border-white\/15,
+html:not(.dark) .admin-panel-container .border-white\/5,
+html:not(.dark) .admin-panel-container .border-white\/20,
+html:not(.dark) .admin-modal .border-white\/10,
+html:not(.dark) .admin-modal .border-white\/15 {
+  border-color: var(--border-color, rgba(26, 9, 10, 0.12)) !important;
+}
+
+[data-theme="light"] #admin-portal-root .bg-white\/10.h-px,
+[data-theme="light"] .admin-panel-container .bg-white\/10.h-px,
+[data-theme="light"] .admin-modal .bg-white\/10.h-px,
+html:not(.dark) #admin-portal-root .bg-white\/10.h-px,
+html:not(.dark) .admin-panel-container .bg-white\/10.h-px,
+html:not(.dark) .admin-modal .bg-white\/10.h-px {
+  background-color: rgba(26, 9, 10, 0.12) !important;
+}
+
+/* Typography, Headings & Labels in Light Mode */
+[data-theme="light"] #admin-portal-root h1,
+[data-theme="light"] #admin-portal-root h2,
+[data-theme="light"] #admin-portal-root h3,
+[data-theme="light"] #admin-portal-root h4,
+[data-theme="light"] #admin-portal-root h5,
+[data-theme="light"] #admin-portal-root h6,
+[data-theme="light"] .admin-panel-container h1,
+[data-theme="light"] .admin-panel-container h2,
+[data-theme="light"] .admin-panel-container h3,
+[data-theme="light"] .admin-panel-container h4,
+[data-theme="light"] .admin-panel-container h5,
+[data-theme="light"] .admin-panel-container h6,
+[data-theme="light"] .admin-modal h1,
+[data-theme="light"] .admin-modal h2,
+[data-theme="light"] .admin-modal h3,
+[data-theme="light"] .admin-modal h4,
+[data-theme="light"] .admin-modal h5,
+[data-theme="light"] .admin-modal h6,
+html:not(.dark) #admin-portal-root h1,
+html:not(.dark) #admin-portal-root h2,
+html:not(.dark) #admin-portal-root h3,
+html:not(.dark) #admin-portal-root h4,
+html:not(.dark) #admin-portal-root h5,
+html:not(.dark) #admin-portal-root h6,
+html:not(.dark) .admin-panel-container h1,
+html:not(.dark) .admin-panel-container h2,
+html:not(.dark) .admin-panel-container h3,
+html:not(.dark) .admin-panel-container h4,
+html:not(.dark) .admin-panel-container h5,
+html:not(.dark) .admin-panel-container h6,
+html:not(.dark) .admin-modal h1,
+html:not(.dark) .admin-modal h2,
+html:not(.dark) .admin-modal h3,
+html:not(.dark) .admin-modal h4,
+html:not(.dark) .admin-modal h5,
+html:not(.dark) .admin-modal h6 {
+  color: var(--text-primary, #1A090A) !important;
+}
+
+[data-theme="light"] #admin-portal-root label,
+[data-theme="light"] .admin-panel-container label,
+[data-theme="light"] .admin-modal label,
+html:not(.dark) #admin-portal-root label,
+html:not(.dark) .admin-panel-container label,
+html:not(.dark) .admin-modal label {
+  color: var(--text-primary, #1A090A) !important;
+}
+
+/* General Text Utilities in Light Mode */
+[data-theme="light"] #admin-portal-root .text-white:not(.badge-solid-text):not(.bg-rose-600 *):not(.bg-rose-700 *):not(.bg-rose-500 *):not(.bg-accent-primary *):not(.bg-emerald-600 *):not(.bg-indigo-600 *):not(.bg-amber-500 *):not(.bg-amber-600 *):not(.badge-white-text),
+[data-theme="light"] .admin-panel-container .text-white:not(.badge-solid-text):not(.bg-rose-600 *):not(.bg-rose-700 *):not(.bg-rose-500 *):not(.bg-accent-primary *):not(.bg-emerald-600 *):not(.bg-indigo-600 *):not(.bg-amber-500 *):not(.bg-amber-600 *):not(.badge-white-text),
+[data-theme="light"] .admin-modal .text-white:not(.badge-solid-text):not(.bg-rose-600 *):not(.bg-rose-700 *):not(.bg-rose-500 *):not(.bg-accent-primary *):not(.bg-emerald-600 *):not(.bg-indigo-600 *):not(.bg-amber-500 *):not(.bg-amber-600 *):not(.badge-white-text),
+html:not(.dark) #admin-portal-root .text-white:not(.badge-solid-text):not(.bg-rose-600 *):not(.bg-rose-700 *):not(.bg-rose-500 *):not(.bg-accent-primary *):not(.bg-emerald-600 *):not(.bg-indigo-600 *):not(.bg-amber-500 *):not(.bg-amber-600 *):not(.badge-white-text),
+html:not(.dark) .admin-panel-container .text-white:not(.badge-solid-text):not(.bg-rose-600 *):not(.bg-rose-700 *):not(.bg-rose-500 *):not(.bg-accent-primary *):not(.bg-emerald-600 *):not(.bg-indigo-600 *):not(.bg-amber-500 *):not(.bg-amber-600 *):not(.badge-white-text),
+html:not(.dark) .admin-modal .text-white:not(.badge-solid-text):not(.bg-rose-600 *):not(.bg-rose-700 *):not(.bg-rose-500 *):not(.bg-accent-primary *):not(.bg-emerald-600 *):not(.bg-indigo-600 *):not(.bg-amber-500 *):not(.bg-amber-600 *):not(.badge-white-text) {
+  color: var(--text-primary, #1A090A) !important;
+}
+
+[data-theme="light"] #admin-portal-root .text-neutral-100,
+[data-theme="light"] #admin-portal-root .text-neutral-200,
+[data-theme="light"] #admin-portal-root .text-neutral-300,
+[data-theme="light"] #admin-portal-root .text-gray-100,
+[data-theme="light"] #admin-portal-root .text-gray-200,
+[data-theme="light"] #admin-portal-root .text-gray-300,
+[data-theme="light"] .admin-panel-container .text-neutral-100,
+[data-theme="light"] .admin-panel-container .text-neutral-200,
+[data-theme="light"] .admin-panel-container .text-neutral-300,
+[data-theme="light"] .admin-panel-container .text-gray-100,
+[data-theme="light"] .admin-panel-container .text-gray-200,
+[data-theme="light"] .admin-panel-container .text-gray-300,
+[data-theme="light"] .admin-modal .text-neutral-100,
+[data-theme="light"] .admin-modal .text-neutral-200,
+[data-theme="light"] .admin-modal .text-neutral-300,
+[data-theme="light"] .admin-modal .text-gray-100,
+[data-theme="light"] .admin-modal .text-gray-200,
+[data-theme="light"] .admin-modal .text-gray-300,
+html:not(.dark) #admin-portal-root .text-neutral-100,
+html:not(.dark) #admin-portal-root .text-neutral-200,
+html:not(.dark) #admin-portal-root .text-neutral-300,
+html:not(.dark) #admin-portal-root .text-gray-100,
+html:not(.dark) #admin-portal-root .text-gray-200,
+html:not(.dark) #admin-portal-root .text-gray-300,
+html:not(.dark) .admin-panel-container .text-neutral-100,
+html:not(.dark) .admin-panel-container .text-neutral-200,
+html:not(.dark) .admin-panel-container .text-neutral-300,
+html:not(.dark) .admin-panel-container .text-gray-100,
+html:not(.dark) .admin-panel-container .text-gray-200,
+html:not(.dark) .admin-panel-container .text-gray-300,
+html:not(.dark) .admin-modal .text-neutral-100,
+html:not(.dark) .admin-modal .text-neutral-200,
+html:not(.dark) .admin-modal .text-neutral-300,
+html:not(.dark) .admin-modal .text-gray-100,
+html:not(.dark) .admin-modal .text-gray-200,
+html:not(.dark) .admin-modal .text-gray-300 {
+  color: var(--text-secondary, #2A1012) !important;
+}
+
+[data-theme="light"] #admin-portal-root .text-neutral-400,
+[data-theme="light"] #admin-portal-root .text-gray-400,
+[data-theme="light"] .admin-panel-container .text-neutral-400,
+[data-theme="light"] .admin-panel-container .text-gray-400,
+[data-theme="light"] .admin-modal .text-neutral-400,
+[data-theme="light"] .admin-modal .text-gray-400,
+html:not(.dark) #admin-portal-root .text-neutral-400,
+html:not(.dark) #admin-portal-root .text-gray-400,
+html:not(.dark) .admin-panel-container .text-neutral-400,
+html:not(.dark) .admin-panel-container .text-gray-400,
+html:not(.dark) .admin-modal .text-neutral-400,
+html:not(.dark) .admin-modal .text-gray-400 {
+  color: var(--text-muted, rgba(26, 9, 10, 0.70)) !important;
+}
+
+[data-theme="light"] #admin-portal-root .text-neutral-500,
+[data-theme="light"] #admin-portal-root .text-gray-500,
+[data-theme="light"] .admin-panel-container .text-neutral-500,
+[data-theme="light"] .admin-panel-container .text-gray-500,
+[data-theme="light"] .admin-modal .text-neutral-500,
+[data-theme="light"] .admin-modal .text-gray-500,
+html:not(.dark) #admin-portal-root .text-neutral-500,
+html:not(.dark) #admin-portal-root .text-gray-500,
+html:not(.dark) .admin-panel-container .text-neutral-500,
+html:not(.dark) .admin-panel-container .text-gray-500,
+html:not(.dark) .admin-modal .text-neutral-500,
+html:not(.dark) .admin-modal .text-gray-500 {
+  color: rgba(26, 9, 10, 0.58) !important;
+}
+
+[data-theme="light"] #admin-portal-root .hover\:text-white:hover,
+[data-theme="light"] .admin-panel-container .hover\:text-white:hover,
+[data-theme="light"] .admin-modal .hover\:text-white:hover,
+html:not(.dark) #admin-portal-root .hover\:text-white:hover,
+html:not(.dark) .admin-panel-container .hover\:text-white:hover,
+html:not(.dark) .admin-modal .hover\:text-white:hover {
+  color: var(--text-primary, #1A090A) !important;
+}
+
+/* Ensure Primary Buttons and Active Tabs always retain Crisp White Text */
+[data-theme="light"] #admin-portal-root .bg-rose-600,
+[data-theme="light"] #admin-portal-root .bg-rose-600 *,
+[data-theme="light"] #admin-portal-root .bg-rose-700,
+[data-theme="light"] #admin-portal-root .bg-rose-700 *,
+[data-theme="light"] #admin-portal-root .bg-rose-500,
+[data-theme="light"] #admin-portal-root .bg-rose-500 *,
+[data-theme="light"] #admin-portal-root .bg-accent-primary,
+[data-theme="light"] #admin-portal-root .bg-accent-primary *,
+[data-theme="light"] #admin-portal-root .bg-emerald-600,
+[data-theme="light"] #admin-portal-root .bg-emerald-600 *,
+[data-theme="light"] #admin-portal-root .bg-indigo-600,
+[data-theme="light"] #admin-portal-root .bg-indigo-600 *,
+[data-theme="light"] #admin-portal-root .bg-amber-500,
+[data-theme="light"] #admin-portal-root .bg-amber-600,
+[data-theme="light"] .admin-panel-container .bg-rose-600,
+[data-theme="light"] .admin-panel-container .bg-rose-600 *,
+[data-theme="light"] .admin-panel-container .bg-rose-700,
+[data-theme="light"] .admin-panel-container .bg-rose-700 *,
+[data-theme="light"] .admin-panel-container .bg-rose-500,
+[data-theme="light"] .admin-panel-container .bg-rose-500 *,
+[data-theme="light"] .admin-panel-container .bg-accent-primary,
+[data-theme="light"] .admin-panel-container .bg-accent-primary *,
+[data-theme="light"] .admin-panel-container .bg-emerald-600,
+[data-theme="light"] .admin-panel-container .bg-emerald-600 *,
+[data-theme="light"] .admin-panel-container .bg-indigo-600,
+[data-theme="light"] .admin-panel-container .bg-indigo-600 *,
+[data-theme="light"] .admin-modal .bg-rose-600,
+[data-theme="light"] .admin-modal .bg-rose-600 *,
+[data-theme="light"] .admin-modal .bg-rose-700,
+[data-theme="light"] .admin-modal .bg-rose-700 *,
+html:not(.dark) #admin-portal-root .bg-rose-600,
+html:not(.dark) #admin-portal-root .bg-rose-600 *,
+html:not(.dark) #admin-portal-root .bg-rose-700,
+html:not(.dark) #admin-portal-root .bg-rose-700 *,
+html:not(.dark) #admin-portal-root .bg-rose-500,
+html:not(.dark) #admin-portal-root .bg-rose-500 *,
+html:not(.dark) #admin-portal-root .bg-accent-primary,
+html:not(.dark) #admin-portal-root .bg-accent-primary *,
+html:not(.dark) #admin-portal-root .bg-emerald-600,
+html:not(.dark) #admin-portal-root .bg-emerald-600 *,
+html:not(.dark) #admin-portal-root .bg-indigo-600,
+html:not(.dark) #admin-portal-root .bg-indigo-600 *,
+html:not(.dark) .admin-panel-container .bg-rose-600,
+html:not(.dark) .admin-panel-container .bg-rose-600 *,
+html:not(.dark) .admin-panel-container .bg-rose-700,
+html:not(.dark) .admin-panel-container .bg-rose-700 *,
+html:not(.dark) .admin-panel-container .bg-accent-primary,
+html:not(.dark) .admin-panel-container .bg-accent-primary *,
+html:not(.dark) .admin-panel-container .bg-emerald-600,
+html:not(.dark) .admin-panel-container .bg-emerald-600 *,
+html:not(.dark) .admin-panel-container .bg-indigo-600,
+html:not(.dark) .admin-panel-container .bg-indigo-600 *,
+html:not(.dark) .admin-modal .bg-rose-600,
+html:not(.dark) .admin-modal .bg-rose-600 *,
+html:not(.dark) .admin-modal .bg-rose-700,
+html:not(.dark) .admin-modal .bg-rose-700 * {
+  color: #FFFFFF !important;
+  -webkit-text-fill-color: #FFFFFF !important;
+}
+
+/* ==========================================================================
+   INPUTS, TEXTAREAS, SELECTS & SEARCH BOXES IN LIGHT MODE
+   ========================================================================== */
+[data-theme="light"] #admin-portal-root input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="submit"]):not([type="button"]):not([type="reset"]),
+[data-theme="light"] #admin-portal-root textarea,
+[data-theme="light"] #admin-portal-root select,
+[data-theme="light"] .admin-panel-container input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="submit"]):not([type="button"]):not([type="reset"]),
+[data-theme="light"] .admin-panel-container textarea,
+[data-theme="light"] .admin-panel-container select,
+[data-theme="light"] .admin-modal input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="submit"]):not([type="button"]):not([type="reset"]),
+[data-theme="light"] .admin-modal textarea,
+[data-theme="light"] .admin-modal select,
+html:not(.dark) #admin-portal-root input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="submit"]):not([type="button"]):not([type="reset"]),
+html:not(.dark) #admin-portal-root textarea,
+html:not(.dark) #admin-portal-root select,
+html:not(.dark) .admin-panel-container input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="submit"]):not([type="button"]):not([type="reset"]),
+html:not(.dark) .admin-panel-container textarea,
+html:not(.dark) .admin-panel-container select,
+html:not(.dark) .admin-modal input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="submit"]):not([type="button"]):not([type="reset"]),
+html:not(.dark) .admin-modal textarea,
+html:not(.dark) .admin-modal select {
+  background-color: #FFFFFF !important;
+  border-color: rgba(26, 9, 10, 0.18) !important;
+  color: #1A090A !important;
+  -webkit-text-fill-color: #1A090A !important;
+  caret-color: #A50C18 !important;
+}
+
+/* Light Mode Input Placeholders */
+[data-theme="light"] #admin-portal-root input::placeholder,
+[data-theme="light"] #admin-portal-root textarea::placeholder,
+[data-theme="light"] .admin-panel-container input::placeholder,
+[data-theme="light"] .admin-panel-container textarea::placeholder,
+[data-theme="light"] .admin-modal input::placeholder,
+[data-theme="light"] .admin-modal textarea::placeholder,
+html:not(.dark) #admin-portal-root input::placeholder,
+html:not(.dark) #admin-portal-root textarea::placeholder,
+html:not(.dark) .admin-panel-container input::placeholder,
+html:not(.dark) .admin-panel-container textarea::placeholder,
+html:not(.dark) .admin-modal input::placeholder,
+html:not(.dark) .admin-modal textarea::placeholder {
+  color: rgba(26, 9, 10, 0.45) !important;
+  -webkit-text-fill-color: rgba(26, 9, 10, 0.45) !important;
+  opacity: 1 !important;
+}
+
+/* Light Mode Select Options */
+[data-theme="light"] #admin-portal-root select option,
+[data-theme="light"] .admin-panel-container select option,
+[data-theme="light"] .admin-modal select option,
+html:not(.dark) #admin-portal-root select option,
+html:not(.dark) .admin-panel-container select option,
+html:not(.dark) .admin-modal select option {
+  background-color: #FFFFFF !important;
+  color: #1A090A !important;
+}
+
+/* Light Mode Input Focus States */
+[data-theme="light"] #admin-portal-root input:focus,
+[data-theme="light"] #admin-portal-root textarea:focus,
+[data-theme="light"] #admin-portal-root select:focus,
+[data-theme="light"] .admin-panel-container input:focus,
+[data-theme="light"] .admin-panel-container textarea:focus,
+[data-theme="light"] .admin-panel-container select:focus,
+[data-theme="light"] .admin-modal input:focus,
+[data-theme="light"] .admin-modal textarea:focus,
+[data-theme="light"] .admin-modal select:focus,
+html:not(.dark) #admin-portal-root input:focus,
+html:not(.dark) #admin-portal-root textarea:focus,
+html:not(.dark) #admin-portal-root select:focus,
+html:not(.dark) .admin-panel-container input:focus,
+html:not(.dark) .admin-panel-container textarea:focus,
+html:not(.dark) .admin-panel-container select:focus,
+html:not(.dark) .admin-modal input:focus,
+html:not(.dark) .admin-modal textarea:focus,
+html:not(.dark) .admin-modal select:focus {
+  border-color: #A50C18 !important;
+  box-shadow: 0 0 0 3px rgba(165, 12, 24, 0.12) !important;
+  outline: none !important;
+}
+
+/* Light Mode Disabled Inputs */
+[data-theme="light"] #admin-portal-root input:disabled,
+[data-theme="light"] #admin-portal-root textarea:disabled,
+[data-theme="light"] #admin-portal-root select:disabled,
+[data-theme="light"] .admin-panel-container input:disabled,
+[data-theme="light"] .admin-panel-container textarea:disabled,
+[data-theme="light"] .admin-panel-container select:disabled,
+[data-theme="light"] .admin-modal input:disabled,
+[data-theme="light"] .admin-modal textarea:disabled,
+[data-theme="light"] .admin-modal select:disabled,
+html:not(.dark) #admin-portal-root input:disabled,
+html:not(.dark) #admin-portal-root textarea:disabled,
+html:not(.dark) #admin-portal-root select:disabled,
+html:not(.dark) .admin-panel-container input:disabled,
+html:not(.dark) .admin-panel-container textarea:disabled,
+html:not(.dark) .admin-panel-container select:disabled,
+html:not(.dark) .admin-modal input:disabled,
+html:not(.dark) .admin-modal textarea:disabled,
+html:not(.dark) .admin-modal select:disabled {
+  background-color: #F1ECE9 !important;
+  color: rgba(26, 9, 10, 0.45) !important;
+  -webkit-text-fill-color: rgba(26, 9, 10, 0.45) !important;
+  border-color: rgba(26, 9, 10, 0.10) !important;
+  cursor: not-allowed;
+}
+
+/* ==========================================================================
+   TABLES IN LIGHT MODE
+   ========================================================================== */
+[data-theme="light"] #admin-portal-root table,
+[data-theme="light"] .admin-panel-container table,
+html:not(.dark) #admin-portal-root table,
+html:not(.dark) .admin-panel-container table {
+  color: var(--text-primary, #1A090A) !important;
+}
+
+[data-theme="light"] #admin-portal-root thead,
+[data-theme="light"] #admin-portal-root th,
+[data-theme="light"] .admin-panel-container thead,
+[data-theme="light"] .admin-panel-container th,
+html:not(.dark) #admin-portal-root thead,
+html:not(.dark) #admin-portal-root th,
+html:not(.dark) .admin-panel-container thead,
+html:not(.dark) .admin-panel-container th {
+  background-color: #F4EDE9 !important;
+  color: var(--text-primary, #1A090A) !important;
+  border-color: rgba(26, 9, 10, 0.10) !important;
+}
+
+[data-theme="light"] #admin-portal-root td,
+[data-theme="light"] .admin-panel-container td,
+html:not(.dark) #admin-portal-root td,
+html:not(.dark) .admin-panel-container td {
+  color: var(--text-primary, #1A090A) !important;
+  border-color: rgba(26, 9, 10, 0.08) !important;
+}
+
+[data-theme="light"] #admin-portal-root tbody tr:hover,
+[data-theme="light"] .admin-panel-container tbody tr:hover,
+html:not(.dark) #admin-portal-root tbody tr:hover,
+html:not(.dark) .admin-panel-container tbody tr:hover {
+  background-color: rgba(165, 12, 24, 0.04) !important;
+}
+
+/* ==========================================================================
+   ALERT & STATUS BANNERS IN LIGHT MODE
+   ========================================================================== */
+[data-theme="light"] #admin-portal-root .bg-emerald-500\/15,
+[data-theme="light"] #admin-portal-root .bg-emerald-500\/10,
+[data-theme="light"] .admin-panel-container .bg-emerald-500\/15,
+[data-theme="light"] .admin-modal .bg-emerald-500\/15,
+html:not(.dark) #admin-portal-root .bg-emerald-500\/15,
+html:not(.dark) #admin-portal-root .bg-emerald-500\/10,
+html:not(.dark) .admin-panel-container .bg-emerald-500\/15,
+html:not(.dark) .admin-modal .bg-emerald-500\/15 {
+  background-color: rgba(16, 185, 129, 0.10) !important;
+  border-color: rgba(16, 185, 129, 0.35) !important;
+  color: #065F46 !important;
+}
+
+[data-theme="light"] #admin-portal-root .bg-emerald-500\/15 .text-emerald-200,
+[data-theme="light"] #admin-portal-root .bg-emerald-500\/15 .text-emerald-300,
+[data-theme="light"] #admin-portal-root .bg-emerald-500\/15 .text-neutral-300,
+[data-theme="light"] #admin-portal-root .bg-emerald-500\/15 .text-neutral-400,
+[data-theme="light"] .admin-panel-container .bg-emerald-500\/15 .text-neutral-300,
+[data-theme="light"] .admin-modal .bg-emerald-500\/15 .text-neutral-300,
+html:not(.dark) #admin-portal-root .bg-emerald-500\/15 .text-emerald-200,
+html:not(.dark) #admin-portal-root .bg-emerald-500\/15 .text-emerald-300,
+html:not(.dark) #admin-portal-root .bg-emerald-500\/15 .text-neutral-300,
+html:not(.dark) #admin-portal-root .bg-emerald-500\/15 .text-neutral-400,
+html:not(.dark) .admin-panel-container .bg-emerald-500\/15 .text-neutral-300,
+html:not(.dark) .admin-modal .bg-emerald-500\/15 .text-neutral-300 {
+  color: #065F46 !important;
+}
+
+[data-theme="light"] #admin-portal-root .bg-rose-500\/15,
+[data-theme="light"] #admin-portal-root .bg-rose-500\/10,
+[data-theme="light"] .admin-panel-container .bg-rose-500\/15,
+[data-theme="light"] .admin-modal .bg-rose-500\/15,
+html:not(.dark) #admin-portal-root .bg-rose-500\/15,
+html:not(.dark) #admin-portal-root .bg-rose-500\/10,
+html:not(.dark) .admin-panel-container .bg-rose-500\/15,
+html:not(.dark) .admin-modal .bg-rose-500\/15 {
+  background-color: rgba(239, 68, 68, 0.10) !important;
+  border-color: rgba(239, 68, 68, 0.35) !important;
+  color: #991B1B !important;
+}
+
+[data-theme="light"] #admin-portal-root .bg-rose-500\/15 .text-rose-200,
+[data-theme="light"] #admin-portal-root .bg-rose-500\/15 .text-rose-300,
+[data-theme="light"] #admin-portal-root .bg-rose-500\/15 .text-neutral-300,
+[data-theme="light"] .admin-panel-container .bg-rose-500\/15 .text-rose-300,
+[data-theme="light"] .admin-modal .bg-rose-500\/15 .text-rose-300,
+html:not(.dark) #admin-portal-root .bg-rose-500\/15 .text-rose-200,
+html:not(.dark) #admin-portal-root .bg-rose-500\/15 .text-rose-300,
+html:not(.dark) #admin-portal-root .bg-rose-500\/15 .text-neutral-300,
+html:not(.dark) .admin-panel-container .bg-rose-500\/15 .text-rose-300,
+html:not(.dark) .admin-modal .bg-rose-500\/15 .text-rose-300 {
+  color: #991B1B !important;
+}
+
+/* ==========================================================================
+   2. DARK MODE ADMIN ADAPTATIONS
+   ========================================================================== */
+[data-theme="dark"] #admin-portal-root,
+[data-theme="dark"] .admin-panel-container,
+[data-theme="dark"] .admin-modal,
+[data-theme="dark"] #admin-insights-dashboard,
+.dark #admin-portal-root,
+.dark .admin-panel-container,
+.dark .admin-modal,
+.dark #admin-insights-dashboard {
+  color-scheme: dark;
+  background-color: var(--bg-primary, #080607) !important;
+  color: var(--text-primary, #FFFFFF) !important;
+}
+
+[data-theme="dark"] #admin-portal-root main,
+[data-theme="dark"] .admin-panel-container main,
+.dark #admin-portal-root main,
+.dark .admin-panel-container main {
+  background-color: #0A0809 !important;
+}
+
+[data-theme="dark"] #admin-portal-root header,
+[data-theme="dark"] .admin-panel-container header,
+[data-theme="dark"] #admin-portal-root aside,
+[data-theme="dark"] .admin-panel-container aside,
+.dark #admin-portal-root header,
+.dark .admin-panel-container header,
+.dark #admin-portal-root aside,
+.dark .admin-panel-container aside {
+  background-color: #120A0C !important;
+  border-color: rgba(255, 255, 255, 0.10) !important;
+}
+
+[data-theme="dark"] #admin-portal-root .bg-neutral-900,
+[data-theme="dark"] #admin-portal-root .bg-neutral-900\/80,
+[data-theme="dark"] #admin-portal-root .bg-neutral-900\/90,
+[data-theme="dark"] #admin-portal-root .bg-neutral-900\/95,
+[data-theme="dark"] #admin-portal-root .bg-neutral-900\/60,
+[data-theme="dark"] .admin-panel-container .bg-neutral-900,
+[data-theme="dark"] .admin-panel-container .bg-neutral-900\/80,
+[data-theme="dark"] .admin-panel-container .bg-neutral-900\/90,
+[data-theme="dark"] .admin-panel-container .bg-neutral-900\/95,
+[data-theme="dark"] .admin-panel-container .bg-neutral-900\/60,
+[data-theme="dark"] .admin-modal,
+.dark #admin-portal-root .bg-neutral-900,
+.dark #admin-portal-root .bg-neutral-900\/80,
+.dark #admin-portal-root .bg-neutral-900\/90,
+.dark #admin-portal-root .bg-neutral-900\/95,
+.dark #admin-portal-root .bg-neutral-900\/60,
+.dark .admin-panel-container .bg-neutral-900,
+.dark .admin-panel-container .bg-neutral-900\/80,
+.dark .admin-panel-container .bg-neutral-900\/90,
+.dark .admin-panel-container .bg-neutral-900\/95,
+.dark .admin-panel-container .bg-neutral-900\/60,
+.dark .admin-modal {
+  background-color: #140C0E !important;
+  border-color: rgba(255, 255, 255, 0.10) !important;
+}
+
+[data-theme="dark"] #admin-portal-root input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="submit"]):not([type="button"]):not([type="reset"]),
+[data-theme="dark"] #admin-portal-root textarea,
+[data-theme="dark"] #admin-portal-root select,
+[data-theme="dark"] .admin-panel-container input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="submit"]):not([type="button"]):not([type="reset"]),
+[data-theme="dark"] .admin-panel-container textarea,
+[data-theme="dark"] .admin-panel-container select,
+[data-theme="dark"] .admin-modal input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="submit"]):not([type="button"]):not([type="reset"]),
+[data-theme="dark"] .admin-modal textarea,
+[data-theme="dark"] .admin-modal select,
+.dark #admin-portal-root input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="submit"]):not([type="button"]):not([type="reset"]),
+.dark #admin-portal-root textarea,
+.dark #admin-portal-root select,
+.dark .admin-panel-container input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="submit"]):not([type="button"]):not([type="reset"]),
+.dark .admin-panel-container textarea,
+.dark .admin-panel-container select,
+.dark .admin-modal input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="submit"]):not([type="button"]):not([type="reset"]),
+.dark .admin-modal textarea,
+.dark .admin-modal select {
+  background-color: rgba(0, 0, 0, 0.45) !important;
+  border-color: rgba(255, 255, 255, 0.14) !important;
+  color: #FFFFFF !important;
+  -webkit-text-fill-color: #FFFFFF !important;
+  caret-color: #D31322 !important;
+}
+
+[data-theme="dark"] #admin-portal-root input::placeholder,
+[data-theme="dark"] #admin-portal-root textarea::placeholder,
+[data-theme="dark"] .admin-panel-container input::placeholder,
+[data-theme="dark"] .admin-panel-container textarea::placeholder,
+[data-theme="dark"] .admin-modal input::placeholder,
+[data-theme="dark"] .admin-modal textarea::placeholder,
+.dark #admin-portal-root input::placeholder,
+.dark #admin-portal-root textarea::placeholder,
+.dark .admin-panel-container input::placeholder,
+.dark .admin-panel-container textarea::placeholder,
+.dark .admin-modal input::placeholder,
+.dark .admin-modal textarea::placeholder {
+  color: rgba(255, 255, 255, 0.45) !important;
+  -webkit-text-fill-color: rgba(255, 255, 255, 0.45) !important;
+}
+
+[data-theme="dark"] #admin-portal-root select option,
+[data-theme="dark"] .admin-panel-container select option,
+[data-theme="dark"] .admin-modal select option,
+.dark #admin-portal-root select option,
+.dark .admin-panel-container select option,
+.dark .admin-modal select option {
+  background-color: #140C0E !important;
+  color: #FFFFFF !important;
 }
 

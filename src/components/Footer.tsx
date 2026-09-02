@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Instagram, Linkedin, Github, MessageSquare, ArrowRight, CheckCircle2, X, Phone, Mail } from 'lucide-react';
+import { Instagram, Linkedin, Github, MessageSquare, ArrowRight, CheckCircle2, X, Phone, Mail, Lock } from 'lucide-react';
 import { WHATSAPP_BUSINESS_URL, contactConfig } from '../data';
 import WhatsAppIcon from './WhatsAppIcon';
 import { subscribeToNewsletter } from '../services/firebase/firestore';
@@ -286,25 +286,26 @@ export default function Footer({ onNavigate }: FooterProps = {}) {
       </div>
 
       {/* Bottom Footer Section */}
-      <div className="max-w-7xl mx-auto px-6 pt-8 border-t border-border-color flex flex-col md:flex-row items-center justify-between gap-4 text-xs">
-        <div id="footer-copyright">
+      <div className="max-w-7xl mx-auto px-6 pt-8 border-t border-border-color flex flex-col sm:flex-row items-center justify-between gap-4 text-xs">
+        <div id="footer-copyright" className="text-text-secondary text-center sm:text-left">
           Copyright © 2026 Rohit Verma. All rights reserved.
         </div>
-        <div className="flex items-center gap-6" id="footer-policy-links">
+        <div className="flex flex-wrap items-center justify-center sm:justify-end gap-3 sm:gap-6" id="footer-policy-links">
           <button
             onClick={() => setActiveModal('privacy')}
-            className="hover:text-accent-primary transition-colors cursor-pointer bg-transparent border-none text-text-secondary/60"
+            className="hover:text-accent-primary transition-colors cursor-pointer bg-transparent border-none text-text-secondary hover:underline underline-offset-4 py-2 px-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-primary/50 rounded"
           >
             Privacy Policy
           </button>
           <button
             onClick={() => setActiveModal('terms')}
-            className="hover:text-accent-primary transition-colors cursor-pointer bg-transparent border-none text-text-secondary/60"
+            className="hover:text-accent-primary transition-colors cursor-pointer bg-transparent border-none text-text-secondary hover:underline underline-offset-4 py-2 px-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-primary/50 rounded"
           >
             Terms and Conditions
           </button>
           <a
             href="/admin"
+            id="footer-admin-portal-link"
             onClick={(e) => {
               e.preventDefault();
               if (onNavigate) {
@@ -318,10 +319,12 @@ export default function Footer({ onNavigate }: FooterProps = {}) {
                 }
               }
             }}
-            className="hover:text-accent-primary transition-colors cursor-pointer text-text-secondary/40 hover:text-text-secondary"
-            title="Administrator Portal"
+            className="inline-flex items-center gap-1.5 py-2 px-2.5 rounded-lg text-text-secondary hover:text-accent-primary hover:bg-accent-primary/10 transition-all cursor-pointer font-medium min-h-[44px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-primary/50"
+            aria-label="Admin Portal - Secure Administrator Login"
+            title="Administrator Portal Login"
           >
-            Admin Portal
+            <Lock className="w-3.5 h-3.5 text-accent-primary/80 flex-shrink-0" aria-hidden="true" />
+            <span>Admin Portal</span>
           </a>
         </div>
       </div>

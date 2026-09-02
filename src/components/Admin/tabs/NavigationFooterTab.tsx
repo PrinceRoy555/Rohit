@@ -22,21 +22,50 @@ export const NavigationFooterTab: React.FC = () => {
   const [newNavPath, setNewNavPath] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const header = draftConfig.header;
-  const footer = draftConfig.footer;
-  const socialLinks = draftConfig.socialLinks || [];
+  // Safe navigation items resolution
+  const navItems: NavigationItem[] =
+    draftConfig?.navigation?.items ||
+    draftConfig?.navigation?.navigation ||
+    draftConfig?.header?.navigation ||
+    draftConfig?.header?.items ||
+    [];
+
+  const ctaButton =
+    draftConfig?.navigation?.ctaButton ||
+    draftConfig?.header?.ctaButton ||
+    {};
+
+  const footer = draftConfig?.footer || {};
+  const socialLinks = draftConfig?.socialLinks || draftConfig?.branding?.socials || [];
 
   const handleUpdateHeaderCta = (field: string, val: any) => {
-    updateDraft((prev) => ({
-      ...prev,
-      header: {
-        ...prev.header,
-        ctaButton: {
-          ...prev.header.ctaButton,
-          [field]: val
+    updateDraft((prev) => {
+      const prevNav = prev?.navigation || {};
+      const prevHeader = prev?.header || {};
+      const updatedCta = {
+        ...(prevNav.ctaButton || prevHeader.ctaButton || {}),
+        [field]: val,
+        // Sync text <-> label and link <-> route
+        ...(field === 'text' ? { label: val } : {}),
+        ...(field === 'label' ? { text: val } : {}),
+        ...(field === 'link' ? { route: val } : {}),
+        ...(field === 'route' ? { link: val } : {})
+      };
+
+      return {
+        ...prev,
+        navigation: {
+          ...prevNav,
+          items: prevNav.items || prevHeader.navigation || [],
+          ctaButton: updatedCta
+        },
+        header: {
+          ...prevHeader,
+          navigation: prevHeader.navigation || prevNav.items || [],
+          ctaButton: updatedCta
         }
-      }
-    }));
+      };
+    });
   };
 
   const handleAddNavItem = (e: React.FormEvent) => {
@@ -47,16 +76,32 @@ export const NavigationFooterTab: React.FC = () => {
       id: `nav-${Date.now()}`,
       label: newNavLabel.trim(),
       path: newNavPath.trim(),
-      order: header.navigation.length + 1
+      route: newNavPath.trim().replace(/^#|^\//, '') || 'home',
+      order: navItems.length + 1,
+      isVisible: true
     };
 
-    updateDraft((prev) => ({
-      ...prev,
-      header: {
-        ...prev.header,
-        navigation: [...prev.header.navigation, newItem]
-      }
-    }));
+    updateDraft((prev) => {
+      const currentList =
+        prev?.navigation?.items ||
+        prev?.navigation?.navigation ||
+        prev?.header?.navigation ||
+        prev?.header?.items ||
+        [];
+      const updatedList = [...currentList, newItem];
+
+      return {
+        ...prev,
+        navigation: {
+          ...(prev?.navigation || {}),
+          items: updatedList
+        },
+        header: {
+          ...(prev?.header || {}),
+          navigation: updatedList
+        }
+      };
+    });
 
     setIsModalOpen(false);
     setNewNavLabel('');
@@ -64,41 +109,73 @@ export const NavigationFooterTab: React.FC = () => {
   };
 
   const handleDeleteNavItem = (id: string) => {
-    updateDraft((prev) => ({
-      ...prev,
-      header: {
-        ...prev.header,
-        navigation: prev.header.navigation.filter((n) => n.id !== id)
-      }
-    }));
+    updateDraft((prev) => {
+      const currentList =
+        prev?.navigation?.items ||
+        prev?.navigation?.navigation ||
+        prev?.header?.navigation ||
+        prev?.header?.items ||
+        [];
+      const updatedList = currentList.filter((n) => n.id !== id);
+
+      return {
+        ...prev,
+        navigation: {
+          ...(prev?.navigation || {}),
+          items: updatedList
+        },
+        header: {
+          ...(prev?.header || {}),
+          navigation: updatedList
+        }
+      };
+    });
   };
 
   const handleUpdateFooter = (field: string, val: any) => {
     updateDraft((prev) => ({
       ...prev,
       footer: {
-        ...prev.footer,
+        ...(prev?.footer || {}),
         [field]: val
       }
     }));
   };
 
-  const handleToggleSocial = (id: string) => {
-    updateDraft((prev) => ({
-      ...prev,
-      socialLinks: (prev.socialLinks || []).map((s) =>
-        s.id === id ? { ...s, isVisible: !s.isVisible } : s
-      )
-    }));
+  const handleToggleSocial = (id?: string) => {
+    if (!id) return;
+    updateDraft((prev) => {
+      const currentSocials = prev?.socialLinks || prev?.branding?.socials || [];
+      const updatedSocials = currentSocials.map((s) =>
+        s.id === id ? { ...s, isVisible: s.isVisible !== false ? false : true } : s
+      );
+      return {
+        ...prev,
+        socialLinks: updatedSocials,
+        branding: {
+          ...(prev?.branding || {}),
+          socials: updatedSocials
+        } as any
+      };
+    });
   };
 
-  const handleUpdateSocialUrl = (id: string, url: string) => {
-    updateDraft((prev) => ({
-      ...prev,
-      socialLinks: (prev.socialLinks || []).map((s) =>
+  const handleUpdateSocialUrl = (id: string | undefined, url: string) => {
+    if (!id) return;
+    updateDraft((prev) => {
+      const currentSocials = prev?.socialLinks || prev?.branding?.socials || [];
+      const updatedSocials = currentSocials.map((s) =>
         s.id === id ? { ...s, url } : s
-      )
-    }));
+      );
+      return {
+        ...prev,
+        socialLinks: updatedSocials,
+        branding: {
+          ...(prev?.branding || {}),
+          socials: updatedSocials
+        } as any
+      };
+    });
   };
 
   const handleSave = async () => {
@@ -112,13 +189,13 @@ export const NavigationFooterTab: React.FC = () => {
   return (
     <div className="space-y-8 max-w-5xl mx-auto">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-white/10 pb-6">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-border-color pb-6">
         <div>
-          <h2 className="text-xl sm:text-2xl font-bold text-white flex items-center gap-2.5">
+          <h2 className="text-xl sm:text-2xl font-bold text-text-primary flex items-center gap-2.5">
             <Menu className="w-6 h-6 text-rose-500" />
             <span>Navigation, Footer & Social Profiles</span>
           </h2>
-          <p className="text-sm text-neutral-400 mt-1">
+          <p className="text-sm text-text-muted mt-1">
             Configure header menu items, contact CTA buttons, social handles, and footer copywriting.
           </p>
         </div>
@@ -143,11 +220,11 @@ export const NavigationFooterTab: React.FC = () => {
       </div>
 
       {/* SECTION 1: HEADER NAVIGATION */}
-      <div className="bg-neutral-900/80 border border-white/10 rounded-2xl p-6 space-y-5">
+      <div className="bg-bg-card border border-border-color rounded-2xl p-6 space-y-5">
         <div className="flex items-center justify-between">
           <div>
-            <h3 className="text-base font-bold text-white">Header Menu Items</h3>
-            <p className="text-xs text-neutral-400">Navigation links displayed on top of the website.</p>
+            <h3 className="text-base font-bold text-text-primary">Header Menu Items</h3>
+            <p className="text-xs text-text-muted">Navigation links displayed on top of the website.</p>
           </div>
           <button
             onClick={() => setIsModalOpen(true)}
@@ -158,119 +235,136 @@ export const NavigationFooterTab: React.FC = () => {
           </button>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          {header.navigation.map((item) => (
-            <div
-              key={item.id}
-              className="p-3.5 rounded-xl bg-black/40 border border-white/10 flex items-center justify-between"
-            >
-              <div>
-                <span className="text-sm font-bold text-white">{item.label}</span>
-                <span className="text-xs text-neutral-400 font-mono ml-2">{item.path}</span>
-              </div>
-              <button
-                onClick={() => handleDeleteNavItem(item.id)}
-                className="p-1.5 rounded-lg bg-rose-500/10 text-rose-400 hover:bg-rose-500/20"
+        {navItems.length === 0 ? (
+          <div className="p-6 rounded-xl border border-dashed border-border-color text-center text-text-muted text-xs">
+            No navigation items configured. Click "Add Menu Link" to create one.
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            {navItems.map((item) => (
+              <div
+                key={item.id}
+                className="p-3.5 rounded-xl bg-black/20 dark:bg-black/40 border border-border-color flex items-center justify-between"
               >
-                <Trash2 className="w-3.5 h-3.5" />
-              </button>
-            </div>
-          ))}
-        </div>
+                <div>
+                  <span className="text-sm font-bold text-text-primary">{item.label}</span>
+                  <span className="text-xs text-text-muted font-mono ml-2">{item.path || item.route || '/'}</span>
+                </div>
+                <button
+                  onClick={() => handleDeleteNavItem(item.id)}
+                  className="p-1.5 rounded-lg bg-rose-500/10 text-rose-500 hover:bg-rose-500/20"
+                  aria-label={`Delete ${item.label}`}
+                >
+                  <Trash2 className="w-3.5 h-3.5" />
+                </button>
+              </div>
+            ))}
+          </div>
+        )}
 
-        <div className="pt-4 border-t border-white/10 grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div className="pt-4 border-t border-border-color grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
-            <label className="block text-xs font-semibold text-neutral-300 mb-1">Header CTA Button Text</label>
+            <label className="block text-xs font-semibold text-text-primary mb-1">Header CTA Button Text</label>
             <input
               type="text"
-              value={header.ctaButton?.text || ''}
+              value={ctaButton.text || ctaButton.label || ''}
               onChange={(e) => handleUpdateHeaderCta('text', e.target.value)}
-              className="w-full bg-black/40 border border-white/10 rounded-xl px-3 py-2 text-sm text-white focus:border-rose-500 focus:outline-none"
+              className="w-full bg-input-bg border border-border-color rounded-xl px-3 py-2 text-sm text-text-primary focus:border-rose-500 focus:outline-none"
             />
           </div>
           <div>
-            <label className="block text-xs font-semibold text-neutral-300 mb-1">Header CTA Link Target</label>
+            <label className="block text-xs font-semibold text-text-primary mb-1">Header CTA Link Target</label>
             <input
               type="text"
-              value={header.ctaButton?.link || ''}
+              value={ctaButton.link || ctaButton.route || ''}
               onChange={(e) => handleUpdateHeaderCta('link', e.target.value)}
-              className="w-full bg-black/40 border border-white/10 rounded-xl px-3 py-2 text-sm text-white focus:border-rose-500 focus:outline-none"
+              className="w-full bg-input-bg border border-border-color rounded-xl px-3 py-2 text-sm text-text-primary focus:border-rose-500 focus:outline-none"
             />
           </div>
         </div>
       </div>
 
       {/* SECTION 2: SOCIAL PROFILES */}
-      <div className="bg-neutral-900/80 border border-white/10 rounded-2xl p-6 space-y-5">
+      <div className="bg-bg-card border border-border-color rounded-2xl p-6 space-y-5">
         <div>
-          <h3 className="text-base font-bold text-white">Social Media Profiles</h3>
-          <p className="text-xs text-neutral-400">Direct profile URLs and visibility toggles.</p>
+          <h3 className="text-base font-bold text-text-primary">Social Media Profiles</h3>
+          <p className="text-xs text-text-muted">Direct profile URLs and visibility toggles.</p>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          {socialLinks.map((social) => (
-            <div
-              key={social.id}
-              className="p-4 rounded-xl bg-black/40 border border-white/10 flex flex-col gap-2"
-            >
-              <div className="flex items-center justify-between">
-                <span className="text-xs font-bold text-white">{social.platform}</span>
-                <button
-                  onClick={() => handleToggleSocial(social.id)}
-                  className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
-                    social.isVisible ? 'bg-emerald-500/20 text-emerald-300' : 'bg-neutral-800 text-neutral-400'
-                  }`}
-                >
-                  {social.isVisible ? 'Active' : 'Hidden'}
-                </button>
-              </div>
+          {socialLinks.map((social, idx) => {
+            const socialId = social.id || `social-${idx}`;
+            const isVisible = social.isVisible !== false;
+            return (
+              <div
+                key={socialId}
+                className="p-4 rounded-xl bg-black/20 dark:bg-black/40 border border-border-color flex flex-col gap-2"
+              >
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-bold text-text-primary">{social.platform || social.name || social.label || 'Link'}</span>
+                  <button
+                    onClick={() => handleToggleSocial(social.id || socialId)}
+                    className={`px-2 py-0.5 rounded-full text-[10px] font-bold transition-colors ${
+                      isVisible ? 'bg-emerald-500/20 text-emerald-500' : 'bg-white/10 text-text-muted'
+                    }`}
+                  >
+                    {isVisible ? 'Active' : 'Hidden'}
+                  </button>
+                </div>
 
-              <input
-                type="text"
-                value={social.url}
-                onChange={(e) => handleUpdateSocialUrl(social.id, e.target.value)}
-                className="w-full bg-neutral-900 border border-white/10 rounded-lg px-2.5 py-1.5 text-xs text-white focus:border-rose-500 focus:outline-none font-mono"
-              />
-            </div>
-          ))}
+                <input
+                  type="text"
+                  value={social.url || ''}
+                  onChange={(e) => handleUpdateSocialUrl(social.id || socialId, e.target.value)}
+                  className="w-full bg-input-bg border border-border-color rounded-lg px-2.5 py-1.5 text-xs text-text-primary focus:border-rose-500 focus:outline-none font-mono"
+                />
+              </div>
+            );
+          })}
         </div>
       </div>
 
       {/* SECTION 3: FOOTER SETTINGS */}
-      <div className="bg-neutral-900/80 border border-white/10 rounded-2xl p-6 space-y-4">
+      <div className="bg-bg-card border border-border-color rounded-2xl p-6 space-y-4">
         <div>
-          <h3 className="text-base font-bold text-white">Footer Copywriting</h3>
-          <p className="text-xs text-neutral-400">Copyright notices and closing statements.</p>
+          <h3 className="text-base font-bold text-text-primary">Footer Copywriting</h3>
+          <p className="text-xs text-text-muted">Copyright notices and closing statements.</p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <label className="block text-xs font-semibold text-neutral-300 mb-1">Copyright Notice</label>
+            <label className="block text-xs font-semibold text-text-primary mb-1">Copyright Notice</label>
             <input
               type="text"
-              value={footer.copyrightText || ''}
-              onChange={(e) => handleUpdateFooter('copyrightText', e.target.value)}
-              className="w-full bg-black/40 border border-white/10 rounded-xl px-3 py-2 text-sm text-white focus:border-rose-500 focus:outline-none"
+              value={footer.copyrightText || footer.copyright || ''}
+              onChange={(e) => {
+                handleUpdateFooter('copyrightText', e.target.value);
+                handleUpdateFooter('copyright', e.target.value);
+              }}
+              className="w-full bg-input-bg border border-border-color rounded-xl px-3 py-2 text-sm text-text-primary focus:border-rose-500 focus:outline-none"
             />
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-neutral-300 mb-1">Footer Tagline</label>
+            <label className="block text-xs font-semibold text-text-primary mb-1">Footer Tagline</label>
             <input
               type="text"
               value={footer.tagline || ''}
               onChange={(e) => handleUpdateFooter('tagline', e.target.value)}
-              className="w-full bg-black/40 border border-white/10 rounded-xl px-3 py-2 text-sm text-white focus:border-rose-500 focus:outline-none"
+              className="w-full bg-input-bg border border-border-color rounded-xl px-3 py-2 text-sm text-text-primary focus:border-rose-500 focus:outline-none"
             />
           </div>
 
           <div className="md:col-span-2">
-            <label className="block text-xs font-semibold text-neutral-300 mb-1">Bottom Subtext</label>
+            <label className="block text-xs font-semibold text-text-primary mb-1">Bottom Subtext</label>
             <input
               type="text"
-              value={footer.bottomSubtext || ''}
-              onChange={(e) => handleUpdateFooter('bottomSubtext', e.target.value)}
-              className="w-full bg-black/40 border border-white/10 rounded-xl px-3 py-2 text-sm text-white focus:border-rose-500 focus:outline-none"
+              value={footer.bottomSubtext || footer.customNote || ''}
+              onChange={(e) => {
+                handleUpdateFooter('bottomSubtext', e.target.value);
+                handleUpdateFooter('customNote', e.target.value);
+              }}
+              className="w-full bg-input-bg border border-border-color rounded-xl px-3 py-2 text-sm text-text-primary focus:border-rose-500 focus:outline-none"
             />
           </div>
         </div>
@@ -279,31 +373,31 @@ export const NavigationFooterTab: React.FC = () => {
       {/* MODAL: Add Nav Link */}
       {isModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
-          <div className="bg-neutral-900 border border-white/15 rounded-2xl max-w-sm w-full p-6 space-y-4 shadow-2xl">
-            <h3 className="text-lg font-bold text-white">Add Menu Link</h3>
+          <div className="admin-modal bg-bg-card border border-border-color rounded-2xl max-w-sm w-full p-6 space-y-4 shadow-2xl text-text-primary">
+            <h3 className="text-lg font-bold text-text-primary">Add Menu Link</h3>
 
             <form onSubmit={handleAddNavItem} className="space-y-4">
               <div>
-                <label className="block text-xs font-semibold text-neutral-300 mb-1">Menu Label</label>
+                <label className="block text-xs font-semibold text-text-primary mb-1">Menu Label</label>
                 <input
                   type="text"
                   required
                   placeholder="e.g., Insights"
                   value={newNavLabel}
                   onChange={(e) => setNewNavLabel(e.target.value)}
-                  className="w-full bg-black/40 border border-white/10 rounded-xl px-3 py-2 text-sm text-white focus:border-rose-500 focus:outline-none"
+                  className="w-full bg-input-bg border border-border-color rounded-xl px-3 py-2 text-sm text-text-primary focus:border-rose-500 focus:outline-none"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-neutral-300 mb-1">Target Path / Anchor</label>
+                <label className="block text-xs font-semibold text-text-primary mb-1">Target Path / Anchor</label>
                 <input
                   type="text"
                   required
                   placeholder="e.g., #insights or /insights"
                   value={newNavPath}
                   onChange={(e) => setNewNavPath(e.target.value)}
-                  className="w-full bg-black/40 border border-white/10 rounded-xl px-3 py-2 text-sm text-white focus:border-rose-500 focus:outline-none font-mono"
+                  className="w-full bg-input-bg border border-border-color rounded-xl px-3 py-2 text-sm text-text-primary focus:border-rose-500 focus:outline-none font-mono"
                 />
               </div>
 
@@ -311,7 +405,7 @@ export const NavigationFooterTab: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => setIsModalOpen(false)}
-                  className="px-4 py-2 rounded-xl text-xs font-semibold bg-white/10 hover:bg-white/15 text-white"
+                  className="px-4 py-2 rounded-xl text-xs font-semibold bg-white/10 hover:bg-white/15 text-text-primary"
                 >
                   Cancel
                 </button>
