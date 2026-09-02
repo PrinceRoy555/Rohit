@@ -1,7 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { useSiteConfig } from '../../context/SiteConfigContext';
-import { logoutAdmin, checkAdminSession, loginAdmin } from '../../services/adminApi';
+import { logoutAdmin, checkAdminSession, loginAdmin, syncFirebaseAdminSession } from '../../services/adminApi';
+import {
+  signInAdmin,
+  signInAdminWithGoogle,
+  signOutAdmin,
+  observeAuthState,
+  verifyAdminRole
+} from '../../services/firebase/auth';
 import {
   LayoutDashboard,
   Palette,
@@ -21,14 +28,12 @@ import {
   Eye,
   Send,
   LogOut,
-  ExternalLink,
   ChevronRight,
   CheckCircle2,
   AlertCircle,
   X,
   Lock,
   Globe,
-  KeyRound,
   ShieldCheck,
   UserCheck
 } from 'lucide-react';
@@ -76,12 +81,16 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose, onLogout }) => 
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
   const [authChecking, setAuthChecking] = useState<boolean>(true);
   const [adminEmail, setAdminEmail] = useState<string>('');
+  const [adminRole, setAdminRole] = useState<'super_admin' | 'admin' | 'editor'>('admin');
+  const [isUnauthorizedUser, setIsUnauthorizedUser] = useState<boolean>(false);
+  const [unauthorizedEmail, setUnauthorizedEmail] = useState<string>('');
 
-  // Login form state
-  const [loginEmail, setLoginEmail] = useState('admin@rohitverma.design');
+  // Login form state (Empty defaults to prevent credential exposure)
+  const [loginEmail, setLoginEmail] = useState('');
   const [loginPassword, setLoginPassword] = useState('');
   const [loginError, setLoginError] = useState<string | null>(null);
   const [isLoggingIn, setIsLoggingIn] = useState(false);
+  const [isGoogleLoggingIn, setIsGoogleLoggingIn] = useState(false);
 
   // Tab & Modal State
   const [activeTab, setActiveTab] = useState<string>('dashboard');
@@ -92,7 +101,6 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose, onLogout }) => 
 
   const {
     config,
-    draftConfig,
     hasUnpublishedChanges,
     isPublishing,
     publish,
@@ -101,53 +109,162 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose, onLogout }) => 
     refreshConfig
   } = useSiteConfig();
 
-  // Verify auth on mount
+  // Verify auth on mount via Firebase Auth listener & server fallback
   useEffect(() => {
-    async function verifyAuth() {
-      setAuthChecking(true);
-      try {
-        const session = await checkAdminSession();
-        if (session.authenticated) {
+    let isMounted = true;
+    setAuthChecking(true);
+
+    const unsubscribe = observeAuthState(async (user) => {
+      if (!isMounted) return;
+
+      if (user) {
+        // Authenticated with Firebase: Verify Admin Authorization
+        const roleRes = await verifyAdminRole(user);
+        if (!isMounted) return;
+
+        if (roleRes.authorized) {
+          setIsUnauthorizedUser(false);
           setIsAuthenticated(true);
-          setAdminEmail(session.adminEmail || 'admin@rohitverma.design');
-          await refreshConfig();
+          setAdminEmail(user.email || 'admin');
+          setAdminRole(roleRes.role);
+
+          try {
+            const idToken = await user.getIdToken();
+            await syncFirebaseAdminSession(user.email || '', idToken);
+            await refreshConfig();
+          } catch (e) {
+            console.warn('[AdminPanel] Session sync warning:', e);
+          }
+          setAuthChecking(false);
         } else {
+          // Firebase authenticated, but NOT an authorized administrator
+          setIsUnauthorizedUser(true);
+          setUnauthorizedEmail(user.email || '');
           setIsAuthenticated(false);
+          // Purge Firebase session to prevent privilege escalation
+          await signOutAdmin();
+          setAuthChecking(false);
         }
-      } catch {
-        setIsAuthenticated(false);
-      } finally {
-        setAuthChecking(false);
+      } else {
+        // Not authenticated in Firebase, check existing server session as fallback
+        try {
+          const session = await checkAdminSession();
+          if (!isMounted) return;
+          if (session.authenticated && session.adminEmail) {
+            setIsAuthenticated(true);
+            setAdminEmail(session.adminEmail);
+            setIsUnauthorizedUser(false);
+            await refreshConfig();
+          } else {
+            setIsAuthenticated(false);
+          }
+        } catch {
+          if (isMounted) setIsAuthenticated(false);
+        } finally {
+          if (isMounted) setAuthChecking(false);
+        }
       }
-    }
-    verifyAuth();
+    });
+
+    return () => {
+      isMounted = false;
+      unsubscribe();
+    };
   }, [refreshConfig]);
 
   const handleLoginSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!loginEmail.trim() || !loginPassword.trim()) return;
+    const cleanEmail = loginEmail.trim();
+    const cleanPass = loginPassword;
+    if (!cleanEmail || !cleanPass) {
+      setLoginError('Please enter both admin email and password.');
+      return;
+    }
 
     setIsLoggingIn(true);
     setLoginError(null);
+    setIsUnauthorizedUser(false);
 
-    const res = await loginAdmin(loginEmail.trim(), loginPassword);
-    if (res.success) {
+    // 1. Primary: Authenticate via Firebase Authentication
+    const firebaseResult = await signInAdmin(cleanEmail, cleanPass);
+    if (firebaseResult.success && firebaseResult.user) {
+      const roleCheck = await verifyAdminRole(firebaseResult.user);
+      if (roleCheck.authorized) {
+        const idToken = await firebaseResult.user.getIdToken();
+        await syncFirebaseAdminSession(cleanEmail, idToken);
+        setIsAuthenticated(true);
+        setAdminEmail(cleanEmail);
+        setAdminRole(roleCheck.role);
+        setLoginPassword('');
+        await refreshConfig();
+        setIsLoggingIn(false);
+        return;
+      } else {
+        await signOutAdmin();
+        setLoginError('Access Denied: This account is not registered as an authorized administrator.');
+        setIsUnauthorizedUser(true);
+        setUnauthorizedEmail(cleanEmail);
+        setIsLoggingIn(false);
+        return;
+      }
+    }
+
+    // 2. Secondary fallback: Attempt server credential verification if server has ADMIN_PASSWORD set
+    const serverResult = await loginAdmin(cleanEmail, cleanPass);
+    if (serverResult.success) {
       setIsAuthenticated(true);
-      setAdminEmail(res.adminEmail || loginEmail);
+      setAdminEmail(serverResult.adminEmail || cleanEmail);
+      setLoginPassword('');
       await refreshConfig();
     } else {
-      setLoginError(res.error || 'Invalid credentials or account locked.');
+      setLoginError(firebaseResult.error || serverResult.error || 'Invalid administrator credentials.');
     }
     setIsLoggingIn(false);
   };
 
+  const handleGoogleLogin = async () => {
+    setIsGoogleLoggingIn(true);
+    setLoginError(null);
+    setIsUnauthorizedUser(false);
+
+    const res = await signInAdminWithGoogle();
+    if (res.success && res.user) {
+      const roleCheck = await verifyAdminRole(res.user);
+      if (roleCheck.authorized) {
+        const idToken = await res.user.getIdToken();
+        await syncFirebaseAdminSession(res.user.email || '', idToken);
+        setIsAuthenticated(true);
+        setAdminEmail(res.user.email || '');
+        setAdminRole(roleCheck.role);
+        await refreshConfig();
+      } else {
+        await signOutAdmin();
+        setLoginError('Access Denied: This Google account is not authorized as an administrator.');
+        setIsUnauthorizedUser(true);
+        setUnauthorizedEmail(res.user.email || '');
+      }
+    } else if (res.error) {
+      setLoginError(res.error);
+    }
+    setIsGoogleLoggingIn(false);
+  };
+
   const handleLogout = async () => {
-    await logoutAdmin();
-    setIsAuthenticated(false);
-    if (onLogout) {
-      onLogout();
-    } else {
-      onClose();
+    try {
+      await signOutAdmin();
+      await logoutAdmin();
+    } catch (e) {
+      console.warn('[AdminPanel] Logout error:', e);
+    } finally {
+      setIsAuthenticated(false);
+      setIsUnauthorizedUser(false);
+      setAdminEmail('');
+      setLoginPassword('');
+      if (onLogout) {
+        onLogout();
+      } else {
+        onClose();
+      }
     }
   };
 
@@ -162,7 +279,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose, onLogout }) => 
     }
   };
 
-  // 1. Loading State
+  // 1. Loading State (Prevents UI flicker while checking session)
   if (authChecking) {
     return (
       <div className="fixed inset-0 z-50 bg-[#0c0a09] flex items-center justify-center text-white font-sans">
@@ -174,7 +291,64 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose, onLogout }) => 
     );
   }
 
-  // 2. Login Screen
+  // 2. Unauthorized Account Screen (Firebase authenticated, but not permitted in Admin CMS)
+  if (isUnauthorizedUser && !isAuthenticated) {
+    return (
+      <div className="fixed inset-0 z-50 bg-[#0c0a09]/95 backdrop-blur-md flex items-center justify-center p-4 font-sans">
+        <div className="bg-neutral-900 border border-rose-500/30 rounded-3xl max-w-md w-full p-6 sm:p-8 space-y-6 shadow-2xl relative overflow-hidden">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2.5">
+              <div className="w-9 h-9 rounded-xl bg-rose-500/20 text-rose-400 border border-rose-500/30 flex items-center justify-center font-bold text-sm">
+                <AlertCircle className="w-5 h-5" />
+              </div>
+              <div>
+                <h3 className="text-base font-bold text-white">Access Restricted</h3>
+                <p className="text-xs text-neutral-400">Unauthorized User Account</p>
+              </div>
+            </div>
+
+            <button
+              onClick={onClose}
+              className="p-2 rounded-xl bg-white/5 hover:bg-white/10 text-neutral-400 hover:text-white"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          </div>
+
+          <div className="p-4 rounded-xl bg-rose-500/10 border border-rose-500/20 text-xs text-rose-200 space-y-2">
+            <p className="font-semibold text-rose-300">
+              The account <span className="underline font-mono">{unauthorizedEmail}</span> is authenticated, but is not registered with administrator privileges.
+            </p>
+            <p className="text-neutral-400">
+              To manage site content, please sign in using an authorized administrator account or contact the super administrator.
+            </p>
+          </div>
+
+          <div className="flex flex-col gap-3">
+            <button
+              onClick={() => {
+                setIsUnauthorizedUser(false);
+                setLoginError(null);
+              }}
+              className="w-full py-2.5 rounded-xl text-xs font-semibold bg-rose-600 hover:bg-rose-700 text-white shadow-md shadow-rose-600/30 flex items-center justify-center gap-2 transition-all"
+            >
+              <LogOut className="w-3.5 h-3.5" />
+              <span>Sign In with Different Account</span>
+            </button>
+
+            <button
+              onClick={onClose}
+              className="w-full py-2 rounded-xl text-xs font-medium bg-white/5 hover:bg-white/10 text-neutral-400 hover:text-white transition-all"
+            >
+              Return to Public Website
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // 3. Login Screen
   if (!isAuthenticated) {
     return (
       <div className="fixed inset-0 z-50 bg-[#0c0a09]/95 backdrop-blur-md flex items-center justify-center p-4 font-sans">
@@ -188,24 +362,42 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose, onLogout }) => 
               </div>
               <div>
                 <h3 className="text-base font-bold text-white">Administrator Access</h3>
-                <p className="text-xs text-neutral-400">Secure Web Management System</p>
+                <p className="text-xs text-neutral-400">Firebase Authenticated Portal</p>
               </div>
             </div>
 
             <button
               onClick={onClose}
-              className="p-2 rounded-xl bg-white/5 hover:bg-white/10 text-neutral-400 hover:text-white"
+              className="p-2 rounded-xl bg-white/5 hover:bg-white/10 text-neutral-400 hover:text-white transition-colors"
+              title="Close and Return to Site"
             >
               <X className="w-4 h-4" />
             </button>
           </div>
 
           {loginError && (
-            <div className="p-3.5 rounded-xl bg-rose-500/15 border border-rose-500/30 text-rose-300 text-xs flex items-center gap-2.5">
+            <div className="p-3.5 rounded-xl bg-rose-500/15 border border-rose-500/30 text-rose-300 text-xs flex items-center gap-2.5 animate-in fade-in duration-200">
               <AlertCircle className="w-4 h-4 flex-shrink-0 text-rose-400" />
               <span>{loginError}</span>
             </div>
           )}
+
+          {/* Google Sign In Option */}
+          <button
+            type="button"
+            onClick={handleGoogleLogin}
+            disabled={isGoogleLoggingIn || isLoggingIn}
+            className="w-full py-2.5 px-4 rounded-xl text-xs font-semibold bg-white/10 hover:bg-white/15 text-white border border-white/10 flex items-center justify-center gap-2.5 transition-all disabled:opacity-50"
+          >
+            <Globe className="w-4 h-4 text-rose-400" />
+            <span>{isGoogleLoggingIn ? 'Connecting with Google...' : 'Sign in with Google Admin'}</span>
+          </button>
+
+          <div className="flex items-center gap-3">
+            <div className="flex-1 h-px bg-white/10" />
+            <span className="text-[11px] text-neutral-500 font-medium uppercase tracking-wider">or email credentials</span>
+            <div className="flex-1 h-px bg-white/10" />
+          </div>
 
           <form onSubmit={handleLoginSubmit} className="space-y-4">
             <div>
@@ -213,9 +405,11 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose, onLogout }) => 
               <input
                 type="email"
                 required
+                placeholder="admin@rohitverma.design"
                 value={loginEmail}
                 onChange={(e) => setLoginEmail(e.target.value)}
-                className="w-full bg-black/40 border border-white/10 rounded-xl px-3.5 py-2.5 text-sm text-white focus:border-rose-500 focus:outline-none"
+                className="w-full bg-black/40 border border-white/10 rounded-xl px-3.5 py-2.5 text-sm text-white focus:border-rose-500 focus:outline-none transition-colors"
+                autoComplete="email"
               />
             </div>
 
@@ -224,17 +418,18 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose, onLogout }) => 
               <input
                 type="password"
                 required
-                placeholder="Enter password"
+                placeholder="••••••••••••"
                 value={loginPassword}
                 onChange={(e) => setLoginPassword(e.target.value)}
-                className="w-full bg-black/40 border border-white/10 rounded-xl px-3.5 py-2.5 text-sm text-white focus:border-rose-500 focus:outline-none"
+                className="w-full bg-black/40 border border-white/10 rounded-xl px-3.5 py-2.5 text-sm text-white focus:border-rose-500 focus:outline-none transition-colors"
+                autoComplete="current-password"
               />
             </div>
 
             <button
               type="submit"
-              disabled={isLoggingIn}
-              className="w-full py-3 rounded-xl text-sm font-semibold bg-rose-600 hover:bg-rose-700 text-white shadow-lg shadow-rose-600/30 flex items-center justify-center gap-2 transition-all mt-2"
+              disabled={isLoggingIn || isGoogleLoggingIn}
+              className="w-full py-3 rounded-xl text-sm font-semibold bg-rose-600 hover:bg-rose-700 text-white shadow-lg shadow-rose-600/30 flex items-center justify-center gap-2 transition-all mt-2 disabled:opacity-50"
             >
               <Lock className="w-4 h-4" />
               <span>{isLoggingIn ? 'Authenticating...' : 'Sign In to Admin Panel'}</span>
@@ -243,14 +438,14 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose, onLogout }) => 
 
           <div className="pt-4 border-t border-white/10 text-center text-xs text-neutral-500 flex items-center justify-center gap-1.5">
             <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
-            <span>Protected with rate limiting & HTTP-only cookies</span>
+            <span>Protected with Firebase Auth & Role-Based Access Control</span>
           </div>
         </div>
       </div>
     );
   }
 
-  // 3. Authenticated Admin Panel
+  // 4. Authenticated Admin Dashboard
   return (
     <div className="fixed inset-0 z-50 bg-[#0c0a09] text-white flex flex-col overflow-hidden font-sans">
       {/* Top Navbar */}
@@ -259,6 +454,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose, onLogout }) => 
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             className="lg:hidden p-2 rounded-xl bg-white/5 hover:bg-white/10 text-white"
+            aria-label="Toggle navigation menu"
           >
             <Menu className="w-5 h-5" />
           </button>
@@ -274,6 +470,13 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose, onLogout }) => 
                 </span>
                 <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-white/10 text-neutral-300">
                   v{config.version || 1}
+                </span>
+                <span className={`hidden sm:inline-block px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider ${
+                  adminRole === 'super_admin'
+                    ? 'bg-rose-500/20 text-rose-300 border border-rose-500/30'
+                    : 'bg-indigo-500/20 text-indigo-300 border border-indigo-500/30'
+                }`}>
+                  {adminRole === 'super_admin' ? 'Super Admin' : adminRole.toUpperCase()}
                 </span>
               </div>
             </div>
@@ -324,7 +527,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose, onLogout }) => 
           {/* View Public Website */}
           <button
             onClick={onClose}
-            className="p-2 rounded-xl bg-white/5 hover:bg-white/10 text-neutral-300 hover:text-white"
+            className="p-2 rounded-xl bg-white/5 hover:bg-white/10 text-neutral-300 hover:text-white transition-colors"
             title="Close Admin & View Live Site"
           >
             <X className="w-4 h-4" />
@@ -333,7 +536,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose, onLogout }) => 
           {/* Logout */}
           <button
             onClick={handleLogout}
-            className="p-2 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-400"
+            className="p-2 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 transition-colors"
             title="Sign Out"
           >
             <LogOut className="w-4 h-4" />
@@ -402,8 +605,11 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose, onLogout }) => 
           </div>
 
           <div className="pt-4 border-t border-white/10 text-[11px] text-neutral-500">
-            <div className="truncate font-mono">{adminEmail}</div>
-            <div className="text-[10px] text-neutral-600 mt-0.5">Automated Versioning Active</div>
+            <div className="flex items-center gap-1.5 text-neutral-300 font-medium">
+              <UserCheck className="w-3.5 h-3.5 text-emerald-400 flex-shrink-0" />
+              <span className="truncate font-mono">{adminEmail}</span>
+            </div>
+            <div className="text-[10px] text-neutral-500 mt-1 capitalize">Role: {adminRole.replace('_', ' ')}</div>
           </div>
         </aside>
 
@@ -486,4 +692,3 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose, onLogout }) => 
     </div>
   );
 };
-

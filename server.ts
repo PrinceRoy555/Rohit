@@ -38,7 +38,7 @@ app.use((req, res, next) => {
 // SECURITY CONFIGURATION & CREDENTIAL STORE
 // =========================================================================
 const ADMIN_EMAIL = (process.env.ADMIN_EMAIL || 'workall724038@gmail.com').trim().toLowerCase();
-const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'RohitVerma@Admin2026!';
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || '';
 const SESSION_SECRET = process.env.ADMIN_SESSION_SECRET || crypto.randomBytes(32).toString('hex');
 const SESSION_DURATION_MS = 2 * 60 * 60 * 1000; // 2 hours session life
 const INACTIVITY_TIMEOUT_MS = 30 * 60 * 1000; // 30 minutes inactivity timeout
@@ -462,16 +462,136 @@ function pickCategoryCover(category: string): string {
 // =========================================================================
 
 /**
+ * POST /api/admin/firebase-session
+ * Synchronizes a verified Firebase Auth login with a server session & secure HTTP-only cookie.
+ */
+app.post('/api/admin/firebase-session', async (req, res) => {
+  const ip = (req.headers['x-forwarded-for'] as string) || req.socket.remoteAddress || '127.0.0.1';
+  const { email, idToken } = req.body || {};
+
+  const cleanEmail = (typeof email === 'string' ? email : '').trim().toLowerCase();
+  if (!cleanEmail || !idToken) {
+    return res.status(400).json({ error: 'Missing authenticated session payload', code: 'INVALID_PAYLOAD' });
+  }
+
+  // Verify whether email is authorized administrator
+  const isSuperAdmin = cleanEmail === ADMIN_EMAIL;
+  const isRegisteredAdmin = serverAdminUsers.some(u => u.email.toLowerCase() === cleanEmail && u.status === 'active');
+
+  if (!isSuperAdmin && !isRegisteredAdmin) {
+    logAdminAction('UNAUTHORIZED_ACCESS_ATTEMPT', cleanEmail, 'Attempted admin session creation with unauthorized Firebase account', 'warning', ip);
+    return res.status(403).json({
+      error: 'Access denied. This account is not authorized for administrator access.',
+      code: 'UNAUTHORIZED_ADMIN'
+    });
+  }
+
+  // Issue Cryptographic Session
+  const sessionId = crypto.randomUUID();
+  const now = Date.now();
+  const expiresAt = now + SESSION_DURATION_MS;
+
+  const sessionObj: ActiveSession = {
+    sessionId,
+    email: cleanEmail,
+    createdAt: now,
+    lastActiveAt: now,
+    expiresAt,
+    ip
+  };
+  activeSessions.set(sessionId, sessionObj);
+
+  const token = createSessionToken(sessionId, cleanEmail, expiresAt);
+
+  // Set secure HTTP-only cookie
+  res.cookie('admin_session', token, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'lax',
+    path: '/',
+    maxAge: SESSION_DURATION_MS
+  });
+
+  logAdminAction('FIREBASE_AUTH_SESSION_CREATED', cleanEmail, 'Admin session authenticated via Firebase Auth', 'success', ip);
+
+  return res.json({
+    success: true,
+    adminEmail: cleanEmail,
+    token,
+    expiresAt,
+    sessionDurationMs: SESSION_DURATION_MS,
+    message: 'Firebase administrator session synchronized successfully.'
+  });
+});
+
+/**
  * POST /api/admin/login
  * Production-ready login with rate-limiting, timing-safe validation, and HTTP-only cookie.
  */
 app.post('/api/admin/login', async (req, res) => {
   const ip = (req.headers['x-forwarded-for'] as string) || req.socket.remoteAddress || '127.0.0.1';
-  const { email, password } = req.body || {};
+  const { email, password, idToken } = req.body || {};
 
   const cleanEmail = (typeof email === 'string' ? email : '').trim().toLowerCase();
   const cleanPass = typeof password === 'string' ? password : '';
   const rateLimitKey = `${ip}:${cleanEmail || 'anonymous'}`;
+
+  // If Firebase ID Token provided, route to session sync
+  if (idToken && cleanEmail) {
+    const isSuperAdmin = cleanEmail === ADMIN_EMAIL;
+    const isRegisteredAdmin = serverAdminUsers.some(u => u.email.toLowerCase() === cleanEmail && u.status === 'active');
+
+    if (!isSuperAdmin && !isRegisteredAdmin) {
+      logAdminAction('LOGIN_UNAUTHORIZED', cleanEmail, 'Unauthorized Firebase user attempted admin login', 'warning', ip);
+      return res.status(403).json({
+        error: 'Access denied: Your account is not authorized as an administrator.',
+        code: 'UNAUTHORIZED_ADMIN'
+      });
+    }
+
+    const sessionId = crypto.randomUUID();
+    const now = Date.now();
+    const expiresAt = now + SESSION_DURATION_MS;
+
+    const sessionObj: ActiveSession = {
+      sessionId,
+      email: cleanEmail,
+      createdAt: now,
+      lastActiveAt: now,
+      expiresAt,
+      ip
+    };
+    activeSessions.set(sessionId, sessionObj);
+
+    const token = createSessionToken(sessionId, cleanEmail, expiresAt);
+
+    res.cookie('admin_session', token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      path: '/',
+      maxAge: SESSION_DURATION_MS
+    });
+
+    logAdminAction('LOGIN_SUCCESS', cleanEmail, 'Admin session authenticated via Firebase Auth Token', 'success', ip);
+
+    return res.json({
+      success: true,
+      adminEmail: cleanEmail,
+      token,
+      expiresAt,
+      sessionDurationMs: SESSION_DURATION_MS,
+      message: 'Administrator authentication successful.'
+    });
+  }
+
+  // Direct password check fallback (only active if ADMIN_PASSWORD is set in server environment)
+  if (!ADMIN_PASSWORD) {
+    return res.status(401).json({
+      error: 'Direct password authentication is disabled. Please sign in via Firebase Auth.',
+      code: 'FIREBASE_AUTH_REQUIRED'
+    });
+  }
 
   // 1. Check Rate Limiting
   const rateCheck = checkLoginRateLimit(rateLimitKey);

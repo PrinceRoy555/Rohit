@@ -39,9 +39,55 @@ function getAuthHeaders(): HeadersInit {
 }
 
 /**
+ * Synchronize authenticated Firebase Auth session with backend.
+ */
+export async function syncFirebaseAdminSession(email: string, idToken: string): Promise<{
+  success: boolean;
+  adminEmail?: string;
+  token?: string;
+  expiresAt?: number;
+  sessionDurationMs?: number;
+  error?: string;
+}> {
+  try {
+    const res = await fetch('/api/admin/firebase-session', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include', // Include HTTP-only cookies
+      body: JSON.stringify({ email, idToken }),
+    });
+
+    const data = await res.json();
+    if (!res.ok) {
+      return {
+        success: false,
+        error: data.error || 'Server authorization failed.'
+      };
+    }
+
+    if (data.token) {
+      setAdminToken(data.token);
+    }
+
+    return {
+      success: true,
+      adminEmail: data.adminEmail,
+      token: data.token,
+      expiresAt: data.expiresAt,
+      sessionDurationMs: data.sessionDurationMs
+    };
+  } catch (err: any) {
+    return {
+      success: false,
+      error: 'Network error communicating with server.'
+    };
+  }
+}
+
+/**
  * Authenticate with the server using Administrator credentials.
  */
-export async function loginAdmin(email: string, password: string): Promise<{
+export async function loginAdmin(email: string, password?: string, idToken?: string): Promise<{
   success: boolean;
   adminEmail?: string;
   token?: string;
@@ -55,7 +101,7 @@ export async function loginAdmin(email: string, password: string): Promise<{
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       credentials: 'include', // Include HTTP-only cookies
-      body: JSON.stringify({ email, password }),
+      body: JSON.stringify({ email, password, idToken }),
     });
 
     const data = await res.json();
