@@ -4,6 +4,9 @@ import {
   GoogleAuthProvider,
   signOut,
   onAuthStateChanged,
+  sendPasswordResetEmail,
+  verifyPasswordResetCode,
+  confirmPasswordReset,
   User,
   AuthError
 } from 'firebase/auth';
@@ -22,7 +25,52 @@ export interface AdminRoleResult {
   error?: string;
 }
 
+export interface PasswordRequirementsStatus {
+  minLength: boolean;
+  hasUpper: boolean;
+  hasLower: boolean;
+  hasNumber: boolean;
+  hasSpecial: boolean;
+  isValid: boolean;
+  score: number; // 0 to 5
+}
+
 const SUPER_ADMIN_EMAIL = 'workall724038@gmail.com';
+
+/**
+ * Validates password against enterprise strong-password policy:
+ * - Minimum 8 characters
+ * - At least 1 uppercase letter
+ * - At least 1 lowercase letter
+ * - At least 1 numeric digit
+ * - At least 1 special character
+ */
+export function validatePasswordStrength(password: string): PasswordRequirementsStatus {
+  const minLength = password.length >= 8;
+  const hasUpper = /[A-Z]/.test(password);
+  const hasLower = /[a-z]/.test(password);
+  const hasNumber = /[0-9]/.test(password);
+  const hasSpecial = /[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?`~]/.test(password);
+
+  let score = 0;
+  if (minLength) score++;
+  if (hasUpper) score++;
+  if (hasLower) score++;
+  if (hasNumber) score++;
+  if (hasSpecial) score++;
+
+  const isValid = minLength && hasUpper && hasLower && hasNumber && hasSpecial;
+
+  return {
+    minLength,
+    hasUpper,
+    hasLower,
+    hasNumber,
+    hasSpecial,
+    isValid,
+    score
+  };
+}
 
 /**
  * Maps Firebase Auth error codes to user-friendly messages without exposing system internals.
@@ -193,5 +241,222 @@ export function observeAuthState(callback: (user: User | null) => void): () => v
 export function getCurrentUser(): User | null {
   if (!isFirebaseConfigured() || !auth) return null;
   return auth.currentUser;
+}
+
+/**
+ * Send single-use, time-limited password reset email to administrator.
+ * Protects against account enumeration: Always returns a generic confirmation message
+ * regardless of whether the email address exists in the authentication system.
+ */
+export async function sendAdminPasswordReset(email: string): Promise<{ success: boolean; message: string; error?: string; rateLimited?: boolean }> {
+  const cleanEmail = email.trim().toLowerCase();
+  
+  if (!cleanEmail || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(cleanEmail)) {
+    return {
+      success: false,
+      message: 'Please provide a valid administrator email address.',
+      error: 'Invalid email format'
+    };
+  }
+
+  // 1. Notify backend endpoint for audit logging & rate limit tracking
+  try {
+    const serverRes = await fetch('/api/admin/forgot-password', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: cleanEmail }),
+    });
+
+    if (serverRes.status === 429) {
+      const data = await serverRes.json().catch(() => ({}));
+      return {
+        success: false,
+        rateLimited: true,
+        message: data.error || 'Too many reset requests. Please wait a few minutes before trying again.',
+        error: 'RATE_LIMITED'
+      };
+    }
+  } catch {
+    // If server is unreachable, proceed to direct Firebase Auth reset
+  }
+
+  // 2. Dispatch password reset via Firebase Auth
+  if (isFirebaseConfigured() && auth) {
+    try {
+      // Configure return URL pointing to /admin with reset query parameters
+      const baseUrl = typeof window !== 'undefined' ? window.location.origin : '';
+      const actionCodeSettings = {
+        url: `${baseUrl}/admin`,
+        handleCodeInApp: true,
+      };
+
+      await sendPasswordResetEmail(auth, cleanEmail, actionCodeSettings);
+    } catch (err: any) {
+      const authError = err as AuthError;
+      const code = authError.code || '';
+
+      if (code === 'auth/too-many-requests') {
+        return {
+          success: false,
+          rateLimited: true,
+          message: 'Too many reset requests. Access is temporarily restricted. Please try again later.',
+          error: 'RATE_LIMITED'
+        };
+      }
+
+      if (code === 'auth/network-request-failed') {
+        return {
+          success: false,
+          message: 'Network error: Unable to communicate with authentication service. Please check your connection.',
+          error: 'NETWORK_ERROR'
+        };
+      }
+
+      // If user-not-found or invalid-credential, we purposely do NOT reveal account non-existence
+      // We fall through to return generic message to preserve security against enumeration.
+    }
+  }
+
+  return {
+    success: true,
+    message: 'If an account exists with this email, a password reset link has been sent.'
+  };
+}
+
+/**
+ * Verify a password reset code / oobCode from URL parameters.
+ * Supports both Firebase Auth action codes and server-signed cryptographic reset tokens.
+ */
+export async function verifyAdminPasswordResetCode(oobCode: string): Promise<{ success: boolean; email?: string; error?: string }> {
+  if (!oobCode || typeof oobCode !== 'string') {
+    return {
+      success: false,
+      error: 'Missing or invalid password reset token.'
+    };
+  }
+
+  // 1. Try Firebase Auth verification if configured
+  if (isFirebaseConfigured() && auth) {
+    try {
+      const verifiedEmail = await verifyPasswordResetCode(auth, oobCode);
+      return {
+        success: true,
+        email: verifiedEmail
+      };
+    } catch {
+      // If Firebase verification throws, try server-side reset token validation
+    }
+  }
+
+  // 2. Try Server-side reset token endpoint
+  try {
+    const res = await fetch('/api/admin/verify-reset-token', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ token: oobCode })
+    });
+    const data = await res.json();
+    if (res.ok && data.success) {
+      return {
+        success: true,
+        email: data.email
+      };
+    }
+    return {
+      success: false,
+      error: data.error || 'This password reset link is invalid or has expired.'
+    };
+  } catch {
+    return {
+      success: false,
+      error: 'Unable to verify reset link. Please check your connection or request a new reset link.'
+    };
+  }
+}
+
+/**
+ * Complete the password reset by setting a new strong password.
+ * Supports both Firebase Auth and server-managed password hashing.
+ */
+export async function confirmAdminPasswordReset(
+  oobCode: string,
+  newPassword: string
+): Promise<{ success: boolean; message: string; error?: string }> {
+  if (!oobCode) {
+    return {
+      success: false,
+      message: 'Missing password reset token.',
+      error: 'INVALID_TOKEN'
+    };
+  }
+
+  // Validate strong password policy
+  const strength = validatePasswordStrength(newPassword);
+  if (!strength.isValid) {
+    const missing: string[] = [];
+    if (!strength.minLength) missing.push('at least 8 characters');
+    if (!strength.hasUpper) missing.push('1 uppercase letter');
+    if (!strength.hasLower) missing.push('1 lowercase letter');
+    if (!strength.hasNumber) missing.push('1 number');
+    if (!strength.hasSpecial) missing.push('1 special character');
+
+    return {
+      success: false,
+      message: `Password does not meet requirements: Needs ${missing.join(', ')}.`,
+      error: 'WEAK_PASSWORD'
+    };
+  }
+
+  // 1. Try Firebase Auth confirmation if configured
+  if (isFirebaseConfigured() && auth) {
+    try {
+      await confirmPasswordReset(auth, oobCode, newPassword);
+
+      // Notify server of password update for audit logging
+      try {
+        await fetch('/api/admin/password-reset-completed', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ timestamp: Date.now() }),
+        });
+      } catch {
+        // Non-critical audit call
+      }
+
+      return {
+        success: true,
+        message: 'Your administrator password has been reset successfully. You can now sign in with your new password.'
+      };
+    } catch {
+      // If Firebase Auth fails, try server-side endpoint
+    }
+  }
+
+  // 2. Try Server-side reset password endpoint
+  try {
+    const res = await fetch('/api/admin/reset-password', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ token: oobCode, newPassword })
+    });
+    const data = await res.json();
+    if (res.ok && data.success) {
+      return {
+        success: true,
+        message: data.message || 'Your administrator password has been updated successfully.'
+      };
+    }
+    return {
+      success: false,
+      message: data.error || 'Failed to update password. Please request a new reset link.',
+      error: 'RESET_FAILED'
+    };
+  } catch {
+    return {
+      success: false,
+      message: 'Unable to communicate with the authentication server. Please try again.',
+      error: 'NETWORK_ERROR'
+    };
+  }
 }
 

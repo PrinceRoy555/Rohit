@@ -119,8 +119,13 @@ export default function App() {
       const topHash = hashSegments[0] ? hashSegments[0].toLowerCase() : '';
       const subHash = hashSegments[1] ? hashSegments[1].toLowerCase() : '';
 
-      // Check if Admin route
-      if (topPath === 'admin' || topHash === 'admin') {
+      // Check URL query parameters for Firebase password reset or admin token
+      const urlParams = new URLSearchParams(window.location.search);
+      const mode = urlParams.get('mode');
+      const oobCode = urlParams.get('oobCode') || urlParams.get('resetToken');
+
+      // Check if Admin route or Password Reset action
+      if (topPath === 'admin' || topHash === 'admin' || mode === 'resetPassword' || oobCode) {
         setIsAdminOpen(true);
       }
 

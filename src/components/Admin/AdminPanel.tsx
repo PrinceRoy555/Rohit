@@ -1,13 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { useSiteConfig } from '../../context/SiteConfigContext';
+import { isFirebaseConfigured } from '../../lib/firebase';
 import { logoutAdmin, checkAdminSession, loginAdmin, syncFirebaseAdminSession } from '../../services/adminApi';
 import {
   signInAdmin,
   signInAdminWithGoogle,
   signOutAdmin,
   observeAuthState,
-  verifyAdminRole
+  verifyAdminRole,
+  sendAdminPasswordReset,
+  verifyAdminPasswordResetCode,
+  confirmAdminPasswordReset,
+  validatePasswordStrength
 } from '../../services/firebase/auth';
 import {
   LayoutDashboard,
@@ -26,6 +31,7 @@ import {
   Shield,
   FileText,
   Eye,
+  EyeOff,
   Send,
   LogOut,
   ChevronRight,
@@ -35,7 +41,12 @@ import {
   Lock,
   Globe,
   ShieldCheck,
-  UserCheck
+  UserCheck,
+  KeyRound,
+  Mail,
+  ArrowLeft,
+  Check,
+  RefreshCw
 } from 'lucide-react';
 
 import { DashboardTab } from './tabs/DashboardTab';
@@ -88,9 +99,32 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose, onLogout }) => 
   // Login form state (Empty defaults to prevent credential exposure)
   const [loginEmail, setLoginEmail] = useState('');
   const [loginPassword, setLoginPassword] = useState('');
+  const [showLoginPassword, setShowLoginPassword] = useState(false);
   const [loginError, setLoginError] = useState<string | null>(null);
   const [isLoggingIn, setIsLoggingIn] = useState(false);
   const [isGoogleLoggingIn, setIsGoogleLoggingIn] = useState(false);
+
+  // Authentication View State: 'login' | 'forgot' | 'reset'
+  const [authView, setAuthView] = useState<'login' | 'forgot' | 'reset'>('login');
+
+  // Forgot Password state
+  const [forgotEmail, setForgotEmail] = useState('');
+  const [isSendingReset, setIsSendingReset] = useState(false);
+  const [forgotMessage, setForgotMessage] = useState<string | null>(null);
+  const [forgotError, setForgotError] = useState<string | null>(null);
+
+  // Reset Password (Token / Code confirmation) state
+  const [resetCode, setResetCode] = useState('');
+  const [resetCodeEmail, setResetCodeEmail] = useState<string | null>(null);
+  const [isVerifyingCode, setIsVerifyingCode] = useState(false);
+  const [resetCodeError, setResetCodeError] = useState<string | null>(null);
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [isResettingPassword, setIsResettingPassword] = useState(false);
+  const [resetSuccessMessage, setResetSuccessMessage] = useState<string | null>(null);
+  const [resetFormError, setResetFormError] = useState<string | null>(null);
 
   // Tab & Modal State
   const [activeTab, setActiveTab] = useState<string>('dashboard');
@@ -108,6 +142,38 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose, onLogout }) => 
     setPreviewMode,
     refreshConfig
   } = useSiteConfig();
+
+  // Check URL parameters on mount for reset action codes
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const urlParams = new URLSearchParams(window.location.search);
+    const mode = urlParams.get('mode');
+    const oobCode = urlParams.get('oobCode') || urlParams.get('resetToken');
+
+    if ((mode === 'resetPassword' || mode === 'reset') && oobCode) {
+      setAuthView('reset');
+      setResetCode(oobCode);
+      verifyResetToken(oobCode);
+    }
+  }, []);
+
+  const verifyResetToken = async (code: string) => {
+    setIsVerifyingCode(true);
+    setResetCodeError(null);
+    try {
+      const res = await verifyAdminPasswordResetCode(code);
+      if (res.success && res.email) {
+        setResetCodeEmail(res.email);
+        setForgotEmail(res.email);
+      } else {
+        setResetCodeError(res.error || 'This password reset link is invalid or has expired.');
+      }
+    } catch {
+      setResetCodeError('Unable to verify password reset link. Please request a new link.');
+    } finally {
+      setIsVerifyingCode(false);
+    }
+  };
 
   // Verify auth on mount via Firebase Auth listener & server fallback
   useEffect(() => {
@@ -177,7 +243,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose, onLogout }) => 
     const cleanEmail = loginEmail.trim();
     const cleanPass = loginPassword;
     if (!cleanEmail || !cleanPass) {
-      setLoginError('Please enter both admin email and password.');
+      setLoginError('Invalid email or password.');
       return;
     }
 
@@ -185,39 +251,42 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose, onLogout }) => 
     setLoginError(null);
     setIsUnauthorizedUser(false);
 
-    // 1. Primary: Authenticate via Firebase Authentication
-    const firebaseResult = await signInAdmin(cleanEmail, cleanPass);
-    if (firebaseResult.success && firebaseResult.user) {
-      const roleCheck = await verifyAdminRole(firebaseResult.user);
-      if (roleCheck.authorized) {
-        const idToken = await firebaseResult.user.getIdToken();
-        await syncFirebaseAdminSession(cleanEmail, idToken);
-        setIsAuthenticated(true);
-        setAdminEmail(cleanEmail);
-        setAdminRole(roleCheck.role);
-        setLoginPassword('');
-        await refreshConfig();
-        setIsLoggingIn(false);
-        return;
-      } else {
-        await signOutAdmin();
-        setLoginError('Access Denied: This account is not registered as an authorized administrator.');
-        setIsUnauthorizedUser(true);
-        setUnauthorizedEmail(cleanEmail);
-        setIsLoggingIn(false);
-        return;
+    // 1. Primary: Authenticate via Firebase Authentication if user exists in Firebase Auth
+    if (isFirebaseConfigured()) {
+      const firebaseResult = await signInAdmin(cleanEmail, cleanPass);
+      if (firebaseResult.success && firebaseResult.user) {
+        const roleCheck = await verifyAdminRole(firebaseResult.user);
+        if (roleCheck.authorized) {
+          const idToken = await firebaseResult.user.getIdToken();
+          await syncFirebaseAdminSession(cleanEmail, idToken);
+          setIsAuthenticated(true);
+          setAdminEmail(cleanEmail);
+          setAdminRole(roleCheck.role);
+          setLoginPassword('');
+          await refreshConfig();
+          setIsLoggingIn(false);
+          return;
+        } else {
+          await signOutAdmin();
+          setLoginError('Access Denied: This account is not registered as an authorized administrator.');
+          setIsUnauthorizedUser(true);
+          setUnauthorizedEmail(cleanEmail);
+          setIsLoggingIn(false);
+          return;
+        }
       }
     }
 
-    // 2. Secondary fallback: Attempt server credential verification if server has ADMIN_PASSWORD set
+    // 2. Direct Server Authenticator (Validates configured environment credentials & salted hashes)
     const serverResult = await loginAdmin(cleanEmail, cleanPass);
     if (serverResult.success) {
       setIsAuthenticated(true);
       setAdminEmail(serverResult.adminEmail || cleanEmail);
+      setAdminRole('super_admin');
       setLoginPassword('');
       await refreshConfig();
     } else {
-      setLoginError(firebaseResult.error || serverResult.error || 'Invalid administrator credentials.');
+      setLoginError(serverResult.error || 'Invalid email or password.');
     }
     setIsLoggingIn(false);
   };
@@ -247,6 +316,64 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose, onLogout }) => 
       setLoginError(res.error);
     }
     setIsGoogleLoggingIn(false);
+  };
+
+  const handleForgotSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const cleanEmail = forgotEmail.trim();
+    if (!cleanEmail) {
+      setForgotError('Please enter your administrator email address.');
+      return;
+    }
+
+    setIsSendingReset(true);
+    setForgotError(null);
+    setForgotMessage(null);
+
+    const res = await sendAdminPasswordReset(cleanEmail);
+    setIsSendingReset(false);
+
+    if (res.success) {
+      setForgotMessage(res.message);
+    } else {
+      setForgotError(res.message || 'Unable to request password reset. Please try again.');
+    }
+  };
+
+  const handleResetSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setResetFormError(null);
+
+    if (newPassword !== confirmPassword) {
+      setResetFormError('Passwords do not match. Please ensure both fields are identical.');
+      return;
+    }
+
+    const strength = validatePasswordStrength(newPassword);
+    if (!strength.isValid) {
+      setResetFormError('Password does not satisfy all enterprise security requirements. Please check the rules below.');
+      return;
+    }
+
+    setIsResettingPassword(true);
+    const res = await confirmAdminPasswordReset(resetCode, newPassword);
+    setIsResettingPassword(false);
+
+    if (res.success) {
+      setResetSuccessMessage(res.message);
+      // Clean up URL parameters smoothly
+      if (typeof window !== 'undefined' && window.history?.replaceState) {
+        const url = new URL(window.location.href);
+        url.searchParams.delete('mode');
+        url.searchParams.delete('oobCode');
+        url.searchParams.delete('apiKey');
+        url.searchParams.delete('lang');
+        url.searchParams.delete('resetToken');
+        window.history.replaceState({}, document.title, url.pathname + url.hash);
+      }
+    } else {
+      setResetFormError(res.message || 'Failed to update password. Please request a new password reset link.');
+    }
   };
 
   const handleLogout = async () => {
@@ -348,98 +475,496 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose, onLogout }) => 
     );
   }
 
-  // 3. Login Screen
+  // 3. Authentication & Password Reset Screens
   if (!isAuthenticated) {
+    const passwordStrength = validatePasswordStrength(newPassword);
+    const passwordsMatch = newPassword.length > 0 && newPassword === confirmPassword;
+
     return (
-      <div className="fixed inset-0 z-50 bg-[#0c0a09]/95 backdrop-blur-md flex items-center justify-center p-4 font-sans">
-        <div className="bg-neutral-900 border border-white/15 rounded-3xl max-w-md w-full p-6 sm:p-8 space-y-6 shadow-2xl relative overflow-hidden">
+      <div className="fixed inset-0 z-50 bg-[#0c0a09]/95 backdrop-blur-md flex items-center justify-center p-4 font-sans overflow-y-auto">
+        <div className="bg-neutral-900 border border-white/15 rounded-3xl max-w-md w-full p-6 sm:p-8 space-y-6 shadow-2xl relative overflow-hidden my-auto">
           <div className="absolute top-0 right-0 -mr-16 -mt-16 w-48 h-48 bg-rose-600/15 rounded-full blur-3xl pointer-events-none" />
 
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2.5">
-              <div className="w-9 h-9 rounded-xl bg-rose-600 flex items-center justify-center font-bold text-white shadow-lg shadow-rose-600/30 text-sm">
-                CMS
-              </div>
-              <div>
-                <h3 className="text-base font-bold text-white">Administrator Access</h3>
-                <p className="text-xs text-neutral-400">Firebase Authenticated Portal</p>
-              </div>
-            </div>
+          {/* ========================================================================= */}
+          {/* VIEW: 1. FORGOT PASSWORD                                                  */}
+          {/* ========================================================================= */}
+          {authView === 'forgot' && (
+            <div className="space-y-6 animate-in fade-in duration-200">
+              <div className="flex items-center justify-between">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setAuthView('login');
+                    setForgotError(null);
+                    setForgotMessage(null);
+                  }}
+                  className="flex items-center gap-1.5 text-xs text-neutral-400 hover:text-white transition-colors p-1 -ml-1 rounded-lg"
+                  aria-label="Back to login"
+                >
+                  <ArrowLeft className="w-4 h-4" />
+                  <span>Back to Sign In</span>
+                </button>
 
-            <button
-              onClick={onClose}
-              className="p-2 rounded-xl bg-white/5 hover:bg-white/10 text-neutral-400 hover:text-white transition-colors"
-              title="Close and Return to Site"
-            >
-              <X className="w-4 h-4" />
-            </button>
-          </div>
+                <button
+                  onClick={onClose}
+                  className="p-2 rounded-xl bg-white/5 hover:bg-white/10 text-neutral-400 hover:text-white transition-colors"
+                  title="Close and Return to Site"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
 
-          {loginError && (
-            <div className="p-3.5 rounded-xl bg-rose-500/15 border border-rose-500/30 text-rose-300 text-xs flex items-center gap-2.5 animate-in fade-in duration-200">
-              <AlertCircle className="w-4 h-4 flex-shrink-0 text-rose-400" />
-              <span>{loginError}</span>
+              <div className="space-y-1.5">
+                <div className="w-10 h-10 rounded-xl bg-rose-600/20 border border-rose-500/30 text-rose-400 flex items-center justify-center font-bold text-sm mb-3">
+                  <KeyRound className="w-5 h-5" />
+                </div>
+                <h3 className="text-lg font-bold text-white">Reset Administrator Password</h3>
+                <p className="text-xs text-neutral-400 leading-relaxed">
+                  Enter your registered administrator email address to receive a secure, single-use password reset link.
+                </p>
+              </div>
+
+              {forgotMessage ? (
+                <div className="space-y-4">
+                  <div className="p-4 rounded-2xl bg-emerald-500/15 border border-emerald-500/30 text-emerald-200 text-xs space-y-2">
+                    <div className="flex items-center gap-2 font-semibold text-emerald-400 text-sm">
+                      <CheckCircle2 className="w-4 h-4 flex-shrink-0" />
+                      <span>Password Reset Requested</span>
+                    </div>
+                    <p className="leading-relaxed text-neutral-300">
+                      {forgotMessage}
+                    </p>
+                    <p className="text-[11px] text-neutral-400 pt-1 border-t border-emerald-500/20">
+                      Please check your inbox (and spam folder). For security, reset links are time-limited and expire in 1 hour.
+                    </p>
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setAuthView('login');
+                      setForgotMessage(null);
+                      setForgotError(null);
+                    }}
+                    className="w-full py-3 rounded-xl text-xs font-semibold bg-white/10 hover:bg-white/15 text-white border border-white/10 flex items-center justify-center gap-2 transition-all"
+                  >
+                    <ArrowLeft className="w-3.5 h-3.5" />
+                    <span>Return to Sign In</span>
+                  </button>
+                </div>
+              ) : (
+                <form onSubmit={handleForgotSubmit} className="space-y-4">
+                  {forgotError && (
+                    <div className="p-3.5 rounded-xl bg-rose-500/15 border border-rose-500/30 text-rose-300 text-xs flex items-center gap-2.5 animate-in fade-in duration-200">
+                      <AlertCircle className="w-4 h-4 flex-shrink-0 text-rose-400" />
+                      <span>{forgotError}</span>
+                    </div>
+                  )}
+
+                  <div>
+                    <label className="block text-xs font-semibold text-neutral-300 mb-1.5">Registered Admin Email</label>
+                    <div className="relative">
+                      <input
+                        type="email"
+                        required
+                        placeholder="admin@rohitverma.design"
+                        value={forgotEmail}
+                        onChange={(e) => setForgotEmail(e.target.value)}
+                        className="w-full bg-black/40 border border-white/10 rounded-xl pl-10 pr-3.5 py-2.5 text-sm text-white focus:border-rose-500 focus:outline-none transition-colors"
+                        autoComplete="email"
+                      />
+                      <Mail className="w-4 h-4 text-neutral-500 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+                    </div>
+                  </div>
+
+                  <button
+                    type="submit"
+                    disabled={isSendingReset}
+                    className="w-full py-3 rounded-xl text-sm font-semibold bg-rose-600 hover:bg-rose-700 text-white shadow-lg shadow-rose-600/30 flex items-center justify-center gap-2 transition-all mt-2 disabled:opacity-50"
+                  >
+                    {isSendingReset ? (
+                      <>
+                        <RefreshCw className="w-4 h-4 animate-spin" />
+                        <span>Sending Reset Link...</span>
+                      </>
+                    ) : (
+                      <>
+                        <Send className="w-4 h-4" />
+                        <span>Send Password Reset Link</span>
+                      </>
+                    )}
+                  </button>
+                </form>
+              )}
+
+              <div className="pt-4 border-t border-white/10 text-center text-xs text-neutral-500 flex items-center justify-center gap-1.5">
+                <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
+                <span>Single-use & time-limited cryptographic reset tokens</span>
+              </div>
             </div>
           )}
 
-          {/* Google Sign In Option */}
-          <button
-            type="button"
-            onClick={handleGoogleLogin}
-            disabled={isGoogleLoggingIn || isLoggingIn}
-            className="w-full py-2.5 px-4 rounded-xl text-xs font-semibold bg-white/10 hover:bg-white/15 text-white border border-white/10 flex items-center justify-center gap-2.5 transition-all disabled:opacity-50"
-          >
-            <Globe className="w-4 h-4 text-rose-400" />
-            <span>{isGoogleLoggingIn ? 'Connecting with Google...' : 'Sign in with Google Admin'}</span>
-          </button>
+          {/* ========================================================================= */}
+          {/* VIEW: 2. RESET PASSWORD (SET NEW PASSWORD VIA TOKEN)                      */}
+          {/* ========================================================================= */}
+          {authView === 'reset' && (
+            <div className="space-y-6 animate-in fade-in duration-200">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2.5">
+                  <div className="w-9 h-9 rounded-xl bg-rose-600 flex items-center justify-center font-bold text-white shadow-lg shadow-rose-600/30 text-sm">
+                    <KeyRound className="w-4 h-4" />
+                  </div>
+                  <div>
+                    <h3 className="text-base font-bold text-white">Create New Password</h3>
+                    <p className="text-xs text-neutral-400">Admin Security Update</p>
+                  </div>
+                </div>
 
-          <div className="flex items-center gap-3">
-            <div className="flex-1 h-px bg-white/10" />
-            <span className="text-[11px] text-neutral-500 font-medium uppercase tracking-wider">or email credentials</span>
-            <div className="flex-1 h-px bg-white/10" />
-          </div>
+                <button
+                  onClick={onClose}
+                  className="p-2 rounded-xl bg-white/5 hover:bg-white/10 text-neutral-400 hover:text-white transition-colors"
+                  title="Close"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
 
-          <form onSubmit={handleLoginSubmit} className="space-y-4">
-            <div>
-              <label className="block text-xs font-semibold text-neutral-300 mb-1.5">Admin Email</label>
-              <input
-                type="email"
-                required
-                placeholder="admin@rohitverma.design"
-                value={loginEmail}
-                onChange={(e) => setLoginEmail(e.target.value)}
-                className="w-full bg-black/40 border border-white/10 rounded-xl px-3.5 py-2.5 text-sm text-white focus:border-rose-500 focus:outline-none transition-colors"
-                autoComplete="email"
-              />
+              {isVerifyingCode ? (
+                <div className="py-8 flex flex-col items-center justify-center gap-3 text-center">
+                  <div className="w-8 h-8 rounded-full border-2 border-rose-500 border-t-transparent animate-spin" />
+                  <span className="text-xs text-neutral-400">Verifying secure reset link token...</span>
+                </div>
+              ) : resetCodeError ? (
+                <div className="space-y-4">
+                  <div className="p-4 rounded-2xl bg-rose-500/15 border border-rose-500/30 text-rose-200 text-xs space-y-2">
+                    <div className="flex items-center gap-2 font-semibold text-rose-300 text-sm">
+                      <AlertCircle className="w-4 h-4 flex-shrink-0 text-rose-400" />
+                      <span>Invalid or Expired Reset Link</span>
+                    </div>
+                    <p className="leading-relaxed text-neutral-300">{resetCodeError}</p>
+                  </div>
+
+                  <div className="flex flex-col gap-2">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setAuthView('forgot');
+                        setResetCodeError(null);
+                      }}
+                      className="w-full py-2.5 rounded-xl text-xs font-semibold bg-rose-600 hover:bg-rose-700 text-white flex items-center justify-center gap-2 transition-all"
+                    >
+                      <RefreshCw className="w-3.5 h-3.5" />
+                      <span>Request a New Reset Link</span>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setAuthView('login');
+                        setResetCodeError(null);
+                      }}
+                      className="w-full py-2 rounded-xl text-xs text-neutral-400 hover:text-white bg-white/5 hover:bg-white/10 transition-colors"
+                    >
+                      Back to Sign In
+                    </button>
+                  </div>
+                </div>
+              ) : resetSuccessMessage ? (
+                <div className="space-y-4">
+                  <div className="p-4 rounded-2xl bg-emerald-500/15 border border-emerald-500/30 text-emerald-200 text-xs space-y-2">
+                    <div className="flex items-center gap-2 font-semibold text-emerald-400 text-sm">
+                      <CheckCircle2 className="w-4 h-4 flex-shrink-0" />
+                      <span>Password Reset Successful!</span>
+                    </div>
+                    <p className="leading-relaxed text-neutral-300">{resetSuccessMessage}</p>
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (resetCodeEmail) {
+                        setLoginEmail(resetCodeEmail);
+                      }
+                      setLoginPassword('');
+                      setLoginError(null);
+                      setAuthView('login');
+                    }}
+                    className="w-full py-3 rounded-xl text-xs font-semibold bg-rose-600 hover:bg-rose-700 text-white shadow-lg shadow-rose-600/30 flex items-center justify-center gap-2 transition-all"
+                  >
+                    <Lock className="w-3.5 h-3.5" />
+                    <span>Proceed to Sign In with New Password</span>
+                  </button>
+                </div>
+              ) : (
+                <form onSubmit={handleResetSubmit} className="space-y-4">
+                  {resetCodeEmail && (
+                    <div className="p-2.5 rounded-xl bg-white/5 border border-white/10 text-xs flex items-center justify-between">
+                      <span className="text-neutral-400">Account:</span>
+                      <span className="font-mono font-medium text-white">{resetCodeEmail}</span>
+                    </div>
+                  )}
+
+                  {resetFormError && (
+                    <div className="p-3.5 rounded-xl bg-rose-500/15 border border-rose-500/30 text-rose-300 text-xs flex items-center gap-2.5 animate-in fade-in duration-200">
+                      <AlertCircle className="w-4 h-4 flex-shrink-0 text-rose-400" />
+                      <span>{resetFormError}</span>
+                    </div>
+                  )}
+
+                  <div>
+                    <label className="block text-xs font-semibold text-neutral-300 mb-1.5">New Password</label>
+                    <div className="relative">
+                      <input
+                        type={showNewPassword ? 'text' : 'password'}
+                        required
+                        placeholder="••••••••••••"
+                        value={newPassword}
+                        onChange={(e) => setNewPassword(e.target.value)}
+                        className="w-full bg-black/40 border border-white/10 rounded-xl px-3.5 py-2.5 pr-10 text-sm text-white focus:border-rose-500 focus:outline-none transition-colors"
+                        autoComplete="new-password"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowNewPassword(!showNewPassword)}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-500 hover:text-neutral-300"
+                        aria-label={showNewPassword ? 'Hide password' : 'Show password'}
+                      >
+                        {showNewPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                      </button>
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-semibold text-neutral-300 mb-1.5">Confirm New Password</label>
+                    <div className="relative">
+                      <input
+                        type={showConfirmPassword ? 'text' : 'password'}
+                        required
+                        placeholder="••••••••••••"
+                        value={confirmPassword}
+                        onChange={(e) => setConfirmPassword(e.target.value)}
+                        className="w-full bg-black/40 border border-white/10 rounded-xl px-3.5 py-2.5 pr-10 text-sm text-white focus:border-rose-500 focus:outline-none transition-colors"
+                        autoComplete="new-password"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-500 hover:text-neutral-300"
+                        aria-label={showConfirmPassword ? 'Hide password' : 'Show password'}
+                      >
+                        {showConfirmPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Password Strength Checklist */}
+                  <div className="p-3.5 rounded-xl bg-white/5 border border-white/10 space-y-2.5 text-xs">
+                    <div className="flex items-center justify-between text-[11px]">
+                      <span className="font-semibold text-neutral-300">Password Strength:</span>
+                      <span className={`font-semibold ${
+                        passwordStrength.score >= 5 ? 'text-emerald-400' :
+                        passwordStrength.score >= 3 ? 'text-amber-400' : 'text-rose-400'
+                      }`}>
+                        {passwordStrength.score >= 5 ? 'Strong' :
+                         passwordStrength.score >= 3 ? 'Good' : 'Needs Requirements'}
+                      </span>
+                    </div>
+
+                    {/* Visual Strength Meter */}
+                    <div className="grid grid-cols-5 gap-1.5">
+                      {[1, 2, 3, 4, 5].map((level) => (
+                        <div
+                          key={level}
+                          className={`h-1.5 rounded-full transition-all ${
+                            passwordStrength.score >= level
+                              ? passwordStrength.score >= 5
+                                ? 'bg-emerald-500'
+                                : passwordStrength.score >= 3
+                                ? 'bg-amber-500'
+                                : 'bg-rose-500'
+                              : 'bg-white/10'
+                          }`}
+                        />
+                      ))}
+                    </div>
+
+                    {/* Requirements List */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5 pt-1 text-[11px]">
+                      <div className={`flex items-center gap-1.5 ${passwordStrength.minLength ? 'text-emerald-400' : 'text-neutral-400'}`}>
+                        {passwordStrength.minLength ? <Check className="w-3.5 h-3.5" /> : <div className="w-1.5 h-1.5 rounded-full bg-neutral-600 ml-1" />}
+                        <span>At least 8 characters</span>
+                      </div>
+                      <div className={`flex items-center gap-1.5 ${passwordStrength.hasUpper ? 'text-emerald-400' : 'text-neutral-400'}`}>
+                        {passwordStrength.hasUpper ? <Check className="w-3.5 h-3.5" /> : <div className="w-1.5 h-1.5 rounded-full bg-neutral-600 ml-1" />}
+                        <span>1+ Uppercase letter (A-Z)</span>
+                      </div>
+                      <div className={`flex items-center gap-1.5 ${passwordStrength.hasLower ? 'text-emerald-400' : 'text-neutral-400'}`}>
+                        {passwordStrength.hasLower ? <Check className="w-3.5 h-3.5" /> : <div className="w-1.5 h-1.5 rounded-full bg-neutral-600 ml-1" />}
+                        <span>1+ Lowercase letter (a-z)</span>
+                      </div>
+                      <div className={`flex items-center gap-1.5 ${passwordStrength.hasNumber ? 'text-emerald-400' : 'text-neutral-400'}`}>
+                        {passwordStrength.hasNumber ? <Check className="w-3.5 h-3.5" /> : <div className="w-1.5 h-1.5 rounded-full bg-neutral-600 ml-1" />}
+                        <span>1+ Number (0-9)</span>
+                      </div>
+                      <div className={`flex items-center gap-1.5 ${passwordStrength.hasSpecial ? 'text-emerald-400' : 'text-neutral-400'}`}>
+                        {passwordStrength.hasSpecial ? <Check className="w-3.5 h-3.5" /> : <div className="w-1.5 h-1.5 rounded-full bg-neutral-600 ml-1" />}
+                        <span>1+ Special symbol (!@#$)</span>
+                      </div>
+                      <div className={`flex items-center gap-1.5 ${passwordsMatch ? 'text-emerald-400' : 'text-neutral-400'}`}>
+                        {passwordsMatch ? <Check className="w-3.5 h-3.5" /> : <div className="w-1.5 h-1.5 rounded-full bg-neutral-600 ml-1" />}
+                        <span>Passwords match</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <button
+                    type="submit"
+                    disabled={isResettingPassword || !passwordStrength.isValid || !passwordsMatch}
+                    className="w-full py-3 rounded-xl text-sm font-semibold bg-rose-600 hover:bg-rose-700 text-white shadow-lg shadow-rose-600/30 flex items-center justify-center gap-2 transition-all mt-2 disabled:opacity-40 disabled:cursor-not-allowed"
+                  >
+                    {isResettingPassword ? (
+                      <>
+                        <RefreshCw className="w-4 h-4 animate-spin" />
+                        <span>Updating Password...</span>
+                      </>
+                    ) : (
+                      <>
+                        <Lock className="w-4 h-4" />
+                        <span>Save New Password & Sign In</span>
+                      </>
+                    )}
+                  </button>
+                </form>
+              )}
+
+              <div className="pt-4 border-t border-white/10 text-center text-xs text-neutral-500 flex items-center justify-center gap-1.5">
+                <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
+                <span>Enterprise grade salted hashing & Firebase security</span>
+              </div>
             </div>
+          )}
 
-            <div>
-              <label className="block text-xs font-semibold text-neutral-300 mb-1.5">Password</label>
-              <input
-                type="password"
-                required
-                placeholder="••••••••••••"
-                value={loginPassword}
-                onChange={(e) => setLoginPassword(e.target.value)}
-                className="w-full bg-black/40 border border-white/10 rounded-xl px-3.5 py-2.5 text-sm text-white focus:border-rose-500 focus:outline-none transition-colors"
-                autoComplete="current-password"
-              />
+          {/* ========================================================================= */}
+          {/* VIEW: 3. STANDARD LOGIN SCREEN                                            */}
+          {/* ========================================================================= */}
+          {authView === 'login' && (
+            <div className="space-y-6">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2.5">
+                  <div className="w-9 h-9 rounded-xl bg-rose-600 flex items-center justify-center font-bold text-white shadow-lg shadow-rose-600/30 text-sm">
+                    CMS
+                  </div>
+                  <div>
+                    <h3 className="text-base font-bold text-white">Administrator Access</h3>
+                    <p className="text-xs text-neutral-400">Firebase Authenticated Portal</p>
+                  </div>
+                </div>
+
+                <button
+                  onClick={onClose}
+                  className="p-2 rounded-xl bg-white/5 hover:bg-white/10 text-neutral-400 hover:text-white transition-colors"
+                  title="Close and Return to Site"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+
+              {loginError && (
+                <div className="p-3.5 rounded-xl bg-rose-500/15 border border-rose-500/30 text-rose-300 text-xs flex items-center gap-2.5 animate-in fade-in duration-200">
+                  <AlertCircle className="w-4 h-4 flex-shrink-0 text-rose-400" />
+                  <span>{loginError}</span>
+                </div>
+              )}
+
+              {/* Google Sign In Option */}
+              <button
+                type="button"
+                onClick={handleGoogleLogin}
+                disabled={isGoogleLoggingIn || isLoggingIn}
+                className="w-full py-2.5 px-4 rounded-xl text-xs font-semibold bg-white/10 hover:bg-white/15 text-white border border-white/10 flex items-center justify-center gap-2.5 transition-all disabled:opacity-50"
+              >
+                <Globe className="w-4 h-4 text-rose-400" />
+                <span>{isGoogleLoggingIn ? 'Connecting with Google...' : 'Sign in with Google Admin'}</span>
+              </button>
+
+              <div className="flex items-center gap-3">
+                <div className="flex-1 h-px bg-white/10" />
+                <span className="text-[11px] text-neutral-500 font-medium uppercase tracking-wider">or email credentials</span>
+                <div className="flex-1 h-px bg-white/10" />
+              </div>
+
+              <form onSubmit={handleLoginSubmit} className="space-y-4">
+                <div>
+                  <label className="block text-xs font-semibold text-neutral-300 mb-1.5">Admin Email</label>
+                  <input
+                    type="email"
+                    required
+                    placeholder="admin@rohitverma.design"
+                    value={loginEmail}
+                    onChange={(e) => setLoginEmail(e.target.value)}
+                    className="w-full bg-black/40 border border-white/10 rounded-xl px-3.5 py-2.5 text-sm text-white focus:border-rose-500 focus:outline-none transition-colors"
+                    autoComplete="email"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-semibold text-neutral-300 mb-1.5">Password</label>
+                  <div className="relative">
+                    <input
+                      type={showLoginPassword ? 'text' : 'password'}
+                      required
+                      placeholder="••••••••••••"
+                      value={loginPassword}
+                      onChange={(e) => setLoginPassword(e.target.value)}
+                      className="w-full bg-black/40 border border-white/10 rounded-xl px-3.5 py-2.5 pr-10 text-sm text-white focus:border-rose-500 focus:outline-none transition-colors"
+                      autoComplete="current-password"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowLoginPassword(!showLoginPassword)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-500 hover:text-neutral-300"
+                      aria-label={showLoginPassword ? 'Hide password' : 'Show password'}
+                    >
+                      {showLoginPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                    </button>
+                  </div>
+
+                  {/* Clearly visible Forgot Password link below the Password field */}
+                  <div className="flex items-center justify-between pt-2">
+                    <span className="text-[11px] text-neutral-500">Authorized personnel only</span>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setAuthView('forgot');
+                        setForgotEmail(loginEmail || '');
+                        setForgotError(null);
+                        setForgotMessage(null);
+                      }}
+                      className="text-xs text-rose-400 hover:text-rose-300 transition-colors font-medium flex items-center gap-1 focus:outline-none focus:underline"
+                      id="admin-forgot-password-link"
+                    >
+                      <KeyRound className="w-3.5 h-3.5" />
+                      <span>Forgot Password?</span>
+                    </button>
+                  </div>
+                </div>
+
+                <button
+                  type="submit"
+                  disabled={isLoggingIn || isGoogleLoggingIn}
+                  className="w-full py-3 rounded-xl text-sm font-semibold bg-rose-600 hover:bg-rose-700 text-white shadow-lg shadow-rose-600/30 flex items-center justify-center gap-2 transition-all mt-2 disabled:opacity-50"
+                >
+                  <Lock className="w-4 h-4" />
+                  <span>{isLoggingIn ? 'Authenticating...' : 'Sign In to Admin Panel'}</span>
+                </button>
+              </form>
+
+              <div className="pt-4 border-t border-white/10 text-center text-xs text-neutral-500 flex items-center justify-center gap-1.5">
+                <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
+                <span>Protected with Firebase Auth & Role-Based Access Control</span>
+              </div>
             </div>
-
-            <button
-              type="submit"
-              disabled={isLoggingIn || isGoogleLoggingIn}
-              className="w-full py-3 rounded-xl text-sm font-semibold bg-rose-600 hover:bg-rose-700 text-white shadow-lg shadow-rose-600/30 flex items-center justify-center gap-2 transition-all mt-2 disabled:opacity-50"
-            >
-              <Lock className="w-4 h-4" />
-              <span>{isLoggingIn ? 'Authenticating...' : 'Sign In to Admin Panel'}</span>
-            </button>
-          </form>
-
-          <div className="pt-4 border-t border-white/10 text-center text-xs text-neutral-500 flex items-center justify-center gap-1.5">
-            <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
-            <span>Protected with Firebase Auth & Role-Based Access Control</span>
-          </div>
+          )}
         </div>
       </div>
     );
