@@ -41,7 +41,7 @@ function getAuthHeaders(): HeadersInit {
 /**
  * Synchronize authenticated Firebase Auth session with backend.
  */
-export async function syncFirebaseAdminSession(email: string, idToken: string): Promise<{
+export async function syncFirebaseAdminSession(email: string, idToken: string, uid?: string): Promise<{
   success: boolean;
   adminEmail?: string;
   token?: string;
@@ -54,7 +54,7 @@ export async function syncFirebaseAdminSession(email: string, idToken: string): 
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       credentials: 'include', // Include HTTP-only cookies
-      body: JSON.stringify({ email, idToken }),
+      body: JSON.stringify({ email, idToken, uid }),
     });
 
     const data = await res.json();
@@ -87,7 +87,7 @@ export async function syncFirebaseAdminSession(email: string, idToken: string): 
 /**
  * Authenticate with the server using Administrator credentials.
  */
-export async function loginAdmin(email: string, password?: string, idToken?: string): Promise<{
+export async function loginAdmin(email: string, password?: string, idToken?: string, uid?: string): Promise<{
   success: boolean;
   adminEmail?: string;
   token?: string;
@@ -101,7 +101,7 @@ export async function loginAdmin(email: string, password?: string, idToken?: str
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       credentials: 'include', // Include HTTP-only cookies
-      body: JSON.stringify({ email, password, idToken }),
+      body: JSON.stringify({ email, password, idToken, uid }),
     });
 
     const data = await res.json();

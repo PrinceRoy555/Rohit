@@ -11,6 +11,7 @@ import {
   signOutAdmin,
   observeAuthState,
   verifyAdminRole,
+  syncAdminFirestoreProfile,
   sendAdminPasswordReset,
   verifyAdminPasswordResetCode,
   confirmAdminPasswordReset,
@@ -99,8 +100,8 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose, onLogout }) => 
   const [isUnauthorizedUser, setIsUnauthorizedUser] = useState<boolean>(false);
   const [unauthorizedEmail, setUnauthorizedEmail] = useState<string>('');
 
-  // Login form state (Empty defaults to prevent credential exposure)
-  const [loginEmail, setLoginEmail] = useState('');
+  // Login form state (Pre-filled with primary admin email for smooth access)
+  const [loginEmail, setLoginEmail] = useState('workall724038@gmail.com');
   const [loginPassword, setLoginPassword] = useState('');
   const [showLoginPassword, setShowLoginPassword] = useState(false);
   const [loginError, setLoginError] = useState<string | null>(null);
@@ -194,12 +195,13 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose, onLogout }) => 
         if (roleRes.authorized) {
           setIsUnauthorizedUser(false);
           setIsAuthenticated(true);
-          setAdminEmail(user.email || 'admin');
+          setAdminEmail(user.email || 'workall724038@gmail.com');
           setAdminRole(roleRes.role);
 
           try {
+            await syncAdminFirestoreProfile(user);
             const idToken = await user.getIdToken();
-            await syncFirebaseAdminSession(user.email || '', idToken);
+            await syncFirebaseAdminSession(user.email || 'workall724038@gmail.com', idToken, user.uid);
             await refreshConfig();
           } catch (e) {
             console.warn('[AdminPanel] Session sync warning:', e);
@@ -260,8 +262,9 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose, onLogout }) => 
       if (firebaseResult.success && firebaseResult.user) {
         const roleCheck = await verifyAdminRole(firebaseResult.user);
         if (roleCheck.authorized) {
+          await syncAdminFirestoreProfile(firebaseResult.user);
           const idToken = await firebaseResult.user.getIdToken();
-          await syncFirebaseAdminSession(cleanEmail, idToken);
+          await syncFirebaseAdminSession(cleanEmail, idToken, firebaseResult.user.uid);
           setIsAuthenticated(true);
           setAdminEmail(cleanEmail);
           setAdminRole(roleCheck.role);
@@ -303,8 +306,9 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose, onLogout }) => 
     if (res.success && res.user) {
       const roleCheck = await verifyAdminRole(res.user);
       if (roleCheck.authorized) {
+        await syncAdminFirestoreProfile(res.user);
         const idToken = await res.user.getIdToken();
-        await syncFirebaseAdminSession(res.user.email || '', idToken);
+        await syncFirebaseAdminSession(res.user.email || '', idToken, res.user.uid);
         setIsAuthenticated(true);
         setAdminEmail(res.user.email || '');
         setAdminRole(roleCheck.role);

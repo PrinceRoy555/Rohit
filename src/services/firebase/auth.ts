@@ -10,7 +10,7 @@ import {
   User,
   AuthError
 } from 'firebase/auth';
-import { doc, getDoc } from 'firebase/firestore';
+import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { auth, db, isFirebaseConfigured } from '../../lib/firebase';
 
 export interface AuthStateResult {
@@ -35,7 +35,8 @@ export interface PasswordRequirementsStatus {
   score: number; // 0 to 5
 }
 
-const SUPER_ADMIN_EMAIL = 'workall724038@gmail.com';
+export const SUPER_ADMIN_EMAIL = 'workall724038@gmail.com';
+export const SUPER_ADMIN_UID = '7wupZnpLh1MPTYpci5keNIS1Fyt1';
 
 /**
  * Validates password against enterprise strong-password policy:
@@ -148,7 +149,7 @@ export async function signInAdminWithGoogle(): Promise<{ success: boolean; user?
  * 3. Firestore /admins/{uid} record
  */
 export async function verifyAdminRole(user: User | null): Promise<AdminRoleResult> {
-  if (!user || !user.email) {
+  if (!user) {
     return {
       authorized: false,
       role: 'editor',
@@ -157,14 +158,18 @@ export async function verifyAdminRole(user: User | null): Promise<AdminRoleResul
     };
   }
 
-  const cleanEmail = user.email.toLowerCase().trim();
+  const cleanEmail = (user.email || '').toLowerCase().trim();
 
-  // 1. Primary Super Admin
-  if (cleanEmail === SUPER_ADMIN_EMAIL) {
+  // 1. Primary Super Admin by UID or Email
+  if (
+    (user.uid && user.uid === SUPER_ADMIN_UID) ||
+    cleanEmail === SUPER_ADMIN_EMAIL ||
+    cleanEmail === 'workall724038@gmail.com'
+  ) {
     return {
       authorized: true,
       role: 'super_admin',
-      email: cleanEmail
+      email: cleanEmail || SUPER_ADMIN_EMAIL
     };
   }
 
@@ -206,6 +211,34 @@ export async function verifyAdminRole(user: User | null): Promise<AdminRoleResul
     email: cleanEmail,
     error: 'Your account is authenticated, but not authorized for Administrator access.'
   };
+}
+
+/**
+ * Ensures admin profile document exists in Firestore for super admin UID
+ */
+export async function syncAdminFirestoreProfile(user: User): Promise<void> {
+  if (!isFirebaseConfigured() || !db || !user?.uid) return;
+  try {
+    const isSuper = user.uid === SUPER_ADMIN_UID || (user.email || '').toLowerCase().trim() === SUPER_ADMIN_EMAIL;
+    if (isSuper) {
+      await setDoc(doc(db, 'adminProfiles', user.uid), {
+        uid: user.uid,
+        email: user.email || SUPER_ADMIN_EMAIL,
+        name: 'Rohit Verma',
+        role: 'super_admin',
+        status: 'active',
+        updatedAt: new Date().toISOString()
+      }, { merge: true });
+
+      await setDoc(doc(db, 'admins', user.uid), {
+        uid: user.uid,
+        email: user.email || SUPER_ADMIN_EMAIL,
+        role: 'super_admin'
+      }, { merge: true });
+    }
+  } catch (e) {
+    console.warn('[Firebase Auth] syncAdminFirestoreProfile warning:', e);
+  }
 }
 
 /**

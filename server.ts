@@ -37,6 +37,7 @@ app.use((req, res, next) => {
 // =========================================================================
 // SECURITY CONFIGURATION & CREDENTIAL STORE
 // =========================================================================
+const SUPER_ADMIN_UID = '7wupZnpLh1MPTYpci5keNIS1Fyt1';
 const ADMIN_EMAIL = (process.env.ADMIN_EMAIL || 'workall724038@gmail.com').trim().toLowerCase();
 const ADMIN_PASSWORD_ENV = (process.env.ADMIN_PASSWORD || '').trim();
 const SESSION_SECRET = process.env.ADMIN_SESSION_SECRET || crypto.randomBytes(32).toString('hex');
@@ -62,6 +63,7 @@ function getValidAdminPasswords(): string[] {
     process.env.ADMIN_PASS,
     process.env.ADMIN_SECRET,
     ADMIN_PASSWORD_ENV,
+    'rohit@2003',
     'Verma@9027'
   ];
   for (const raw of rawEnv) {
@@ -536,13 +538,13 @@ interface AdminUserRecord extends AdminUser {
   salt?: string;
 }
 
-const initialSuperAdminPass = ADMIN_PASSWORD_ENV || 'Verma@9027';
+const initialSuperAdminPass = ADMIN_PASSWORD_ENV || 'rohit@2003';
 const superAdminHashData = hashPassword(initialSuperAdminPass);
 const editorHashData = hashPassword('Editor@Unicivix2026!');
 
 let serverAdminUsers: AdminUserRecord[] = [
   {
-    id: 'usr-1',
+    id: SUPER_ADMIN_UID,
     email: ADMIN_EMAIL,
     name: 'Rohit Verma',
     role: 'super_admin',
@@ -613,16 +615,17 @@ function pickCategoryCover(category: string): string {
  */
 app.post('/api/admin/firebase-session', async (req, res) => {
   const ip = (req.headers['x-forwarded-for'] as string) || req.socket.remoteAddress || '127.0.0.1';
-  const { email, idToken } = req.body || {};
+  const { email, idToken, uid } = req.body || {};
 
   const cleanEmail = (typeof email === 'string' ? email : '').trim().toLowerCase();
-  if (!cleanEmail || !idToken) {
+  const cleanUid = typeof uid === 'string' ? uid.trim() : '';
+  if ((!cleanEmail && !cleanUid) || !idToken) {
     return res.status(400).json({ error: 'Missing authenticated session payload', code: 'INVALID_PAYLOAD' });
   }
 
-  // Verify whether email is authorized administrator
-  const isSuperAdmin = cleanEmail === ADMIN_EMAIL;
-  const isRegisteredAdmin = serverAdminUsers.some(u => u.email.toLowerCase() === cleanEmail && u.status === 'active');
+  // Verify whether email or UID is authorized administrator
+  const isSuperAdmin = cleanUid === SUPER_ADMIN_UID || cleanEmail === ADMIN_EMAIL || isConfiguredAdminEmail(cleanEmail);
+  const isRegisteredAdmin = serverAdminUsers.some(u => (u.email.toLowerCase() === cleanEmail || u.id === cleanUid) && u.status === 'active');
 
   if (!isSuperAdmin && !isRegisteredAdmin) {
     logAdminAction('UNAUTHORIZED_ACCESS_ATTEMPT', cleanEmail, 'Attempted admin session creation with unauthorized Firebase account', 'warning', ip);
@@ -828,16 +831,17 @@ app.post('/api/admin/password-reset-completed', (req, res) => {
  */
 app.post('/api/admin/login', async (req, res) => {
   const ip = (req.headers['x-forwarded-for'] as string) || req.socket.remoteAddress || '127.0.0.1';
-  const { email, password, idToken } = req.body || {};
+  const { email, password, idToken, uid } = req.body || {};
 
   const cleanEmail = (typeof email === 'string' ? email : '').trim().toLowerCase();
+  const cleanUid = typeof uid === 'string' ? uid.trim() : '';
   const cleanPass = typeof password === 'string' ? password : '';
   const rateLimitKey = `${ip}:${cleanEmail || 'anonymous'}`;
 
   // If Firebase ID Token provided, route to session sync
-  if (idToken && cleanEmail) {
-    const isSuperAdmin = cleanEmail === ADMIN_EMAIL;
-    const isRegisteredAdmin = serverAdminUsers.some(u => u.email.toLowerCase() === cleanEmail && u.status === 'active');
+  if (idToken && (cleanEmail || cleanUid)) {
+    const isSuperAdmin = cleanUid === SUPER_ADMIN_UID || cleanEmail === ADMIN_EMAIL || isConfiguredAdminEmail(cleanEmail);
+    const isRegisteredAdmin = serverAdminUsers.some(u => (u.email.toLowerCase() === cleanEmail || u.id === cleanUid) && u.status === 'active');
 
     if (!isSuperAdmin && !isRegisteredAdmin) {
       logAdminAction('LOGIN_UNAUTHORIZED', cleanEmail, 'Unauthorized Firebase user attempted admin login', 'warning', ip);
