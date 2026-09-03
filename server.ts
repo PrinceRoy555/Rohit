@@ -7,7 +7,7 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
-const app = express();
+export const app = express();
 const PORT = 3000;
 
 // Initialize Gemini SDK with User-Agent: 'aistudio-build' for telemetry
@@ -2270,6 +2270,11 @@ const startServer = async () => {
   });
 };
 
-startServer().catch((err) => {
-  console.error('Failed to start server:', err);
-});
+// Only listen when running standalone (not in Vercel serverless environment)
+if (!process.env.VERCEL) {
+  startServer().catch((err) => {
+    console.error('Failed to start server:', err);
+  });
+}
+
+export default app;
