@@ -3,18 +3,20 @@ import { getFirestore, initializeFirestore, Firestore } from 'firebase/firestore
 import { getAuth, Auth } from 'firebase/auth';
 import { getStorage, FirebaseStorage } from 'firebase/storage';
 import { initializeAppCheck, ReCaptchaV3Provider, AppCheck } from 'firebase/app-check';
-import { getAnalytics, isSupported, Analytics } from 'firebase/analytics';
 import firebaseConfigJson from '../../firebase-applet-config.json';
+
+// Firebase integration toggle - Set to true to enable all Firebase services, authentication, and database connections
+export const FIREBASE_INTEGRATION_ENABLED = true;
 
 // Exact Firebase Web App Configuration
 export const FIREBASE_CONFIG = {
-  apiKey: "AIzaSyD5w8nlLD4qMjLUcTo9JvJKA2fWtqMniEM",
-  authDomain: "rohit-portfolio-e5225.firebaseapp.com",
-  projectId: "rohit-portfolio-e5225",
-  storageBucket: "rohit-portfolio-e5225.firebasestorage.app",
-  messagingSenderId: "968719694345",
-  appId: "1:968719694345:web:abaa7d6a5cfe6f29b316d8",
-  measurementId: "G-3VLKXTJPH6"
+  apiKey: "AIzaSyB_TS7hxSqENHMERmVhfPY-myZW5crYEig",
+  authDomain: "rohit-72bfa.firebaseapp.com",
+  projectId: "rohit-72bfa",
+  storageBucket: "rohit-72bfa.firebasestorage.app",
+  messagingSenderId: "444813274833",
+  appId: "1:444813274833:web:7a4faf76c2090a4b57dff0",
+  measurementId: "G-PRMKZMV6LR"
 };
 
 // Central contact fallbacks when Firebase is unavailable
@@ -73,10 +75,10 @@ const getFirebaseConfig = () => {
   };
 };
 
-const rawConfig = getFirebaseConfig();
+const rawConfig = FIREBASE_INTEGRATION_ENABLED ? getFirebaseConfig() : null;
 
 export const isFirebaseConfigured = (): boolean => {
-  return Boolean(rawConfig && rawConfig.apiKey && rawConfig.projectId);
+  return Boolean(FIREBASE_INTEGRATION_ENABLED && rawConfig && rawConfig.apiKey && rawConfig.projectId);
 };
 
 let app: FirebaseApp | null = null;
@@ -84,9 +86,9 @@ let db: Firestore | null = null;
 let auth: Auth | null = null;
 let storage: FirebaseStorage | null = null;
 let appCheck: AppCheck | null = null;
-let analytics: Analytics | null = null;
+const analytics = null;
 
-if (rawConfig && rawConfig.apiKey && rawConfig.projectId) {
+if (FIREBASE_INTEGRATION_ENABLED && rawConfig && rawConfig.apiKey && rawConfig.projectId) {
   try {
     if (!getApps().length) {
       app = initializeApp(rawConfig);
@@ -107,15 +109,6 @@ if (rawConfig && rawConfig.apiKey && rawConfig.projectId) {
 
       auth = getAuth(app);
       storage = getStorage(app);
-
-      // Initialize Analytics if supported in browser environment
-      if (typeof window !== 'undefined') {
-        isSupported().then((supported) => {
-          if (supported && app) {
-            analytics = getAnalytics(app);
-          }
-        }).catch(() => {});
-      }
 
       // App Check Initialization - strictly optional
       const metaEnv = typeof import.meta !== 'undefined' && import.meta?.env ? import.meta.env : (process.env as unknown as Record<string, string>);
@@ -146,14 +139,19 @@ if (rawConfig && rawConfig.apiKey && rawConfig.projectId) {
     console.error('[Firebase] Error initializing Firebase:', error);
   }
 } else {
-  console.warn('[Firebase] Missing Firebase configuration. Features will fall back gracefully.');
+  // Firebase integration is disabled or not configured
+  if (!FIREBASE_INTEGRATION_ENABLED) {
+    console.log('[Firebase] Firebase integration is disabled. App is operating in standalone full-stack mode.');
+  } else {
+    console.warn('[Firebase] Missing Firebase configuration. Features will fall back gracefully.');
+  }
 }
 
 export { app, db, auth, storage, appCheck, analytics };
 
 export function getFirebaseConfigDetails() {
   return {
-    projectId: rawConfig?.projectId || 'rohit-portfolio-e5225',
+    projectId: rawConfig?.projectId || 'rohit-72bfa',
     firestoreDatabaseId: rawConfig?.firestoreDatabaseId || '(default)',
     isAppInitialized: Boolean(app),
     hasDb: Boolean(db),
@@ -163,7 +161,7 @@ export function getFirebaseConfigDetails() {
 
 /**
  * Helper to check if Firebase Storage is active and enabled for uploads.
- * On Spark plan or when Storage bucket is disabled/unavailable, returns false.
+ * Uses the configured Firebase Storage bucket (rohit-72bfa.firebasestorage.app).
  */
 export function isStorageAvailable(): boolean {
   if (!isFirebaseConfigured() || !storage) return false;
@@ -174,16 +172,10 @@ export function isStorageAvailable(): boolean {
     return false;
   }
 
-  const bucket = (firebaseConfigJson as { storageBucket?: string })?.storageBucket || metaEnv?.VITE_FIREBASE_STORAGE_BUCKET || '';
+  const bucket = (firebaseConfigJson as { storageBucket?: string })?.storageBucket || metaEnv?.VITE_FIREBASE_STORAGE_BUCKET || FIREBASE_CONFIG.storageBucket || '';
   if (!bucket || bucket.includes('PLACEHOLDER') || bucket.includes('<')) {
     return false;
   }
 
-  // If explicitly enabled via VITE_FIREBASE_STORAGE_ENABLED="true", return true
-  if (storageEnabledEnv === 'true') {
-    return true;
-  }
-
-  // Default to false while Storage is temporarily disabled on Spark plan
-  return false;
+  return true;
 }

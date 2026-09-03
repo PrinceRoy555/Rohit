@@ -7,7 +7,7 @@ import { SERVICE_CATEGORIES, SERVICES_LIST } from '../servicesData';
 import WhatsAppIcon from './WhatsAppIcon';
 import { submitContactEnquiry, getReadableFirebaseError } from '../services/firebase/firestore';
 import { uploadProjectBrief } from '../services/firebase/storage';
-import { FIREBASE_FALLBACK_CONTACT, isStorageAvailable } from '../lib/firebase';
+import { FIREBASE_FALLBACK_CONTACT, isStorageAvailable, isFirebaseConfigured } from '../lib/firebase';
 import { validateAttachment } from '../lib/validation';
 
 interface ContactFormData {
@@ -182,39 +182,46 @@ export default function ContactSection() {
         if (isDev) console.log('[Form Submission] Step 4: No attachment selected, skipping storage.');
       }
 
-      // Step 5: Write document to Firestore (12s per-step timeout inside submitContactEnquiry)
-      if (isDev) console.log('[Form Submission] Step 5: Submitting payload to Firestore contactEnquiries...');
-      const firestoreRes = await submitContactEnquiry({
-        submissionId: currentSubmissionId,
-        name: data.name,
-        email: data.email,
-        phone: data.phone,
-        selectedService: data.service,
-        budgetRange: data.budget,
-        projectDescription: data.description,
-        consentAccepted: data.consent,
-        attachmentUrl,
-        attachmentName,
-        attachmentType,
-        attachmentSize,
-        attachmentPath,
-        attachmentStatus
-      });
+      let recordId = currentSubmissionId;
 
-      if (!firestoreRes.success) {
-        if (isDev) console.error('[Form Submission] Step 5 Failed:', firestoreRes.error);
-        return {
-          success: false,
-          errorCode: firestoreRes.errorCode || 'unavailable',
-          error: firestoreRes.error || getReadableFirebaseError(firestoreRes.errorCode || 'unavailable')
-        };
+      // Step 5: Write document to Firestore if Firebase integration is enabled
+      if (isFirebaseConfigured()) {
+        if (isDev) console.log('[Form Submission] Step 5: Submitting payload to Firestore contactEnquiries...');
+        const firestoreRes = await submitContactEnquiry({
+          submissionId: currentSubmissionId,
+          name: data.name,
+          email: data.email,
+          phone: data.phone,
+          selectedService: data.service,
+          budgetRange: data.budget,
+          projectDescription: data.description,
+          consentAccepted: data.consent,
+          attachmentUrl,
+          attachmentName,
+          attachmentType,
+          attachmentSize,
+          attachmentPath,
+          attachmentStatus
+        });
+
+        if (!firestoreRes.success) {
+          if (isDev) console.error('[Form Submission] Step 5 Failed:', firestoreRes.error);
+          return {
+            success: false,
+            errorCode: firestoreRes.errorCode || 'unavailable',
+            error: firestoreRes.error || getReadableFirebaseError(firestoreRes.errorCode || 'unavailable')
+          };
+        }
+
+        if (firestoreRes.id) recordId = firestoreRes.id;
+        if (isDev) console.log('[Form Submission] Step 5 Complete: Firestore document created with ID:', recordId);
+      } else {
+        if (isDev) console.log('[Form Submission] Firebase integration disabled: submitting directly to server CRM...');
       }
 
-      if (isDev) console.log('[Form Submission] Step 5 Complete: Firestore document created with ID:', firestoreRes.id);
-
-      // Step 6: Email notification dispatch (8s per-step timeout, non-blocking)
+      // Step 6: Server CRM & Email notification dispatch
       let emailFailed = false;
-      if (isDev) console.log('[Form Submission] Step 6: Triggering email notification dispatch...');
+      if (isDev) console.log('[Form Submission] Step 6: Triggering server inquiry dispatch...');
       try {
         const controller = new AbortController();
         const emailTimer = setTimeout(() => controller.abort(), 8000);
@@ -238,18 +245,20 @@ export default function ContactSection() {
 
         if (!emailRes || !emailRes.ok) {
           emailFailed = true;
-          if (isDev) console.warn('[Form Submission] Step 6 Notice: Email endpoint did not respond OK, but Firestore write succeeded.');
+          if (isDev) console.warn('[Form Submission] Server inquiry endpoint returned non-ok status.');
         } else {
-          if (isDev) console.log('[Form Submission] Step 6 Complete: Email notification dispatched.');
+          const resData = await emailRes.json().catch(() => null);
+          if (resData?.inquiryId) recordId = resData.inquiryId;
+          if (isDev) console.log('[Form Submission] Step 6 Complete: Server inquiry recorded.');
         }
       } catch {
         emailFailed = true;
-        if (isDev) console.warn('[Form Submission] Step 6 Notice: Email notification failed, but Firestore write succeeded.');
+        if (isDev) console.warn('[Form Submission] Step 6 Notice: Server dispatch timed out or network failed.');
       }
 
       return {
         success: true,
-        id: firestoreRes.id,
+        id: recordId,
         emailFailed
       };
     };

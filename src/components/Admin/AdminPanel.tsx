@@ -892,22 +892,26 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose, onLogout }) => 
                 </div>
               )}
 
-              {/* Google Sign In Option */}
-              <button
-                type="button"
-                onClick={handleGoogleLogin}
-                disabled={isGoogleLoggingIn || isLoggingIn}
-                className="w-full py-2.5 px-4 rounded-xl text-xs font-semibold bg-white/10 hover:bg-white/15 text-white border border-white/10 flex items-center justify-center gap-2.5 transition-all disabled:opacity-50"
-              >
-                <Globe className="w-4 h-4 text-rose-400" />
-                <span>{isGoogleLoggingIn ? 'Connecting with Google...' : 'Sign in with Google Admin'}</span>
-              </button>
+              {/* Google Sign In Option (Only active when Firebase Auth is configured) */}
+              {isFirebaseConfigured() && (
+                <>
+                  <button
+                    type="button"
+                    onClick={handleGoogleLogin}
+                    disabled={isGoogleLoggingIn || isLoggingIn}
+                    className="w-full py-2.5 px-4 rounded-xl text-xs font-semibold bg-white/10 hover:bg-white/15 text-white border border-white/10 flex items-center justify-center gap-2.5 transition-all disabled:opacity-50"
+                  >
+                    <Globe className="w-4 h-4 text-rose-400" />
+                    <span>{isGoogleLoggingIn ? 'Connecting with Google...' : 'Sign in with Google Admin'}</span>
+                  </button>
 
-              <div className="flex items-center gap-3">
-                <div className="flex-1 h-px bg-white/10" />
-                <span className="text-[11px] text-neutral-500 font-medium uppercase tracking-wider">or email credentials</span>
-                <div className="flex-1 h-px bg-white/10" />
-              </div>
+                  <div className="flex items-center gap-3">
+                    <div className="flex-1 h-px bg-white/10" />
+                    <span className="text-[11px] text-neutral-500 font-medium uppercase tracking-wider">or email credentials</span>
+                    <div className="flex-1 h-px bg-white/10" />
+                  </div>
+                </>
+              )}
 
               <form onSubmit={handleLoginSubmit} className="space-y-4">
                 <div>
