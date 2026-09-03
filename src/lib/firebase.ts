@@ -3,7 +3,19 @@ import { getFirestore, initializeFirestore, Firestore } from 'firebase/firestore
 import { getAuth, Auth } from 'firebase/auth';
 import { getStorage, FirebaseStorage } from 'firebase/storage';
 import { initializeAppCheck, ReCaptchaV3Provider, AppCheck } from 'firebase/app-check';
+import { getAnalytics, isSupported, Analytics } from 'firebase/analytics';
 import firebaseConfigJson from '../../firebase-applet-config.json';
+
+// Exact Firebase Web App Configuration
+export const FIREBASE_CONFIG = {
+  apiKey: "AIzaSyD5w8nlLD4qMjLUcTo9JvJKA2fWtqMniEM",
+  authDomain: "rohit-portfolio-e5225.firebaseapp.com",
+  projectId: "rohit-portfolio-e5225",
+  storageBucket: "rohit-portfolio-e5225.firebasestorage.app",
+  messagingSenderId: "968719694345",
+  appId: "1:968719694345:web:abaa7d6a5cfe6f29b316d8",
+  measurementId: "G-3VLKXTJPH6"
+};
 
 // Central contact fallbacks when Firebase is unavailable
 export const FIREBASE_FALLBACK_CONTACT = {
@@ -40,30 +52,25 @@ const getFirebaseConfig = () => {
       apiKey: envKey,
       authDomain: cleanEnvVal(metaEnv.VITE_FIREBASE_AUTH_DOMAIN) || `${envProjectId}.firebaseapp.com`,
       projectId: envProjectId,
-      storageBucket: cleanEnvVal(metaEnv.VITE_FIREBASE_STORAGE_BUCKET) || `${envProjectId}.appspot.com`,
-      messagingSenderId: cleanEnvVal(metaEnv.VITE_FIREBASE_MESSAGING_SENDER_ID),
-      appId: cleanEnvVal(metaEnv.VITE_FIREBASE_APP_ID),
-      measurementId: cleanEnvVal(metaEnv.VITE_FIREBASE_MEASUREMENT_ID),
-      firestoreDatabaseId: cleanEnvVal(metaEnv.VITE_FIREBASE_FIRESTORE_DATABASE_ID) || '(default)'
+      storageBucket: cleanEnvVal(metaEnv.VITE_FIREBASE_STORAGE_BUCKET) || `${envProjectId}.firebasestorage.app`,
+      messagingSenderId: cleanEnvVal(metaEnv.VITE_FIREBASE_MESSAGING_SENDER_ID) || FIREBASE_CONFIG.messagingSenderId,
+      appId: cleanEnvVal(metaEnv.VITE_FIREBASE_APP_ID) || FIREBASE_CONFIG.appId,
+      measurementId: cleanEnvVal(metaEnv.VITE_FIREBASE_MEASUREMENT_ID) || FIREBASE_CONFIG.measurementId,
+      firestoreDatabaseId: '(default)'
     };
   }
 
-  // Fallback to firebase-applet-config.json if provisioned
-  if (firebaseConfigJson && firebaseConfigJson.projectId && firebaseConfigJson.apiKey) {
-    const projId = cleanEnvVal(firebaseConfigJson.projectId) || 'rohit-portfolio-e5225';
-    return {
-      apiKey: cleanEnvVal(firebaseConfigJson.apiKey),
-      authDomain: cleanEnvVal(firebaseConfigJson.authDomain) || `${projId}.firebaseapp.com`,
-      projectId: projId,
-      storageBucket: cleanEnvVal(firebaseConfigJson.storageBucket) || `${projId}.firebasestorage.app`,
-      messagingSenderId: cleanEnvVal(firebaseConfigJson.messagingSenderId),
-      appId: cleanEnvVal(firebaseConfigJson.appId),
-      measurementId: cleanEnvVal(firebaseConfigJson.measurementId),
-      firestoreDatabaseId: cleanEnvVal(firebaseConfigJson.firestoreDatabaseId) || '(default)'
-    };
-  }
-
-  return null;
+  // Authoritative Firebase web configuration
+  return {
+    apiKey: cleanEnvVal(firebaseConfigJson?.apiKey) || FIREBASE_CONFIG.apiKey,
+    authDomain: cleanEnvVal(firebaseConfigJson?.authDomain) || FIREBASE_CONFIG.authDomain,
+    projectId: cleanEnvVal(firebaseConfigJson?.projectId) || FIREBASE_CONFIG.projectId,
+    storageBucket: cleanEnvVal(firebaseConfigJson?.storageBucket) || FIREBASE_CONFIG.storageBucket,
+    messagingSenderId: cleanEnvVal(firebaseConfigJson?.messagingSenderId) || FIREBASE_CONFIG.messagingSenderId,
+    appId: cleanEnvVal(firebaseConfigJson?.appId) || FIREBASE_CONFIG.appId,
+    measurementId: cleanEnvVal(firebaseConfigJson?.measurementId) || FIREBASE_CONFIG.measurementId,
+    firestoreDatabaseId: '(default)'
+  };
 };
 
 const rawConfig = getFirebaseConfig();
@@ -77,6 +84,7 @@ let db: Firestore | null = null;
 let auth: Auth | null = null;
 let storage: FirebaseStorage | null = null;
 let appCheck: AppCheck | null = null;
+let analytics: Analytics | null = null;
 
 if (rawConfig && rawConfig.apiKey && rawConfig.projectId) {
   try {
@@ -100,9 +108,18 @@ if (rawConfig && rawConfig.apiKey && rawConfig.projectId) {
       auth = getAuth(app);
       storage = getStorage(app);
 
+      // Initialize Analytics if supported in browser environment
+      if (typeof window !== 'undefined') {
+        isSupported().then((supported) => {
+          if (supported && app) {
+            analytics = getAnalytics(app);
+          }
+        }).catch(() => {});
+      }
+
       // App Check Initialization - strictly optional
       const metaEnv = typeof import.meta !== 'undefined' && import.meta?.env ? import.meta.env : (process.env as unknown as Record<string, string>);
-      const rawSiteKey = metaEnv?.VITE_FIREBASE_APP_CHECK_SITE_KEY || (firebaseConfigJson as { recaptchaSiteKey?: string })?.recaptchaSiteKey;
+      const rawSiteKey = metaEnv?.VITE_FIREBASE_APP_CHECK_SITE_KEY;
       const appCheckSiteKey = typeof rawSiteKey === 'string' ? rawSiteKey.trim() : '';
 
       // Only initialize if key is present, non-empty, and not a template placeholder
@@ -132,7 +149,7 @@ if (rawConfig && rawConfig.apiKey && rawConfig.projectId) {
   console.warn('[Firebase] Missing Firebase configuration. Features will fall back gracefully.');
 }
 
-export { app, db, auth, storage, appCheck };
+export { app, db, auth, storage, appCheck, analytics };
 
 export function getFirebaseConfigDetails() {
   return {

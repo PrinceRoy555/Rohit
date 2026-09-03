@@ -443,27 +443,64 @@ export async function fetchAllLeadsFromFirestore(): Promise<any[]> {
   if (!isFirebaseConfigured() || !db) return [];
 
   try {
-    const leadsRef = collection(db, 'leads');
-    const snap = await getDocs(leadsRef);
     const results: any[] = [];
-    snap.forEach((docSnap) => {
-      const d = docSnap.data();
-      results.push({
-        id: docSnap.id,
-        name: d.name || '',
-        email: d.email || '',
-        phone: d.phone || '',
-        businessName: d.businessName || '',
-        service: d.service || d.selectedService || d.requiredService || d.packageName || 'General Inquiry',
-        message: d.message || d.projectDescription || d.conversationSummary || '',
-        status: d.status || 'new',
-        source: d.source || 'website-contact-form',
-        createdAt: d.createdAtIso || (d.createdAt?.toDate ? d.createdAt.toDate().toISOString() : new Date().toISOString()),
-        notes: d.notes || '',
-        budgetRange: d.budgetRange || d.budget || '',
-        attachmentUrl: d.attachmentUrl || null
+    const seenIds = new Set<string>();
+
+    // 1. Fetch from canonical leads collection
+    try {
+      const leadsRef = collection(db, 'leads');
+      const snap = await getDocs(leadsRef);
+      snap.forEach((docSnap) => {
+        const d = docSnap.data();
+        seenIds.add(docSnap.id);
+        results.push({
+          id: docSnap.id,
+          name: d.name || '',
+          email: d.email || '',
+          phone: d.phone || '',
+          businessName: d.businessName || '',
+          service: d.service || d.selectedService || d.requiredService || d.packageName || 'General Inquiry',
+          message: d.message || d.projectDescription || d.conversationSummary || '',
+          status: d.status || 'new',
+          source: d.source || 'website-contact-form',
+          createdAt: d.createdAtIso || (d.createdAt?.toDate ? d.createdAt.toDate().toISOString() : new Date().toISOString()),
+          notes: d.notes || '',
+          budgetRange: d.budgetRange || d.budget || '',
+          attachmentUrl: d.attachmentUrl || null
+        });
       });
-    });
+    } catch (e) {
+      console.warn('[Firestore] Note fetching leads collection:', e);
+    }
+
+    // 2. Also fetch from contactEnquiries collection (shown in Firebase Console)
+    try {
+      const enquiriesRef = collection(db, 'contactEnquiries');
+      const snap = await getDocs(enquiriesRef);
+      snap.forEach((docSnap) => {
+        if (!seenIds.has(docSnap.id)) {
+          seenIds.add(docSnap.id);
+          const d = docSnap.data();
+          results.push({
+            id: docSnap.id,
+            name: d.name || '',
+            email: d.email || '',
+            phone: d.phone || '',
+            businessName: d.businessName || '',
+            service: d.service || d.selectedService || d.requiredService || d.packageName || 'Contact Form',
+            message: d.message || d.projectDescription || d.conversationSummary || '',
+            status: d.status || 'new',
+            source: d.source || 'website-contact-form',
+            createdAt: d.createdAtIso || (d.createdAt?.toDate ? d.createdAt.toDate().toISOString() : (d.createdAt ? String(d.createdAt) : new Date().toISOString())),
+            notes: d.notes || '',
+            budgetRange: d.budgetRange || d.budget || '',
+            attachmentUrl: d.attachmentUrl || null
+          });
+        }
+      });
+    } catch (e) {
+      console.warn('[Firestore] Note fetching contactEnquiries collection:', e);
+    }
 
     return results.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
   } catch (err) {
@@ -475,10 +512,17 @@ export async function fetchAllLeadsFromFirestore(): Promise<any[]> {
 export async function updateLeadStatusInFirestore(leadId: string, status: string, notes?: string): Promise<ServiceResponse> {
   if (!isFirebaseConfigured() || !db) return { success: false, error: 'Database unconfigured' };
   try {
-    const docRef = doc(db, 'leads', leadId);
     const updateData: Record<string, unknown> = { status };
     if (notes !== undefined) updateData.notes = notes;
-    await updateDoc(docRef, updateData);
+
+    try {
+      const docRef = doc(db, 'leads', leadId);
+      await updateDoc(docRef, updateData);
+    } catch (errLeads) {
+      // Try contactEnquiries
+      const enquiryRef = doc(db, 'contactEnquiries', leadId);
+      await updateDoc(enquiryRef, updateData);
+    }
     return { success: true, id: leadId };
   } catch (err) {
     console.error('[Firestore] Error updating lead:', err);
@@ -489,8 +533,13 @@ export async function updateLeadStatusInFirestore(leadId: string, status: string
 export async function deleteLeadFromFirestore(leadId: string): Promise<ServiceResponse> {
   if (!isFirebaseConfigured() || !db) return { success: false, error: 'Database unconfigured' };
   try {
-    const docRef = doc(db, 'leads', leadId);
-    await deleteDoc(docRef);
+    try {
+      const docRef = doc(db, 'leads', leadId);
+      await deleteDoc(docRef);
+    } catch (errLeads) {
+      const enquiryRef = doc(db, 'contactEnquiries', leadId);
+      await deleteDoc(enquiryRef);
+    }
     return { success: true, id: leadId };
   } catch (err) {
     console.error('[Firestore] Error deleting lead:', err);

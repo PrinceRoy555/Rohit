@@ -1,12 +1,10 @@
 {
   "projectId": "rohit-portfolio-e5225",
   "appId": "1:968719694345:web:abaa7d6a5cfe6f29b316d8",
-  "apiKey": "AIzaSyA1lNnIZ3NSqTpGmNeDMJssSNhYWuuWzmQ",
+  "apiKey": "AIzaSyD5w8nlLD4qMjLUcTo9JvJKA2fWtqMniEM",
   "authDomain": "rohit-portfolio-e5225.firebaseapp.com",
   "firestoreDatabaseId": "(default)",
   "storageBucket": "rohit-portfolio-e5225.firebasestorage.app",
   "messagingSenderId": "968719694345",
-  "measurementId": "G-3VLKXIJPH6",
-  "oAuthClientId": "1070821377741-g1anahnthb9u7llogsl5tcqchq5acaj0.apps.googleusercontent.com",
-  "recaptchaSiteKey": ""
+  "measurementId": "G-3VLKXTJPH6"
 }

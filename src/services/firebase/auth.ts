@@ -176,6 +176,18 @@ export async function verifyAdminRole(user: User | null): Promise<AdminRoleResul
   // 2. Check Firestore Role records if database is configured
   if (isFirebaseConfigured() && db && user.uid) {
     try {
+      // Check exact 'Admin Portal' collection from Firestore Console
+      const adminPortalDoc = await getDoc(doc(db, 'Admin Portal', user.uid));
+      if (adminPortalDoc.exists()) {
+        const data = adminPortalDoc.data();
+        const role = (data?.role === 'super_admin' || data?.role === 'admin' || data?.role === 'editor') ? data.role : 'super_admin';
+        return {
+          authorized: true,
+          role,
+          email: cleanEmail || data?.['Admin Email'] || data?.adminEmail || SUPER_ADMIN_EMAIL
+        };
+      }
+
       // Check adminProfiles collection (RBAC)
       const profileDoc = await getDoc(doc(db, 'adminProfiles', user.uid));
       if (profileDoc.exists()) {
@@ -221,6 +233,16 @@ export async function syncAdminFirestoreProfile(user: User): Promise<void> {
   try {
     const isSuper = user.uid === SUPER_ADMIN_UID || (user.email || '').toLowerCase().trim() === SUPER_ADMIN_EMAIL;
     if (isSuper) {
+      // Keep 'Admin Portal' collection in sync with exact field names
+      await setDoc(doc(db, 'Admin Portal', user.uid), {
+        'Admin Email': user.email || SUPER_ADMIN_EMAIL,
+        role: 'super_admin',
+        uid: user.uid,
+        name: 'Rohit Verma',
+        status: 'active',
+        updatedAt: new Date().toISOString()
+      }, { merge: true });
+
       await setDoc(doc(db, 'adminProfiles', user.uid), {
         uid: user.uid,
         email: user.email || SUPER_ADMIN_EMAIL,

@@ -190,6 +190,13 @@ service cloud.firestore {
       allow read, write: if isAdmin();
     }
 
+    // 15. Admin Portal Collection (Exact collection from Firebase Console)
+    match /{colName}/{documentId} {
+      allow read, write: if (colName == 'Admin Portal' || colName == 'adminPortal' || colName == 'AdminPortal') && (
+        request.auth != null && (request.auth.uid == '7wupZnpLh1MPTYpci5keNIS1Fyt1' || isAdmin())
+      );
+    }
+
     // Default deny all other paths
     match /{document=**} {
       allow read, write: if false;
