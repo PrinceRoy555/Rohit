@@ -103,9 +103,13 @@ function removeUndefinedValues<T extends Record<string, unknown>>(data: T): T {
  */
 export async function submitContactEnquiry(payload: ContactEnquiryPayload): Promise<ServiceResponse> {
   const isDev = typeof process !== 'undefined' && process.env?.NODE_ENV !== 'production';
+  const configDetails = getFirebaseConfigDetails();
+  const projectId = configDetails.projectId;
+  const isDbAvailable = Boolean(db);
 
   if (isDev) {
-    console.log('[Form Submission] Step 1: Validating contact form payload...');
+    console.log('[Contact] Firebase projectId:', projectId);
+    console.log('[Contact] Firestore available:', isDbAvailable);
   }
 
   // Sanitization & Validation
@@ -125,10 +129,6 @@ export async function submitContactEnquiry(payload: ContactEnquiryPayload): Prom
     return { success: false, errorCode: 'invalid-argument', error: 'Please accept the consent checkbox to submit your enquiry.' };
   }
 
-  if (isDev) {
-    console.log('[Form Submission] Step 2: Checking connection and Firebase initialization...');
-  }
-
   if (typeof navigator !== 'undefined' && navigator.onLine === false) {
     return {
       success: false,
@@ -138,15 +138,14 @@ export async function submitContactEnquiry(payload: ContactEnquiryPayload): Prom
   }
 
   if (!isFirebaseConfigured() || !db) {
+    if (isDev) {
+      console.warn('[Contact] Firestore not configured or db is null');
+    }
     return {
       success: false,
       errorCode: 'not-configured',
       error: FIREBASE_FALLBACK_CONTACT.message
     };
-  }
-
-  if (isDev) {
-    console.log('[Form Submission] Step 3: Preparing and sanitizing Firestore payload...');
   }
 
   const docData: Record<string, unknown> = {
@@ -157,66 +156,70 @@ export async function submitContactEnquiry(payload: ContactEnquiryPayload): Prom
     consentAccepted: true,
     source: 'website-contact-form',
     status: 'new',
-    createdAt: serverTimestamp(),
-    pageUrl: payload.pageUrl || (typeof window !== 'undefined' ? window.location.href : ''),
-    userAgent: typeof navigator !== 'undefined' ? navigator.userAgent : ''
+    createdAt: serverTimestamp()
   };
 
-  if (payload.businessName) docData.businessName = sanitizeText(payload.businessName, 150);
-  if (payload.phone) docData.phone = sanitizeText(payload.phone, 30);
-  if (payload.budgetRange) docData.budgetRange = sanitizeText(payload.budgetRange, 100);
-  if (payload.deadline) docData.deadline = sanitizeText(payload.deadline, 100);
-  
-  docData.attachmentUrl = payload.attachmentUrl ?? null;
-  docData.attachmentName = payload.attachmentName ? sanitizeText(payload.attachmentName, 150) : null;
-  docData.attachmentStatus = payload.attachmentStatus || (payload.attachmentUrl ? 'uploaded' : 'not-uploaded');
-  if (payload.attachmentType) docData.attachmentType = payload.attachmentType;
-  if (payload.attachmentSize) docData.attachmentSize = payload.attachmentSize;
-  if (payload.attachmentPath) docData.attachmentPath = payload.attachmentPath;
+  if (payload.businessName && payload.businessName.trim()) {
+    docData.businessName = sanitizeText(payload.businessName, 150);
+  }
+  if (payload.phone && payload.phone.trim()) {
+    docData.phone = sanitizeText(payload.phone, 30);
+  }
+  if (payload.budgetRange && payload.budgetRange.trim()) {
+    docData.budgetRange = sanitizeText(payload.budgetRange, 100);
+  }
+  if (payload.deadline && payload.deadline.trim()) {
+    docData.deadline = sanitizeText(payload.deadline, 100);
+  }
+
+  if (payload.attachmentUrl) {
+    docData.attachmentUrl = payload.attachmentUrl;
+    docData.attachmentName = payload.attachmentName ? sanitizeText(payload.attachmentName, 150) : null;
+    docData.attachmentStatus = payload.attachmentStatus || 'uploaded';
+    if (payload.attachmentType) docData.attachmentType = payload.attachmentType;
+    if (payload.attachmentSize) docData.attachmentSize = payload.attachmentSize;
+    if (payload.attachmentPath) docData.attachmentPath = payload.attachmentPath;
+  }
+
+  const pageUrl = payload.pageUrl || (typeof window !== 'undefined' ? window.location.href : '');
+  if (pageUrl) {
+    docData.pageUrl = sanitizeText(pageUrl, 2000);
+  }
+  const userAgent = typeof navigator !== 'undefined' ? navigator.userAgent : '';
+  if (userAgent) {
+    docData.userAgent = sanitizeText(userAgent, 500);
+  }
 
   const cleanPayload = removeUndefinedValues(docData);
 
   if (isDev) {
-    console.log('[Form Submission] Step 5: Executing Firestore document write to contactEnquiries...');
+    console.log('[Contact] Starting contactEnquiries write');
   }
 
-  const TIMEOUT_MS = 12000;
-
   try {
-    const writePromise = (async (): Promise<ServiceResponse> => {
-      const docRef = payload.submissionId
-        ? doc(db, 'contactEnquiries', payload.submissionId)
-        : doc(collection(db, 'contactEnquiries'));
-      const submissionId = docRef.id;
-
+    let submissionId: string;
+    if (payload.submissionId) {
+      const docRef = doc(db, 'contactEnquiries', payload.submissionId);
+      submissionId = docRef.id;
       await setDoc(docRef, cleanPayload);
-      if (isDev) {
-        console.log('[Form Submission] Step 5 Complete: Firestore document set. ID:', submissionId);
-      }
-      return { success: true, id: submissionId };
-    })();
-
-    const timeoutPromise = new Promise<ServiceResponse>((resolve) => {
-      setTimeout(() => {
-        if (isDev) {
-          console.warn('[Form Submission] Step 5 Timeout: Firestore write exceeded 12 seconds.');
-        }
-        resolve({
-          success: false,
-          errorCode: 'connection-timeout',
-          error: 'Submission timed out. Please check your connection or contact Rohit through WhatsApp, email or phone.'
-        });
-      }, TIMEOUT_MS);
-    });
-
-    return await Promise.race([writePromise, timeoutPromise]);
+    } else {
+      const colRef = collection(db, 'contactEnquiries');
+      const docRef = await addDoc(colRef, cleanPayload);
+      submissionId = docRef.id;
+    }
+    if (isDev) {
+      console.log('[Contact] Firestore write success + document ID:', submissionId);
+    }
+    return { success: true, id: submissionId };
   } catch (error: unknown) {
     const errObj = error as { code?: string; message?: string };
     const rawCode = errObj?.code || errObj?.message || 'unknown-error';
-    const cleanCode = typeof rawCode === 'string' ? rawCode.replace(/^firestore\//, '').replace(/^FirebaseError:\s*/, '') : 'unknown-error';
+    const cleanCode = typeof rawCode === 'string'
+      ? rawCode.replace(/^firestore\//, '').replace(/^FirebaseError:\s*/, '')
+      : 'unknown-error';
 
     if (isDev) {
-      console.error('[Form Submission] Step 5 Error: Firestore write failed with error:', error);
+      console.error('[Contact] Firestore write error + Firebase error code:', cleanCode, error);
     }
 
     return {
@@ -1049,23 +1052,24 @@ export async function seedInitialInsights(): Promise<void> {
 export function getReadableFirebaseError(code: string): string {
   switch (code) {
     case 'permission-denied':
-      return 'Firestore rules blocked the write.';
+      return 'Submission was blocked by security rules. Please check your entries or contact Rohit directly.';
     case 'not-found':
-      return 'The configured Firestore database was not found.';
+      return 'The configured database service could not be reached. Please contact Rohit directly.';
     case 'failed-precondition':
-      return 'Firestore is not fully enabled or the database configuration is incomplete.';
+      return 'Firestore service is currently initializing. Please try again in a few moments.';
     case 'invalid-argument':
-      return 'The Firebase configuration or submitted payload is invalid.';
+      return 'Please verify the submitted details and try again.';
     case 'unavailable':
-      return 'Firestore is temporarily unavailable or the network connection failed.';
+      return 'Firestore is temporarily unavailable or the network connection failed. Please try again.';
+    case 'deadline-exceeded':
     case 'connection-timeout':
-      return 'Check Firestore setup and rules.';
+      return 'Connection was interrupted. Please check your internet connection or contact Rohit directly via WhatsApp.';
     case 'offline':
-      return 'You appear to be offline.';
+      return 'You appear to be offline. Please check your internet connection.';
     case 'invalid-config':
-      return 'Firebase configuration is missing or contains invalid placeholders.';
+      return 'Database configuration is incomplete. Please contact Rohit directly.';
     default:
-      return 'Check network connection, security rules and database setup.';
+      return 'Submission could not be completed. Please contact Rohit directly through WhatsApp, email or phone.';
   }
 }
 

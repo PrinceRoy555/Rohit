@@ -97,10 +97,11 @@ if (FIREBASE_INTEGRATION_ENABLED && rawConfig && rawConfig.apiKey && rawConfig.p
     }
 
     if (app) {
-      // Initialize Firestore with auto-detect long polling and ignoreUndefinedProperties
+      // Initialize Firestore with forced long-polling and ignoreUndefinedProperties
+      // This prevents WebSocket connection hangs in sandboxed iframes, proxies, and preview containers
       try {
         db = initializeFirestore(app, {
-          experimentalAutoDetectLongPolling: true,
+          experimentalForceLongPolling: true,
           ignoreUndefinedProperties: true,
         });
       } catch (initDbError) {

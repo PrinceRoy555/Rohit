@@ -5,7 +5,7 @@ import { Mail, Phone, MapPin, Send, Upload, CloudLightning, Trash, MessageSquare
 import { WHATSAPP_BUSINESS_URL, contactConfig } from '../data';
 import { SERVICE_CATEGORIES, SERVICES_LIST } from '../servicesData';
 import WhatsAppIcon from './WhatsAppIcon';
-import { submitContactEnquiry, getReadableFirebaseError } from '../services/firebase/firestore';
+import { submitContactEnquiry, getReadableFirebaseError, ServiceResponse } from '../services/firebase/firestore';
 import { uploadProjectBrief } from '../services/firebase/storage';
 import { FIREBASE_FALLBACK_CONTACT, isStorageAvailable, isFirebaseConfigured } from '../lib/firebase';
 import { validateAttachment } from '../lib/validation';
@@ -108,128 +108,103 @@ export default function ContactSection() {
     setSubmitErrorMessage(null);
     setSubmitSuccess(false);
     setEmailNotice(null);
-
-    if (!submissionIdRef.current) {
-      submissionIdRef.current = 'enquiry_' + Date.now() + '_' + Math.random().toString(36).substring(2, 9);
-    }
-    const currentSubmissionId = submissionIdRef.current;
+    setFileNotice(null);
 
     const isDev = typeof process !== 'undefined' && process.env?.NODE_ENV !== 'production';
 
-    const executeSubmissionFlow = async (): Promise<{
-      success: boolean;
-      id?: string;
-      errorCode?: string;
-      error?: string;
-      emailFailed?: boolean;
-    }> => {
-      // Step 1: Form validation done by react-hook-form
-      if (isDev) console.log('[Form Submission] Step 1 Complete: Form validation passed.');
+    // Step 1: Internet connection check
+    if (typeof navigator !== 'undefined' && navigator.onLine === false) {
+      if (isDev) console.warn('[Contact] Device is offline.');
+      setSubmitErrorMessage('You appear to be offline. Please reconnect and try again.');
+      setIsSubmittingForm(false);
+      return;
+    }
 
-      // Step 2: Internet connection check
-      if (typeof navigator !== 'undefined' && navigator.onLine === false) {
-        if (isDev) console.warn('[Form Submission] Step 2 Failed: Device is offline.');
-        return {
-          success: false,
-          errorCode: 'offline',
-          error: 'You appear to be offline. Please reconnect and try again.'
-        };
-      }
-      if (isDev) console.log('[Form Submission] Step 2 Complete: Internet connection active.');
+    // Step 2: Storage Handling (Optional attachment)
+    let attachmentUrl: string | null = null;
+    let attachmentName: string | null = null;
+    let attachmentType: string | null = null;
+    let attachmentSize: number | null = null;
+    let attachmentPath: string | null = null;
+    let attachmentStatus = 'not-uploaded';
 
-      // Step 3: Prepare payload & sanitize
-      let attachmentUrl: string | null = null;
-      let attachmentName: string | null = null;
-      let attachmentType: string | null = null;
-      let attachmentSize: number | null = null;
-      let attachmentPath: string | null = null;
-      let attachmentStatus = 'not-uploaded';
+    if (file && isStorageAvailable()) {
+      if (isDev) console.log('[Contact] Attempting file upload to Firebase Storage...');
+      setUploadProgress(0);
 
-      // Step 4: Storage Handling
-      if (file && isStorageAvailable()) {
-        if (isDev) console.log('[Form Submission] Step 4: Attempting file upload to Firebase Storage...');
-        setUploadProgress(0);
+      try {
+        const uploadPromise = uploadProjectBrief(file, (percent) => setUploadProgress(percent));
+        const uploadTimeout = new Promise<{ success: false; error: string }>((resolve) => {
+          setTimeout(() => resolve({ success: false, error: 'Upload timeout' }), 8000);
+        });
 
-        try {
-          const uploadPromise = uploadProjectBrief(file, (percent) => setUploadProgress(percent));
-          const uploadTimeout = new Promise<{ success: false; error: string }>((resolve) => {
-            setTimeout(() => resolve({ success: false, error: 'Upload timeout' }), 8000);
-          });
-
-          const uploadRes = await Promise.race([uploadPromise, uploadTimeout]);
-          if (uploadRes.success && 'downloadUrl' in uploadRes) {
-            attachmentUrl = uploadRes.downloadUrl || null;
-            attachmentName = uploadRes.originalFilename || file.name;
-            attachmentType = uploadRes.mimeType || file.type;
-            attachmentSize = uploadRes.fileSize || file.size;
-            attachmentPath = uploadRes.storagePath || null;
-            attachmentStatus = 'uploaded';
-            setUploadProgress(100);
-            if (isDev) console.log('[Form Submission] Step 4 Complete: File upload successful.');
-          } else {
-            if (isDev) console.warn('[Form Submission] Step 4 Notice: File upload failed/timed out, continuing without attachment.');
-            setFileNotice('File upload is temporarily unavailable. Your enquiry will be submitted without the attachment.');
-            setUploadProgress(null);
-          }
-        } catch {
+        const uploadRes = await Promise.race([uploadPromise, uploadTimeout]);
+        if (uploadRes.success && 'downloadUrl' in uploadRes) {
+          attachmentUrl = uploadRes.downloadUrl || null;
+          attachmentName = uploadRes.originalFilename || file.name;
+          attachmentType = uploadRes.mimeType || file.type;
+          attachmentSize = uploadRes.fileSize || file.size;
+          attachmentPath = uploadRes.storagePath || null;
+          attachmentStatus = 'uploaded';
+          setUploadProgress(100);
+          if (isDev) console.log('[Contact] File upload successful.');
+        } else {
+          if (isDev) console.warn('[Contact] File upload failed or timed out, continuing without attachment.');
           setFileNotice('File upload is temporarily unavailable. Your enquiry will be submitted without the attachment.');
           setUploadProgress(null);
         }
-      } else if (file) {
-        if (isDev) console.log('[Form Submission] Step 4: Storage unavailable, skipping file upload.');
+      } catch {
         setFileNotice('File upload is temporarily unavailable. Your enquiry will be submitted without the attachment.');
-      } else {
-        if (isDev) console.log('[Form Submission] Step 4: No attachment selected, skipping storage.');
+        setUploadProgress(null);
       }
+    } else if (file) {
+      if (isDev) console.log('[Contact] Storage unavailable, skipping file upload.');
+      setFileNotice('File upload is temporarily unavailable. Your enquiry will be submitted without the attachment.');
+    }
 
-      let recordId = currentSubmissionId;
+    // Step 3: Primary Firestore Submission
+    // The contact form considers the enquiry successfully submitted immediately after the Firestore write to contactEnquiries succeeds
+    try {
+      const firestoreRes = await submitContactEnquiry({
+        name: data.name,
+        email: data.email,
+        phone: data.phone,
+        selectedService: data.service,
+        budgetRange: data.budget,
+        projectDescription: data.description,
+        consentAccepted: data.consent,
+        attachmentUrl,
+        attachmentName,
+        attachmentType,
+        attachmentSize,
+        attachmentPath,
+        attachmentStatus
+      });
 
-      // Step 5: Write document to Firestore if Firebase integration is enabled
-      if (isFirebaseConfigured()) {
-        if (isDev) console.log('[Form Submission] Step 5: Submitting payload to Firestore contactEnquiries...');
-        const firestoreRes = await submitContactEnquiry({
-          submissionId: currentSubmissionId,
-          name: data.name,
-          email: data.email,
-          phone: data.phone,
-          selectedService: data.service,
-          budgetRange: data.budget,
-          projectDescription: data.description,
-          consentAccepted: data.consent,
-          attachmentUrl,
-          attachmentName,
-          attachmentType,
-          attachmentSize,
-          attachmentPath,
-          attachmentStatus
-        });
+      if (firestoreRes.success) {
+        // Immediately show success to user & reset form
+        submissionIdRef.current = null;
+        setSubmitSuccess(true);
+        reset();
+        setFile(null);
+        if (fileInputRef.current) fileInputRef.current.value = '';
+        setIsSubmittingForm(false);
+        setUploadProgress(null);
 
-        if (!firestoreRes.success) {
-          if (isDev) console.error('[Form Submission] Step 5 Failed:', firestoreRes.error);
-          return {
-            success: false,
-            errorCode: firestoreRes.errorCode || 'unavailable',
-            error: firestoreRes.error || getReadableFirebaseError(firestoreRes.errorCode || 'unavailable')
-          };
+        setTimeout(() => {
+          setSubmitSuccess(false);
+          setEmailNotice(null);
+        }, 10000);
+
+        // Run secondary /api/contact notification separately / non-blocking
+        // Failure of /api/contact must NOT turn a successful Firestore submission into an error
+        if (isDev) {
+          console.log('[Contact] Starting secondary /api/contact notification');
         }
 
-        if (firestoreRes.id) recordId = firestoreRes.id;
-        if (isDev) console.log('[Form Submission] Step 5 Complete: Firestore document created with ID:', recordId);
-      } else {
-        if (isDev) console.log('[Form Submission] Firebase integration disabled: submitting directly to server CRM...');
-      }
-
-      // Step 6: Server CRM & Email notification dispatch
-      let emailFailed = false;
-      if (isDev) console.log('[Form Submission] Step 6: Triggering server inquiry dispatch...');
-      try {
-        const controller = new AbortController();
-        const emailTimer = setTimeout(() => controller.abort(), 8000);
-
-        const emailRes = await fetch('/api/contact', {
+        fetch('/api/contact', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          signal: controller.signal,
           body: JSON.stringify({
             name: data.name,
             email: data.email,
@@ -237,76 +212,35 @@ export default function ContactSection() {
             selectedService: data.service,
             budgetRange: data.budget,
             projectDescription: data.description,
-            attachmentUrl
+            attachmentUrl,
+            firestoreId: firestoreRes.id
           })
-        }).catch(() => null);
+        })
+          .then((res) => {
+            if (res.ok) {
+              if (isDev) console.log('[Contact] Secondary notification success');
+            } else {
+              if (isDev) console.warn('[Contact] Secondary notification failure');
+            }
+          })
+          .catch((err) => {
+            if (isDev) console.warn('[Contact] Secondary notification failure', err);
+          });
 
-        clearTimeout(emailTimer);
-
-        if (!emailRes || !emailRes.ok) {
-          emailFailed = true;
-          if (isDev) console.warn('[Form Submission] Server inquiry endpoint returned non-ok status.');
-        } else {
-          const resData = await emailRes.json().catch(() => null);
-          if (resData?.inquiryId) recordId = resData.inquiryId;
-          if (isDev) console.log('[Form Submission] Step 6 Complete: Server inquiry recorded.');
-        }
-      } catch {
-        emailFailed = true;
-        if (isDev) console.warn('[Form Submission] Step 6 Notice: Server dispatch timed out or network failed.');
+        return;
       }
 
-      return {
-        success: true,
-        id: recordId,
-        emailFailed
-      };
-    };
-
-    const overallTimeoutPromise = new Promise<{
-      success: false;
-      errorCode: 'submission-timeout';
-      error: string;
-    }>((resolve) => {
-      setTimeout(() => {
-        if (isDev) console.warn('[Form Submission] Master 15s Timeout triggered!');
-        resolve({
-          success: false,
-          errorCode: 'submission-timeout',
-          error: 'Submission timed out. Please check your connection or contact Rohit through WhatsApp, email or phone.'
-        });
-      }, 15000);
-    });
-
-    try {
-      const outcome = await Promise.race([executeSubmissionFlow(), overallTimeoutPromise]);
-
-      if (outcome.success) {
-        submissionIdRef.current = null;
-        setSubmitSuccess(true);
-        if (outcome.emailFailed) {
-          setEmailNotice('Your enquiry was saved successfully, but the email notification could not be sent. Rohit will still be able to view your enquiry.');
-        }
-        reset();
-        setFile(null);
-        if (fileInputRef.current) fileInputRef.current.value = '';
-        setTimeout(() => {
-          setSubmitSuccess(false);
-          setEmailNotice(null);
-        }, 10000);
-      } else {
-        const errCode = outcome.errorCode || 'unknown-error';
-        const mappedText = outcome.error || getReadableFirebaseError(errCode);
-        setSubmitErrorMessage(mappedText);
-      }
-    } catch (err: unknown) {
-      if (isDev) console.error('[Form Submission] Unexpected Exception:', err);
-      setSubmitErrorMessage('Submission timed out. Please check your connection or contact Rohit through WhatsApp, email or phone.');
-    } finally {
-      // Step 9: Always reset submitting state and unlock button in finally block
+      // If Firestore write failed, show the error and unlock form
       setIsSubmittingForm(false);
       setUploadProgress(null);
-      if (isDev) console.log('[Form Submission] Form state unlocked in finally block.');
+      const errCode = firestoreRes.errorCode || 'submission-failed';
+      const displayMsg = firestoreRes.error || getReadableFirebaseError(errCode);
+      setSubmitErrorMessage(displayMsg);
+    } catch (err: unknown) {
+      setIsSubmittingForm(false);
+      setUploadProgress(null);
+      if (isDev) console.error('[Contact] Unexpected submission error:', err);
+      setSubmitErrorMessage('Submission could not be completed. Please contact Rohit directly through WhatsApp, email or phone.');
     }
   };
 
