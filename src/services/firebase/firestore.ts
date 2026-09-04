@@ -108,7 +108,7 @@ export async function submitContactEnquiry(payload: ContactEnquiryPayload): Prom
   const isDbAvailable = Boolean(db);
 
   if (isDev) {
-    console.log('[Contact] Firebase projectId:', projectId);
+    console.log('[CONTACT-DEBUG] firebase-project', projectId);
     console.log('[Contact] Firestore available:', isDbAvailable);
   }
 
@@ -193,22 +193,38 @@ export async function submitContactEnquiry(payload: ContactEnquiryPayload): Prom
   const cleanPayload = removeUndefinedValues(docData);
 
   if (isDev) {
-    console.log('[Contact] Starting contactEnquiries write');
+    console.log('[CONTACT-DEBUG] firestore-start');
   }
 
   try {
-    let submissionId: string;
-    if (payload.submissionId) {
-      const docRef = doc(db, 'contactEnquiries', payload.submissionId);
-      submissionId = docRef.id;
-      await setDoc(docRef, cleanPayload);
-    } else {
-      const colRef = collection(db, 'contactEnquiries');
-      const docRef = await addDoc(colRef, cleanPayload);
-      submissionId = docRef.id;
-    }
+    const FIRESTORE_WRITE_TIMEOUT_MS = 15000;
+
+    const writePromise = (async (): Promise<string> => {
+      let submissionId: string;
+      if (payload.submissionId) {
+        const docRef = doc(db, 'contactEnquiries', payload.submissionId);
+        submissionId = docRef.id;
+        await setDoc(docRef, cleanPayload);
+      } else {
+        const colRef = collection(db, 'contactEnquiries');
+        const docRef = await addDoc(colRef, cleanPayload);
+        submissionId = docRef.id;
+      }
+      return submissionId;
+    })();
+
+    const timeoutPromise = new Promise<never>((_, reject) => {
+      setTimeout(() => {
+        const timeoutErr = new Error('deadline-exceeded');
+        (timeoutErr as unknown as { code: string }).code = 'deadline-exceeded';
+        reject(timeoutErr);
+      }, FIRESTORE_WRITE_TIMEOUT_MS);
+    });
+
+    const submissionId = await Promise.race([writePromise, timeoutPromise]);
+
     if (isDev) {
-      console.log('[Contact] Firestore write success + document ID:', submissionId);
+      console.log('[CONTACT-DEBUG] firestore-success', submissionId);
     }
     return { success: true, id: submissionId };
   } catch (error: unknown) {
@@ -1060,12 +1076,10 @@ export function getReadableFirebaseError(code: string): string {
     case 'invalid-argument':
       return 'Please verify the submitted details and try again.';
     case 'unavailable':
-      return 'Firestore is temporarily unavailable or the network connection failed. Please try again.';
     case 'deadline-exceeded':
     case 'connection-timeout':
-      return 'Connection was interrupted. Please check your internet connection or contact Rohit directly via WhatsApp.';
     case 'offline':
-      return 'You appear to be offline. Please check your internet connection.';
+      return 'Unable to submit your project right now. Please check your connection and try again.';
     case 'invalid-config':
       return 'Database configuration is incomplete. Please contact Rohit directly.';
     default:

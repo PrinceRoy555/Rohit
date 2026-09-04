@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { useSiteConfig } from '../../context/SiteConfigContext';
 import { useTheme } from '../../context/ThemeContext';
+import { useBodyScrollLock } from '../../lib/scrollLock';
 import ThemeToggle from '../ThemeToggle';
 import { isFirebaseConfigured } from '../../lib/firebase';
 import { logoutAdmin, checkAdminSession, loginAdmin, syncFirebaseAdminSession } from '../../services/adminApi';
@@ -92,6 +93,9 @@ const NAV_ITEMS = [
 ];
 
 export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose, onLogout }) => {
+  // Lock background body scroll cleanly while Admin Panel is open
+  useBodyScrollLock(true, 'admin-panel-modal');
+
   const { resolvedTheme, toggleTheme } = useTheme();
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
   const [authChecking, setAuthChecking] = useState<boolean>(true);
@@ -257,6 +261,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose, onLogout }) => 
     setIsUnauthorizedUser(false);
 
     // 1. Primary: Authenticate via Firebase Authentication if user exists in Firebase Auth
+    let fbErrorMessage: string | null = null;
     if (isFirebaseConfigured()) {
       const firebaseResult = await signInAdmin(cleanEmail, cleanPass);
       if (firebaseResult.success && firebaseResult.user) {
@@ -280,6 +285,8 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose, onLogout }) => 
           setIsLoggingIn(false);
           return;
         }
+      } else if (firebaseResult.error) {
+        fbErrorMessage = firebaseResult.error;
       }
     }
 
@@ -292,7 +299,17 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose, onLogout }) => 
       setLoginPassword('');
       await refreshConfig();
     } else {
-      setLoginError(serverResult.error || 'Invalid email or password.');
+      if (fbErrorMessage && (
+        fbErrorMessage.includes('domain') ||
+        fbErrorMessage.includes('authorized') ||
+        fbErrorMessage.includes('not configured') ||
+        fbErrorMessage.includes('disabled') ||
+        fbErrorMessage.includes('Too many')
+      )) {
+        setLoginError(fbErrorMessage);
+      } else {
+        setLoginError(serverResult.error || fbErrorMessage || 'Invalid email or password.');
+      }
     }
     setIsLoggingIn(false);
   };

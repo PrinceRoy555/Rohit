@@ -54,20 +54,32 @@ export default function InsightDetailPage({
       setRelatedInsights(filtered);
     });
 
-    // Reading progress listener
-    const handleScroll = () => {
-      const totalScroll = document.documentElement.scrollTop;
-      const windowHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+    // Reading progress listener with RAF throttling
+    let ticking = false;
+
+    const updateProgress = () => {
+      const totalScroll = window.scrollY || document.documentElement.scrollTop;
+      const windowHeight = document.documentElement.scrollHeight - window.innerHeight;
       if (windowHeight > 0) {
         const scrollPercent = (totalScroll / windowHeight) * 100;
         setReadingProgress(Math.min(100, Math.max(0, scrollPercent)));
       }
+      ticking = false;
     };
 
-    window.addEventListener('scroll', handleScroll);
+    const handleScroll = () => {
+      if (!ticking) {
+        ticking = true;
+        window.requestAnimationFrame(updateProgress);
+      }
+    };
+
+    updateProgress();
+    window.addEventListener('scroll', handleScroll, { passive: true });
     return () => {
       document.title = prevTitle;
       window.removeEventListener('scroll', handleScroll);
+      ticking = false;
     };
   }, [insight]);
 

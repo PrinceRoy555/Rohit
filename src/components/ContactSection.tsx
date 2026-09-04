@@ -39,7 +39,10 @@ export default function ContactSection() {
     reset,
     setValue,
     formState: { errors },
-  } = useForm<ContactFormData>();
+  } = useForm<ContactFormData>({
+    mode: 'onTouched',
+    reValidateMode: 'onChange'
+  });
 
   useEffect(() => {
     const handleServiceSelect = (e: Event) => {
@@ -103,7 +106,7 @@ export default function ContactSection() {
   };
 
   const onSubmit = async (data: ContactFormData) => {
-    if (isSubmittingForm) return; // duplicate-submission lock
+    if (isSubmittingForm) return; // Prevent duplicate submissions
     setIsSubmittingForm(true);
     setSubmitErrorMessage(null);
     setSubmitSuccess(false);
@@ -111,136 +114,159 @@ export default function ContactSection() {
     setFileNotice(null);
 
     const isDev = typeof process !== 'undefined' && process.env?.NODE_ENV !== 'production';
-
-    // Step 1: Internet connection check
-    if (typeof navigator !== 'undefined' && navigator.onLine === false) {
-      if (isDev) console.warn('[Contact] Device is offline.');
-      setSubmitErrorMessage('You appear to be offline. Please reconnect and try again.');
-      setIsSubmittingForm(false);
-      return;
+    if (isDev) {
+      console.log('[CONTACT-DEBUG] submit-start');
     }
 
-    // Step 2: Storage Handling (Optional attachment)
-    let attachmentUrl: string | null = null;
-    let attachmentName: string | null = null;
-    let attachmentType: string | null = null;
-    let attachmentSize: number | null = null;
-    let attachmentPath: string | null = null;
-    let attachmentStatus = 'not-uploaded';
-
-    if (file && isStorageAvailable()) {
-      if (isDev) console.log('[Contact] Attempting file upload to Firebase Storage...');
-      setUploadProgress(0);
-
-      try {
-        const uploadPromise = uploadProjectBrief(file, (percent) => setUploadProgress(percent));
-        const uploadTimeout = new Promise<{ success: false; error: string }>((resolve) => {
-          setTimeout(() => resolve({ success: false, error: 'Upload timeout' }), 8000);
-        });
-
-        const uploadRes = await Promise.race([uploadPromise, uploadTimeout]);
-        if (uploadRes.success && 'downloadUrl' in uploadRes) {
-          attachmentUrl = uploadRes.downloadUrl || null;
-          attachmentName = uploadRes.originalFilename || file.name;
-          attachmentType = uploadRes.mimeType || file.type;
-          attachmentSize = uploadRes.fileSize || file.size;
-          attachmentPath = uploadRes.storagePath || null;
-          attachmentStatus = 'uploaded';
-          setUploadProgress(100);
-          if (isDev) console.log('[Contact] File upload successful.');
-        } else {
-          if (isDev) console.warn('[Contact] File upload failed or timed out, continuing without attachment.');
-          setFileNotice('File upload is temporarily unavailable. Your enquiry will be submitted without the attachment.');
-          setUploadProgress(null);
-        }
-      } catch {
-        setFileNotice('File upload is temporarily unavailable. Your enquiry will be submitted without the attachment.');
-        setUploadProgress(null);
-      }
-    } else if (file) {
-      if (isDev) console.log('[Contact] Storage unavailable, skipping file upload.');
-      setFileNotice('File upload is temporarily unavailable. Your enquiry will be submitted without the attachment.');
-    }
-
-    // Step 3: Primary Firestore Submission
-    // The contact form considers the enquiry successfully submitted immediately after the Firestore write to contactEnquiries succeeds
     try {
-      const firestoreRes = await submitContactEnquiry({
-        name: data.name,
-        email: data.email,
-        phone: data.phone,
-        selectedService: data.service,
-        budgetRange: data.budget,
-        projectDescription: data.description,
-        consentAccepted: data.consent,
-        attachmentUrl,
-        attachmentName,
-        attachmentType,
-        attachmentSize,
-        attachmentPath,
-        attachmentStatus
-      });
-
-      if (firestoreRes.success) {
-        // Immediately show success to user & reset form
-        submissionIdRef.current = null;
-        setSubmitSuccess(true);
-        reset();
-        setFile(null);
-        if (fileInputRef.current) fileInputRef.current.value = '';
-        setIsSubmittingForm(false);
-        setUploadProgress(null);
-
-        setTimeout(() => {
-          setSubmitSuccess(false);
-          setEmailNotice(null);
-        }, 10000);
-
-        // Run secondary /api/contact notification separately / non-blocking
-        // Failure of /api/contact must NOT turn a successful Firestore submission into an error
-        if (isDev) {
-          console.log('[Contact] Starting secondary /api/contact notification');
-        }
-
-        fetch('/api/contact', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            name: data.name,
-            email: data.email,
-            phone: data.phone,
-            selectedService: data.service,
-            budgetRange: data.budget,
-            projectDescription: data.description,
-            attachmentUrl,
-            firestoreId: firestoreRes.id
-          })
-        })
-          .then((res) => {
-            if (res.ok) {
-              if (isDev) console.log('[Contact] Secondary notification success');
-            } else {
-              if (isDev) console.warn('[Contact] Secondary notification failure');
-            }
-          })
-          .catch((err) => {
-            if (isDev) console.warn('[Contact] Secondary notification failure', err);
-          });
-
+      // Step 1: Internet connection check
+      if (typeof navigator !== 'undefined' && navigator.onLine === false) {
+        if (isDev) console.warn('[Contact] Device is offline.');
+        setSubmitErrorMessage('You appear to be offline. Please reconnect and try again.');
         return;
       }
 
-      // If Firestore write failed, show the error and unlock form
+      // Step 2: Build payload (FormData if attachment present, JSON if no file)
+      let requestBody: BodyInit;
+      let requestHeaders: HeadersInit = {};
+
+      if (file) {
+        const formData = new FormData();
+        formData.append('name', data.name.trim());
+        formData.append('email', data.email.trim());
+        if (data.phone?.trim()) formData.append('phone', data.phone.trim());
+        formData.append('service', data.service);
+        formData.append('budget', data.budget);
+        formData.append('description', data.description.trim());
+        formData.append('consent', String(data.consent));
+        formData.append('attachment', file);
+
+        requestBody = formData;
+        // IMPORTANT: DO NOT set Content-Type header for FormData; browser automatically generates the multipart boundary
+        requestHeaders = {};
+      } else {
+        requestBody = JSON.stringify({
+          name: data.name.trim(),
+          email: data.email.trim(),
+          phone: data.phone?.trim() || '',
+          service: data.service,
+          budget: data.budget,
+          description: data.description.trim(),
+          consent: Boolean(data.consent)
+        });
+        requestHeaders = {
+          'Content-Type': 'application/json'
+        };
+      }
+
+      // Step 3: API Request with 15-second AbortController timeout
+      const abortController = new AbortController();
+      const timeoutId = setTimeout(() => abortController.abort(), 15000);
+
+      const response = await fetch('/api/project-inquiry', {
+        method: 'POST',
+        headers: requestHeaders,
+        body: requestBody,
+        signal: abortController.signal
+      });
+      clearTimeout(timeoutId);
+
+      const result = await response.json().catch(() => null);
+
+      if (response.ok && result?.success) {
+        if (isDev) {
+          console.log('[CONTACT-DEBUG] ui-success', result);
+        }
+        setSubmitSuccess(true);
+        setSubmitErrorMessage(null);
+        reset();
+        setFile(null);
+        if (fileInputRef.current) fileInputRef.current.value = '';
+      } else if (response.status >= 500 && isFirebaseConfigured()) {
+        // Resilient fallback directly to client-side Firestore
+        if (isDev) console.log('[CONTACT] Server unavailable, falling back to direct Firestore submission...');
+        const fbRes = await submitContactEnquiry({
+          name: data.name.trim(),
+          email: data.email.trim(),
+          phone: data.phone?.trim() || undefined,
+          selectedService: data.service,
+          budgetRange: data.budget,
+          projectDescription: data.description.trim(),
+          consentAccepted: true,
+          attachmentName: file ? file.name : undefined,
+          attachmentType: file ? file.type : undefined,
+          attachmentSize: file ? file.size : undefined
+        });
+
+        if (fbRes.success) {
+          setSubmitSuccess(true);
+          setSubmitErrorMessage(null);
+          reset();
+          setFile(null);
+          if (fileInputRef.current) fileInputRef.current.value = '';
+        } else {
+          setSubmitErrorMessage(fbRes.error || 'Unable to submit your project right now. Please check your connection and try again.');
+        }
+      } else {
+        // Precise status-code error mapping
+        let errorMsg = result?.message || 'Unable to process your project submission';
+        if (response.status === 400 || response.status === 422) {
+          errorMsg = result?.message || 'Please check your entries and try again.';
+        } else if (response.status === 413) {
+          errorMsg = 'The attached file is too large. Maximum allowed size is 15 MB.';
+        } else if (response.status === 429) {
+          errorMsg = 'Too many requests. Please wait a moment and try again.';
+        } else if (response.status >= 500) {
+          errorMsg = result?.message || 'Unable to submit your project right now. Please check your connection and try again.';
+        }
+
+        console.error('[PROJECT INQUIRY ERROR]', {
+          status: response.status,
+          message: errorMsg,
+          result
+        });
+        setSubmitErrorMessage(errorMsg);
+      }
+    } catch (err: any) {
+      if (err.name === 'AbortError') {
+        console.error('[PROJECT INQUIRY ERROR] Request timed out after 15s');
+        setSubmitErrorMessage('Submission timed out. Please check your connection and try again.');
+      } else {
+        console.error('[PROJECT INQUIRY ERROR] Submission network or client error:', err);
+        // Direct Firestore fallback on network error
+        if (isFirebaseConfigured()) {
+          try {
+            const fbRes = await submitContactEnquiry({
+              name: data.name.trim(),
+              email: data.email.trim(),
+              phone: data.phone?.trim() || undefined,
+              selectedService: data.service,
+              budgetRange: data.budget,
+              projectDescription: data.description.trim(),
+              consentAccepted: true,
+              attachmentName: file ? file.name : undefined,
+              attachmentType: file ? file.type : undefined,
+              attachmentSize: file ? file.size : undefined
+            });
+
+            if (fbRes.success) {
+              setSubmitSuccess(true);
+              setSubmitErrorMessage(null);
+              reset();
+              setFile(null);
+              if (fileInputRef.current) fileInputRef.current.value = '';
+              return;
+            }
+          } catch {}
+        }
+        setSubmitErrorMessage('Unable to submit your project right now. Please check your connection and try again.');
+      }
+    } finally {
+      if (isDev) {
+        console.log('[CONTACT-DEBUG] submit-finally');
+      }
       setIsSubmittingForm(false);
       setUploadProgress(null);
-      const errCode = firestoreRes.errorCode || 'submission-failed';
-      const displayMsg = firestoreRes.error || getReadableFirebaseError(errCode);
-      setSubmitErrorMessage(displayMsg);
-    } catch (err: unknown) {
-      setIsSubmittingForm(false);
-      setUploadProgress(null);
-      if (isDev) console.error('[Contact] Unexpected submission error:', err);
-      setSubmitErrorMessage('Submission could not be completed. Please contact Rohit directly through WhatsApp, email or phone.');
     }
   };
 
@@ -507,9 +533,12 @@ export default function ContactSection() {
                   <input
                     id="name"
                     type="text"
-                    {...register('name', { required: 'Name is required' })}
+                    {...register('name', {
+                      required: 'Name is required',
+                      minLength: { value: 2, message: 'Name must be at least 2 characters' }
+                    })}
                     className={`w-full bg-bg-primary border rounded-2xl px-5 py-4 text-base sm:text-sm text-text-primary focus:outline-none transition-colors duration-200 ${
-                      errors.name ? 'border-red-500 focus:border-red-500' : 'border-border-color focus:border-accent-primary'
+                      errors.name ? 'border-red-500 focus:border-red-500' : 'border-border-color focus:border-text-primary/40 focus:ring-1 focus:ring-text-primary/20'
                     }`}
                     placeholder="Enter your name"
                   />
@@ -534,7 +563,7 @@ export default function ContactSection() {
                       },
                     })}
                     className={`w-full bg-bg-primary border rounded-2xl px-5 py-4 text-base sm:text-sm text-text-primary focus:outline-none transition-colors duration-200 ${
-                      errors.email ? 'border-red-500 focus:border-red-500' : 'border-border-color focus:border-accent-primary'
+                      errors.email ? 'border-red-500 focus:border-red-500' : 'border-border-color focus:border-text-primary/40 focus:ring-1 focus:ring-text-primary/20'
                     }`}
                     placeholder="name@company.com"
                   />
@@ -553,10 +582,24 @@ export default function ContactSection() {
                   <input
                     id="phone"
                     type="tel"
-                    {...register('phone')}
-                    className="w-full bg-bg-primary border border-border-color rounded-2xl px-5 py-4 text-base sm:text-sm text-text-primary focus:outline-none focus:border-accent-primary transition-colors"
+                    {...register('phone', {
+                      validate: (val) => {
+                        if (!val || val.trim() === '') return true;
+                        const cleaned = val.trim().replace(/[\s\-()]/g, '');
+                        if (!/^[+]?[0-9]{7,15}$/.test(cleaned)) {
+                          return 'Please enter a valid phone number';
+                        }
+                        return true;
+                      }
+                    })}
+                    className={`w-full bg-bg-primary border rounded-2xl px-5 py-4 text-base sm:text-sm text-text-primary focus:outline-none transition-colors duration-200 ${
+                      errors.phone ? 'border-red-500 focus:border-red-500' : 'border-border-color focus:border-text-primary/40 focus:ring-1 focus:ring-text-primary/20'
+                    }`}
                     placeholder="+91 XXXXX XXXXX"
                   />
+                  {errors.phone && (
+                    <span className="text-xs text-red-400 font-semibold mt-1.5 block">{errors.phone.message}</span>
+                  )}
                 </div>
 
                 {/* Service Required */}
@@ -568,7 +611,7 @@ export default function ContactSection() {
                     id="service"
                     {...register('service', { required: 'Please select a service' })}
                     className={`w-full bg-bg-primary border rounded-2xl px-5 py-4 text-base sm:text-sm text-text-primary focus:outline-none transition-colors duration-200 appearance-none ${
-                      errors.service ? 'border-red-500 focus:border-red-500' : 'border-border-color focus:border-accent-primary'
+                      errors.service ? 'border-red-500 focus:border-red-500' : 'border-border-color focus:border-text-primary/40 focus:ring-1 focus:ring-text-primary/20'
                     }`}
                   >
                     <option value="">Select service required</option>
@@ -601,7 +644,7 @@ export default function ContactSection() {
                   id="budget"
                   {...register('budget', { required: 'Please select your budget range' })}
                   className={`w-full bg-bg-primary border rounded-2xl px-5 py-4 text-base sm:text-sm text-text-primary focus:outline-none appearance-none transition-colors ${
-                    errors.budget ? 'border-red-500' : 'border-border-color focus:border-accent-primary'
+                    errors.budget ? 'border-red-500 focus:border-red-500' : 'border-border-color focus:border-text-primary/40 focus:ring-1 focus:ring-text-primary/20'
                   }`}
                 >
                   <option value="">Select project budget</option>
@@ -623,9 +666,12 @@ export default function ContactSection() {
                 <textarea
                   id="description"
                   rows={4}
-                  {...register('description', { required: 'Please write a short brief' })}
+                  {...register('description', {
+                    required: 'Project description is required',
+                    minLength: { value: 10, message: 'Please provide at least 10 characters describing your project' }
+                  })}
                   className={`w-full bg-bg-primary border rounded-2xl px-5 py-4 text-base sm:text-sm text-text-primary focus:outline-none transition-colors duration-200 ${
-                    errors.description ? 'border-red-500 focus:border-red-500' : 'border-border-color focus:border-accent-primary'
+                    errors.description ? 'border-red-500 focus:border-red-500' : 'border-border-color focus:border-text-primary/40 focus:ring-1 focus:ring-text-primary/20'
                   }`}
                   placeholder="Describe your goals, reference accounts, required assets details, timeline bounds..."
                 />
@@ -746,7 +792,7 @@ export default function ContactSection() {
                 ) : submitSuccess ? (
                   <>
                     <CheckCircle2 className="w-5 h-5 text-white" />
-                    <span>Submitted Successfully</span>
+                    <span>Project Submitted Successfully</span>
                   </>
                 ) : submitErrorMessage ? (
                   <>
@@ -755,7 +801,7 @@ export default function ContactSection() {
                   </>
                 ) : (
                   <>
-                    <span>Send Message</span>
+                    <span>Submit Project</span>
                     <Send className="w-4 h-4" />
                   </>
                 )}
@@ -766,15 +812,25 @@ export default function ContactSection() {
                 <div
                   id="contact-submit-success-banner"
                   aria-live="polite"
-                  className="p-4 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400 text-sm flex items-start gap-3"
+                  className="p-5 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400 text-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4"
                 >
-                  <CheckCircle2 className="w-5 h-5 flex-shrink-0 mt-0.5 text-emerald-500" />
-                  <div className="text-left">
-                    <p className="font-bold">Thank you! Your project enquiry has been submitted.</p>
-                    <p className="text-xs text-text-secondary mt-1 leading-relaxed">
-                      {emailNotice || "Rohit Verma will review your brief and get back to you within 24 hours."}
-                    </p>
+                  <div className="flex items-start gap-3">
+                    <CheckCircle2 className="w-5 h-5 flex-shrink-0 mt-0.5 text-emerald-500" />
+                    <div className="text-left">
+                      <p className="font-bold text-base">Project Submitted Successfully</p>
+                      <p className="text-xs text-text-secondary mt-1 leading-relaxed">
+                        Thank you for sharing your project details. We’ll review your requirements and get back to you soon.
+                      </p>
+                    </div>
                   </div>
+                  <button
+                    type="button"
+                    onClick={() => setSubmitSuccess(false)}
+                    className="self-start sm:self-center px-4 py-2 text-xs font-semibold rounded-xl bg-emerald-600 text-white hover:bg-emerald-700 transition-colors cursor-pointer whitespace-nowrap"
+                    id="submit-another-project-btn"
+                  >
+                    Submit Another Project
+                  </button>
                 </div>
               )}
 

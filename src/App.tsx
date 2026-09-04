@@ -15,6 +15,7 @@ import Footer from './components/Footer';
 import FloatingElements from './components/FloatingElements';
 import AIChatbot from './components/AIChatbot';
 import Preloader from './components/Preloader';
+import CustomCursor from './components/custom-cursor';
 import { updateDocumentMetadata } from './seoConfig';
 import { Insight } from './types';
 import { fetchInsightBySlug } from './services/firebase/firestore';
@@ -37,10 +38,11 @@ interface AnimatedSectionProps {
 function AnimatedSection({ children }: AnimatedSectionProps) {
   return (
     <motion.div
-      initial={{ opacity: 0, y: 35 }}
+      initial={{ opacity: 0, y: 30 }}
       whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: '-80px' }}
-      transition={{ duration: 0.55, ease: 'easeOut' }}
+      viewport={{ once: true, margin: '-60px' }}
+      transition={{ duration: 0.5, ease: 'easeOut' }}
+      style={{ willChange: 'opacity, transform' }}
     >
       {children}
     </motion.div>
@@ -70,15 +72,18 @@ export default function App() {
     (typeof window !== 'undefined' && (window as any).__MAINTENANCE_MODE__ === true)
   );
 
-  // Track scroll position to update active header link
+  // Track scroll position to update active header link with RAF throttling
   useEffect(() => {
     if (currentRoute !== 'home') {
       setActiveSection(currentRoute);
       return;
     }
 
-    const handleScroll = () => {
-      const sections = ['home', 'about', 'services', 'portfolio', 'experience', 'blog', 'contact'];
+    let ticking = false;
+    let currentActive = 'home';
+    const sections = ['home', 'about', 'services', 'portfolio', 'experience', 'blog', 'contact'];
+
+    const updateActiveSection = () => {
       const scrollPosition = window.scrollY + 160;
 
       for (const section of sections) {
@@ -87,15 +92,29 @@ export default function App() {
           const top = el.offsetTop;
           const height = el.offsetHeight;
           if (scrollPosition >= top && scrollPosition < top + height) {
-            setActiveSection(section);
+            if (currentActive !== section) {
+              currentActive = section;
+              setActiveSection(section);
+            }
             break;
           }
         }
       }
+      ticking = false;
+    };
+
+    const handleScroll = () => {
+      if (!ticking) {
+        ticking = true;
+        window.requestAnimationFrame(updateActiveSection);
+      }
     };
 
     window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      ticking = false;
+    };
   }, [currentRoute]);
 
   // Support pathname and hash routing with clean fallbacks and dynamic path parsing
@@ -512,6 +531,22 @@ export default function App() {
 
       {/* AI Chatbot Component */}
       <AIChatbot />
+
+      {/* React Bits Pro Custom Cursor with target morphing & spring physics */}
+      <CustomCursor
+        circleColor={theme === 'dark' ? 'rgba(255, 59, 78, 0.65)' : 'rgba(165, 12, 24, 0.65)'}
+        dotColor={theme === 'dark' ? '#FF3B4E' : '#A50C18'}
+        circleSize={36}
+        dotSize={6}
+        circleBorderWidth={1.5}
+        circleStiffness={160}
+        circleDamping={22}
+        dotStiffness={320}
+        dotDamping={28}
+        targetPadding={5}
+        elastic={true}
+        targets={['button', 'a', 'input', 'textarea', '[role="button"]', '[data-cursor-target]', '.cursor-target']}
+      />
     </div>
   );
 }

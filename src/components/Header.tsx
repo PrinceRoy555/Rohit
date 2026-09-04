@@ -43,11 +43,31 @@ export default function Header({ activeSection, theme: propTheme, toggleTheme: p
   useBodyScrollLock(isMobileMenuOpen, 'header-mobile-menu');
 
   useEffect(() => {
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 20);
+    let ticking = false;
+    let isScrolledVal = false;
+
+    const updateScroll = () => {
+      const scrolled = window.scrollY > 20;
+      if (scrolled !== isScrolledVal) {
+        isScrolledVal = scrolled;
+        setIsScrolled(scrolled);
+      }
+      ticking = false;
     };
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
+
+    const handleScroll = () => {
+      if (!ticking) {
+        ticking = true;
+        window.requestAnimationFrame(updateScroll);
+      }
+    };
+
+    updateScroll();
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      ticking = false;
+    };
   }, []);
 
   useEffect(() => {
@@ -107,21 +127,12 @@ export default function Header({ activeSection, theme: propTheme, toggleTheme: p
       }
     }
 
-    // 3. Scroll homepage to top immediately on single click
+    // 3. Scroll homepage to top cleanly on click
     const scrollBehavior = isHomeRoute ? 'smooth' : 'auto';
     window.scrollTo({
       top: 0,
       left: 0,
       behavior: scrollBehavior
-    });
-
-    // 4. Ensure scroll completes even if route component was switching
-    requestAnimationFrame(() => {
-      window.scrollTo({
-        top: 0,
-        left: 0,
-        behavior: scrollBehavior
-      });
     });
   };
 

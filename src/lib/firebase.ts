@@ -49,7 +49,7 @@ const getFirebaseConfig = () => {
   const envKey = cleanEnvVal(metaEnv?.VITE_FIREBASE_API_KEY);
   const envProjectId = cleanEnvVal(metaEnv?.VITE_FIREBASE_PROJECT_ID);
 
-  if (envKey && envProjectId && envProjectId !== 'gen-lang-client-0536814422') {
+  if (envKey && envProjectId && envProjectId !== 'gen-lang-client-0536814422' && envProjectId !== 'rohit-portfolio-e5225') {
     return {
       apiKey: envKey,
       authDomain: cleanEnvVal(metaEnv.VITE_FIREBASE_AUTH_DOMAIN) || `${envProjectId}.firebaseapp.com`,

@@ -213,23 +213,60 @@ html.dark {
 }
 
 /* Global body styling with dynamic cinematic red glow background */
-html,
-body,
-#root,
-__next,
-main {
+html {
+  color-scheme: light;
+  scroll-behavior: smooth;
+  overflow-x: clip;
+  width: 100%;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto !important;
+  }
+}
+
+html[data-theme="dark"],
+html.dark {
+  color-scheme: dark;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  min-height: 100vh;
   background-color: var(--bg-primary);
   color: var(--text-primary);
-  background: var(--bg-gradient);
-  background-attachment: fixed;
   overflow-x: clip;
-  max-width: 100%;
+  position: relative;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Hardware-accelerated fixed background canvas - eliminates costly scroll repainting while preserving the exact gradient aesthetic */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background: var(--bg-gradient);
+  transform: translateZ(0);
+  will-change: transform;
+}
+
+#root,
+__next,
+main,
+#portfolio-app-root,
+#main-content {
+  width: 100%;
+  min-height: 100%;
+  overflow-x: clip;
 }
 
 /* Targeted smooth theme transition on core surface elements */
-body,
-#root,
-main,
 .site-header,
 .bg-bg-card,
 .bg-bg-primary,
@@ -1694,11 +1731,7 @@ a.btn-primary:hover {
   color: #FFFFFF;
 }
 
-/* Global smooth scrolling and sticky header scroll offset */
-html {
-  scroll-behavior: smooth;
-}
-
+/* Sticky header scroll offset for anchor navigation */
 #home,
 #about,
 #services,
@@ -1970,18 +2003,19 @@ section[id] {
    ========================================================================== */
 
 html, body {
-  overflow-x: hidden !important;
-  max-width: 100vw !important;
+  overflow-x: clip !important;
+  max-width: 100% !important;
   width: 100% !important;
   margin: 0;
   padding: 0;
+  -webkit-overflow-scrolling: touch;
 }
 
 #root,
 #portfolio-app-root,
 main,
 #main-content {
-  overflow-x: hidden !important;
+  overflow-x: clip !important;
   max-width: 100% !important;
   width: 100% !important;
 }
@@ -2199,6 +2233,10 @@ html:not(.dark) .admin-panel-container aside {
 [data-theme="light"] .admin-modal .bg-neutral-900,
 [data-theme="light"] .admin-modal .bg-neutral-900\/80,
 [data-theme="light"] .admin-modal,
+[data-theme="light"] #admin-portal-root .bg-bg-card,
+[data-theme="light"] .admin-panel-container .bg-bg-card,
+html:not(.dark) #admin-portal-root .bg-bg-card,
+html:not(.dark) .admin-panel-container .bg-bg-card,
 html:not(.dark) #admin-portal-root .bg-neutral-900,
 html:not(.dark) #admin-portal-root .bg-neutral-900\/40,
 html:not(.dark) #admin-portal-root .bg-neutral-900\/60,
@@ -2794,6 +2832,10 @@ html:not(.dark) .admin-modal .bg-rose-500\/15 .text-rose-300 {
 [data-theme="dark"] .admin-panel-container .bg-neutral-900\/95,
 [data-theme="dark"] .admin-panel-container .bg-neutral-900\/60,
 [data-theme="dark"] .admin-modal,
+[data-theme="dark"] #admin-portal-root .bg-bg-card,
+[data-theme="dark"] .admin-panel-container .bg-bg-card,
+.dark #admin-portal-root .bg-bg-card,
+.dark .admin-panel-container .bg-bg-card,
 .dark #admin-portal-root .bg-neutral-900,
 .dark #admin-portal-root .bg-neutral-900\/80,
 .dark #admin-portal-root .bg-neutral-900\/90,

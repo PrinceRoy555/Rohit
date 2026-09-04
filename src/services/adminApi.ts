@@ -17,23 +17,44 @@ export interface AuditLogEntry {
   status: 'success' | 'failure' | 'warning' | 'info';
 }
 
-// In-memory token storage (if header fallback is needed alongside HTTP-only cookies)
+// In-memory & browser storage token caching for cross-origin / iframe resilience
 let inMemoryToken: string | null = null;
 
 export function getAdminToken(): string | null {
+  if (!inMemoryToken && typeof window !== 'undefined') {
+    try {
+      inMemoryToken = sessionStorage.getItem('rohit_admin_token') || localStorage.getItem('rohit_admin_token');
+    } catch {
+      // Storage access blocked or restricted
+    }
+  }
   return inMemoryToken;
 }
 
 export function setAdminToken(token: string | null) {
   inMemoryToken = token;
+  if (typeof window !== 'undefined') {
+    try {
+      if (token) {
+        sessionStorage.setItem('rohit_admin_token', token);
+        localStorage.setItem('rohit_admin_token', token);
+      } else {
+        sessionStorage.removeItem('rohit_admin_token');
+        localStorage.removeItem('rohit_admin_token');
+      }
+    } catch {
+      // Storage access blocked or restricted
+    }
+  }
 }
 
 function getAuthHeaders(): HeadersInit {
+  const token = getAdminToken();
   const headers: Record<string, string> = {
     'Content-Type': 'application/json',
   };
-  if (inMemoryToken) {
-    headers['Authorization'] = `Bearer ${inMemoryToken}`;
+  if (token) {
+    headers['Authorization'] = `Bearer ${token}`;
   }
   return headers;
 }

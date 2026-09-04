@@ -2,13 +2,70 @@ import express, { Request, Response, NextFunction } from 'express';
 import path from 'path';
 import crypto from 'crypto';
 import cookieParser from 'cookie-parser';
+import multer from 'multer';
+import { initializeApp as initFirebaseApp, getApps as getFirebaseApps, getApp as getFirebaseApp } from 'firebase/app';
+import { getFirestore as getFirebaseFirestore, collection as firestoreCol, addDoc as firestoreAddDoc, serverTimestamp as firestoreServerTimestamp } from 'firebase/firestore';
 import { GoogleGenAI, Type } from '@google/genai';
 import dotenv from 'dotenv';
+import { INITIAL_INSIGHTS, DEFAULT_AUTOMATION_SETTINGS } from './src/insightsData';
+import { DEFAULT_SITE_CONFIG, BUILT_IN_TEMPLATES } from './src/data/defaultSiteConfig';
+import type { SiteConfig, SiteTemplate, SiteRevision, MediaItem, InquiryRecord, AdminUser } from './src/types/cms';
 
 dotenv.config();
 
+// Authoritative Firebase Configuration with fallback
+const FIREBASE_CONFIG = {
+  projectId: process.env.VITE_FIREBASE_PROJECT_ID && process.env.VITE_FIREBASE_PROJECT_ID !== 'rohit-portfolio-e5225' && process.env.VITE_FIREBASE_PROJECT_ID !== 'gen-lang-client-0536814422'
+    ? process.env.VITE_FIREBASE_PROJECT_ID
+    : 'rohit-72bfa',
+  appId: process.env.VITE_FIREBASE_APP_ID || '1:444813274833:web:7a4faf76c2090a4b57dff0',
+  apiKey: process.env.VITE_FIREBASE_API_KEY || 'AIzaSyB_TS7hxSqENHMERmVhfPY-myZW5crYEig',
+  authDomain: process.env.VITE_FIREBASE_AUTH_DOMAIN || 'rohit-72bfa.firebaseapp.com',
+  firestoreDatabaseId: '(default)',
+  storageBucket: process.env.VITE_FIREBASE_STORAGE_BUCKET || 'rohit-72bfa.firebasestorage.app',
+  messagingSenderId: process.env.VITE_FIREBASE_MESSAGING_SENDER_ID || '444813274833',
+  measurementId: process.env.VITE_FIREBASE_MEASUREMENT_ID || 'G-PRMKZMV6LR'
+};
+
+// Initialize server-side Firestore instance
+let serverDb: any = null;
+try {
+  const fbApp = getFirebaseApps().length ? getFirebaseApp() : initFirebaseApp(FIREBASE_CONFIG);
+  serverDb = getFirebaseFirestore(fbApp);
+  console.log('[Firebase Server] Connected to Firestore project:', FIREBASE_CONFIG.projectId);
+} catch (fbErr: any) {
+  console.warn('[Firebase Server] Note: Could not init server Firestore:', fbErr.message);
+}
+
 export const app = express();
+app.set('trust proxy', 1);
 const PORT = 3000;
+
+// Normalize incoming request paths (handles cases where Vercel rewrites strip /api)
+app.use((req, res, next) => {
+  if (
+    req.url.startsWith('/admin') ||
+    req.url.startsWith('/project-inquiry') ||
+    req.url.startsWith('/contact') ||
+    req.url.startsWith('/chat') ||
+    req.url.startsWith('/health') ||
+    req.url.startsWith('/site-config') ||
+    req.url.startsWith('/backup')
+  ) {
+    req.url = '/api' + req.url;
+  }
+  next();
+});
+
+// Explicit health check endpoint
+app.get(['/api/health', '/health'], (req, res) => {
+  res.status(200).json({
+    status: 'ok',
+    service: 'rohit-portfolio-api',
+    time: new Date().toISOString(),
+    environment: process.env.NODE_ENV || 'development'
+  });
+});
 
 // Initialize Gemini SDK with User-Agent: 'aistudio-build' for telemetry
 const apiKey = process.env.GEMINI_API_KEY;
@@ -40,7 +97,10 @@ app.use((req, res, next) => {
 const SUPER_ADMIN_UID = '7wupZnpLh1MPTYpci5keNIS1Fyt1';
 const ADMIN_EMAIL = (process.env.ADMIN_EMAIL || 'workall724038@gmail.com').trim().toLowerCase();
 const ADMIN_PASSWORD_ENV = (process.env.ADMIN_PASSWORD || '').trim();
-const SESSION_SECRET = process.env.ADMIN_SESSION_SECRET || crypto.randomBytes(32).toString('hex');
+// Deterministic session secret across serverless instances
+const SESSION_SECRET = (process.env.ADMIN_SESSION_SECRET && process.env.ADMIN_SESSION_SECRET.trim().length > 0)
+  ? process.env.ADMIN_SESSION_SECRET.trim()
+  : crypto.createHash('sha256').update(`rohit-portfolio-secret-${ADMIN_PASSWORD_ENV || 'Verma@9027'}`).digest('hex');
 const SESSION_DURATION_MS = 2 * 60 * 60 * 1000; // 2 hours session life
 const INACTIVITY_TIMEOUT_MS = 30 * 60 * 1000; // 30 minutes inactivity timeout
 
@@ -438,10 +498,6 @@ function sanitizeSlug(val: unknown): string {
 // =========================================================================
 // IN-MEMORY INSIGHTS CACHE & AUTOMATION STATE
 // =========================================================================
-import { INITIAL_INSIGHTS, DEFAULT_AUTOMATION_SETTINGS } from './src/insightsData';
-import { DEFAULT_SITE_CONFIG, BUILT_IN_TEMPLATES } from './src/data/defaultSiteConfig';
-import { SiteConfig, SiteTemplate, SiteRevision, MediaItem, InquiryRecord, AdminUser } from './src/types/cms';
-
 let serverInsights = [...INITIAL_INSIGHTS];
 let serverAutomationSettings = { ...DEFAULT_AUTOMATION_SETTINGS };
 
@@ -2100,44 +2156,241 @@ Sitemap: ${cleanBase}/sitemap.xml
   res.send(robots);
 });
 
-// API route for email notification proxy & inquiries storage
-app.post('/api/contact', async (req, res) => {
-  try {
-    const { name, email, selectedService, projectDescription, phone, service, message, source } = req.body || {};
-    const finalName = name || 'Anonymous Visitor';
-    const finalEmail = email || 'not-provided@client.com';
-    const finalService = service || selectedService || 'General Creative Inquiry';
-    const finalMessage = message || projectDescription || '';
-    const finalSource = source === 'ai_chat' ? 'ai_chat' : 'contact_form';
-
-    // Store in CRM Inquiries
-    const newInquiry: InquiryRecord = {
-      id: `inq-${Date.now()}`,
-      name: sanitizeInput(finalName, 100),
-      email: sanitizeInput(finalEmail, 120),
-      phone: phone ? sanitizeInput(phone, 30) : undefined,
-      service: sanitizeInput(finalService, 100),
-      message: sanitizeInput(finalMessage, 2000),
-      status: 'new',
-      source: finalSource,
-      createdAt: new Date().toISOString()
-    };
-    serverInquiries.unshift(newInquiry);
-
-    const recipient = process.env.CONTACT_RECIPIENT_EMAIL || 'workall724038@gmail.com';
-    console.log(`[Contact Notification] New inquiry received from ${finalName} (${finalEmail}) for service "${finalService}". Stored in CMS Inbox. Notification target: ${recipient}`);
-
-    res.json({
-      success: true,
-      inquiryId: newInquiry.id,
-      recipient,
-      message: 'Inquiry received and processed successfully.'
-    });
-  } catch (error: any) {
-    console.error('Error in /api/contact:', error);
-    res.status(500).json({ error: 'Failed to process email notification' });
+// Configure Multer for project brief attachments (max 15MB)
+const inquiryUpload = multer({
+  storage: multer.memoryStorage(),
+  limits: {
+    fileSize: 15 * 1024 * 1024 // 15 MB
   }
 });
+
+// Multipart parsing middleware with graceful size and format error handling
+const handleInquiryUpload = (req: Request, res: Response, next: NextFunction) => {
+  const contentType = (req.headers['content-type'] || '').toLowerCase();
+  if (contentType.includes('multipart/form-data')) {
+    inquiryUpload.single('attachment')(req, res, (err: any) => {
+      if (err) {
+        if (err instanceof multer.MulterError && err.code === 'LIMIT_FILE_SIZE') {
+          console.error('[PROJECT INQUIRY ERROR] File too large:', err.message);
+          return res.status(413).json({
+            success: false,
+            message: 'File is too large. Maximum allowed size is 15 MB.'
+          });
+        }
+        console.error('[PROJECT INQUIRY ERROR] Multipart upload error:', err.message);
+        return res.status(400).json({
+          success: false,
+          message: err.message || 'File upload error.'
+        });
+      }
+      next();
+    });
+  } else {
+    next();
+  }
+};
+
+// Unified Project Inquiry & Contact Submission Handler
+const handleProjectInquiry = async (req: Request, res: Response) => {
+  try {
+    const body = req.body || {};
+    const name = typeof body.name === 'string' ? body.name.trim() : '';
+    const email = typeof body.email === 'string' ? body.email.trim() : '';
+    const phone = typeof body.phone === 'string' ? body.phone.trim() : '';
+    const service = typeof body.service === 'string' && body.service.trim()
+      ? body.service.trim()
+      : (typeof body.selectedService === 'string' && body.selectedService.trim()
+        ? body.selectedService.trim()
+        : (typeof body.serviceRequired === 'string' ? body.serviceRequired.trim() : ''));
+    const budget = typeof body.budget === 'string' && body.budget.trim()
+      ? body.budget.trim()
+      : (typeof body.budgetRange === 'string' ? body.budgetRange.trim() : '');
+    const description = typeof body.description === 'string' && body.description.trim()
+      ? body.description.trim()
+      : (typeof body.projectDescription === 'string' && body.projectDescription.trim()
+        ? body.projectDescription.trim()
+        : (typeof body.message === 'string' ? body.message.trim() : ''));
+    const rawConsent = body.consent !== undefined ? body.consent : body.consentAccepted;
+    const consent = rawConsent === true || rawConsent === 'true' || rawConsent === 1 || rawConsent === '1' || rawConsent === 'on';
+
+    // 1. Validation
+    if (!name || name.length < 2) {
+      console.warn('[PROJECT INQUIRY ERROR] Validation failed: Name is required and must be at least 2 characters');
+      return res.status(400).json({
+        success: false,
+        message: 'Name is required and must be at least 2 characters.'
+      });
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!email || !emailRegex.test(email)) {
+      console.warn('[PROJECT INQUIRY ERROR] Validation failed: Invalid email format:', email);
+      return res.status(400).json({
+        success: false,
+        message: 'Please provide a valid email address.'
+      });
+    }
+
+    if (phone) {
+      const cleanedPhone = phone.replace(/[\s\-()]/g, '');
+      if (!/^[+]?[0-9]{7,15}$/.test(cleanedPhone)) {
+        console.warn('[PROJECT INQUIRY ERROR] Validation failed: Invalid phone format:', phone);
+        return res.status(400).json({
+          success: false,
+          message: 'Please enter a valid phone number (7-15 digits).'
+        });
+      }
+    }
+
+    if (!service) {
+      console.warn('[PROJECT INQUIRY ERROR] Validation failed: Service is required');
+      return res.status(400).json({
+        success: false,
+        message: 'Please select a service.'
+      });
+    }
+
+    if (!budget) {
+      console.warn('[PROJECT INQUIRY ERROR] Validation failed: Budget is required');
+      return res.status(400).json({
+        success: false,
+        message: 'Please select your budget range.'
+      });
+    }
+
+    if (!description || description.length < 10) {
+      console.warn('[PROJECT INQUIRY ERROR] Validation failed: Description too short (< 10 chars)');
+      return res.status(400).json({
+        success: false,
+        message: 'Please provide at least 10 characters describing your project.'
+      });
+    }
+
+    if (!consent) {
+      console.warn('[PROJECT INQUIRY ERROR] Validation failed: Consent not accepted');
+      return res.status(400).json({
+        success: false,
+        message: 'You must consent to allow Rohit Verma and Unicivix Solutions to contact you.'
+      });
+    }
+
+    // Attachment validation if present
+    if (req.file) {
+      const allowedExtensions = /\.(pdf|zip|doc|docx|png|jpg|jpeg|webp)$/i;
+      const allowedMimeTypes = [
+        'application/pdf',
+        'application/zip',
+        'application/x-zip-compressed',
+        'application/x-zip',
+        'application/octet-stream',
+        'application/msword',
+        'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+        'image/png',
+        'image/jpeg',
+        'image/jpg',
+        'image/webp'
+      ];
+      if (!allowedExtensions.test(req.file.originalname) && !allowedMimeTypes.includes(req.file.mimetype)) {
+        console.warn('[PROJECT INQUIRY ERROR] Validation failed: Disallowed attachment format:', req.file.originalname);
+        return res.status(400).json({
+          success: false,
+          message: 'Invalid file format. Allowed formats: PDF, ZIP, DOC, DOCX, PNG, JPG, WEBP.'
+        });
+      }
+    }
+
+    // 2. Database & Storage operations
+    const nowIso = new Date().toISOString();
+    let firestoreDocId = '';
+
+    if (serverDb) {
+      try {
+        const firestorePayload: Record<string, any> = {
+          name: sanitizeInput(name, 100),
+          email: email.toLowerCase(),
+          selectedService: sanitizeInput(service, 100),
+          service: sanitizeInput(service, 100),
+          budgetRange: sanitizeInput(budget, 100),
+          budget: sanitizeInput(budget, 100),
+          projectDescription: sanitizeInput(description, 5000),
+          description: sanitizeInput(description, 5000),
+          consentAccepted: true,
+          source: 'website-contact-form',
+          status: 'new',
+          createdAt: firestoreServerTimestamp(),
+          createdAtIso: nowIso
+        };
+
+        if (phone) {
+          firestorePayload.phone = sanitizeInput(phone, 30);
+        }
+
+        if (req.file) {
+          firestorePayload.attachmentName = sanitizeInput(req.file.originalname, 150);
+          firestorePayload.attachmentType = req.file.mimetype;
+          firestorePayload.attachmentSize = req.file.size;
+          firestorePayload.attachmentStatus = 'received';
+        }
+
+        const docRef = await firestoreAddDoc(firestoreCol(serverDb, 'contactEnquiries'), firestorePayload);
+        firestoreDocId = docRef.id;
+
+        // Also add to canonical leads collection
+        await firestoreAddDoc(firestoreCol(serverDb, 'leads'), {
+          name: sanitizeInput(name, 100),
+          email: email.toLowerCase(),
+          phone: phone ? sanitizeInput(phone, 30) : null,
+          service: sanitizeInput(service, 100),
+          budget: sanitizeInput(budget, 100),
+          projectDescription: sanitizeInput(description, 5000),
+          message: sanitizeInput(description, 5000),
+          source: 'website-contact-form',
+          status: 'new',
+          createdAt: firestoreServerTimestamp()
+        }).catch((err) => console.warn('[Leads Save Warning]:', err.message));
+      } catch (dbErr: any) {
+        console.warn('[PROJECT INQUIRY WARNING] Secondary Firestore database write notice:', dbErr.message);
+        // Continue processing to save to CMS inquiries and deliver notification
+      }
+    }
+
+    // 3. Store in CMS Inquiries store
+    const inquiryRecord: InquiryRecord = {
+      id: firestoreDocId || `inq-${Date.now()}`,
+      name: sanitizeInput(name, 100),
+      email: email.toLowerCase(),
+      phone: phone ? sanitizeInput(phone, 30) : undefined,
+      service: sanitizeInput(service, 100),
+      message: sanitizeInput(description, 2000),
+      status: 'new',
+      source: 'contact_form',
+      createdAt: nowIso
+    };
+    serverInquiries.unshift(inquiryRecord);
+
+    // 4. Email notification (non-blocking)
+    const recipient = process.env.CONTACT_RECIPIENT_EMAIL || 'workall724038@gmail.com';
+    console.log(`[Project Inquiry] Success: Received inquiry from ${name} (${email}) for service "${service}". Saved ID: ${inquiryRecord.id}. Notification target: ${recipient}`);
+
+    // 5. Return success JSON
+    return res.status(200).json({
+      success: true,
+      message: 'Project submitted successfully',
+      id: inquiryRecord.id,
+      inquiryId: inquiryRecord.id
+    });
+  } catch (err: any) {
+    console.error('[PROJECT INQUIRY ERROR] Unexpected server exception:', err);
+    return res.status(500).json({
+      success: false,
+      message: 'Unable to process your project submission right now. Please check your connection and try again.'
+    });
+  }
+};
+
+// Mount routes for both /api/project-inquiry and /api/contact
+app.post('/api/project-inquiry', handleInquiryUpload, handleProjectInquiry);
+app.post('/api/contact', handleInquiryUpload, handleProjectInquiry);
 
 // API route for secure chat proxy
 app.post('/api/chat', async (req, res) => {
@@ -2274,11 +2527,26 @@ const startServer = async () => {
   });
 };
 
-// Only listen when running standalone (not in Vercel serverless environment)
-if (!process.env.VERCEL) {
-  startServer().catch((err) => {
-    console.error('Failed to start server:', err);
-  });
+// Only listen when running standalone (not in Vercel or Lambda serverless environment)
+const isServerless = Boolean(
+  process.env.VERCEL ||
+  process.env.VERCEL_ENV ||
+  process.env.AWS_LAMBDA_FUNCTION_NAME ||
+  process.env.LAMBDA_TASK_ROOT ||
+  process.env.IS_SERVERLESS
+);
+
+if (!isServerless && (!process.env.NODE_ENV || process.env.NODE_ENV !== 'test')) {
+  const isDirectRun = !process.argv[1] ||
+    process.argv[1].endsWith('server.ts') ||
+    process.argv[1].endsWith('server.cjs') ||
+    process.argv[1].endsWith('server.js');
+
+  if (isDirectRun) {
+    startServer().catch((err) => {
+      console.error('Failed to start server:', err);
+    });
+  }
 }
 
 export default app;

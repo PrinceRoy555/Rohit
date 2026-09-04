@@ -49,7 +49,18 @@ class ScrollLockManager {
       document.body.style.overflow = '';
       document.body.style.paddingRight = '';
 
-      window.scrollTo(0, scrollY);
+      // Instantly restore the exact prior scroll offset without triggering smooth scroll animation
+      const prevBehavior = document.documentElement.style.scrollBehavior;
+      document.documentElement.style.scrollBehavior = 'auto';
+      try {
+        window.scrollTo({ top: scrollY, left: 0, behavior: 'instant' as ScrollBehavior });
+      } catch {
+        window.scrollTo(0, scrollY);
+      }
+      // Revert inline style on next microtask so normal smooth scroll remains intact
+      requestAnimationFrame(() => {
+        document.documentElement.style.scrollBehavior = prevBehavior;
+      });
     }
   }
 

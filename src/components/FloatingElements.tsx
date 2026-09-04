@@ -1,33 +1,55 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { ArrowUp, MessageCircle, Sparkles } from 'lucide-react';
 import { WHATSAPP_BUSINESS_URL } from '../data';
 
 export default function FloatingElements() {
   const [showBackToTop, setShowBackToTop] = useState(false);
-  const [scrollProgress, setScrollProgress] = useState(0);
   const [isChatbotOpen, setIsChatbotOpen] = useState(false);
   const [showChatTooltip, setShowChatTooltip] = useState(false);
   const [hoveredButton, setHoveredButton] = useState<'top' | 'whatsapp' | 'chatbot' | null>(null);
 
+  const progressBarRef = useRef<HTMLDivElement>(null);
+  const showBackToTopRef = useRef(false);
+
   useEffect(() => {
-    const handleScroll = () => {
-      // Back to top visibility
-      if (window.scrollY > 300) {
-        setShowBackToTop(true);
-      } else {
-        setShowBackToTop(false);
+    let ticking = false;
+
+    const updateScrollMetrics = () => {
+      const scrollY = window.scrollY || document.documentElement.scrollTop;
+
+      // 1. Back to top visibility - only trigger state update when threshold crossed
+      const shouldShow = scrollY > 300;
+      if (shouldShow !== showBackToTopRef.current) {
+        showBackToTopRef.current = shouldShow;
+        setShowBackToTop(shouldShow);
       }
 
-      // Scroll progress percentage
-      const totalHeight = document.documentElement.scrollHeight - window.innerHeight;
-      if (totalHeight > 0) {
-        setScrollProgress((window.scrollY / totalHeight) * 100);
+      // 2. Direct DOM update for top progress bar - completely skips React re-render cycle
+      if (progressBarRef.current) {
+        const totalHeight = document.documentElement.scrollHeight - window.innerHeight;
+        const progress = totalHeight > 0 ? Math.min(100, Math.max(0, (scrollY / totalHeight) * 100)) : 0;
+        progressBarRef.current.style.width = `${progress}%`;
+      }
+
+      ticking = false;
+    };
+
+    const handleScroll = () => {
+      if (!ticking) {
+        ticking = true;
+        window.requestAnimationFrame(updateScrollMetrics);
       }
     };
 
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
+    // Initial check
+    updateScrollMetrics();
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      ticking = false;
+    };
   }, []);
 
   // Listen to AI Chatbot state events
@@ -69,8 +91,9 @@ export default function FloatingElements() {
     <>
       {/* 1. Top Scroll Progress Bar */}
       <div
+        ref={progressBarRef}
         className="scroll-progress"
-        style={{ width: `${scrollProgress}%` }}
+        style={{ width: '0%' }}
         id="scroll-progress-bar-fill"
       />
 
