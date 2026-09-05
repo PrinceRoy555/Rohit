@@ -625,8 +625,8 @@ export const ACHIEVEMENT_CARDS: AchievementCard[] = [
 ];
 
 export const WHATSAPP_BUSINESS_URL = "https://wa.me/message/E53AXF7SH5OMI1";
-export const RESUME_PDF_URL = "/documents/rohit-verma-resume.pdf?v=2";
-export const RESUME_DRIVE_PREVIEW_FALLBACK = "https://drive.google.com/file/d/1VO3KqhDik6UVuKQ5yTanDKSBIJf4JOFs/preview";
+export const RESUME_PDF_URL = "https://ik.imagekit.io/auhuory9w/website%20work/resume/Rohit%20Verma%20(2)%20(3).pdf";
+export const RESUME_DRIVE_PREVIEW_FALLBACK = "https://ik.imagekit.io/auhuory9w/website%20work/resume/Rohit%20Verma%20(2)%20(3).pdf";
 export const RESUME_FILE_NAME = "Rohit-Verma-Resume.pdf";
 export const RESUME_URL = RESUME_PDF_URL;
 

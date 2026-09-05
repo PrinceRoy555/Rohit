@@ -148,6 +148,12 @@ export default function App() {
         setIsAdminOpen(true);
       }
 
+      // Check if direct resume URL
+      if (topPath === 'resume' || topHash === 'resume') {
+        window.location.replace('https://ik.imagekit.io/auhuory9w/website%20work/resume/Rohit%20Verma%20(2)%20(3).pdf');
+        return;
+      }
+
       // Check if dynamic /insights/[slug] or /blog/[slug] route
       if ((topPath === 'insights' || topPath === 'blog') && subPath) {
         const found = await fetchInsightBySlug(subPath);

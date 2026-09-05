@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useSiteConfig } from '../../../context/SiteConfigContext';
 import { ThemeConfig, BrandingConfig, ThemeBorderRadius } from '../../../types/cms';
+import ThemeToggle from '../../ThemeToggle';
 import {
   Palette,
   Type,
@@ -208,23 +209,29 @@ export const CustomizerTab: React.FC = () => {
           </p>
         </div>
 
-        <button
-          onClick={handleSave}
-          disabled={isSaving}
-          className="px-5 py-2.5 rounded-xl text-sm font-semibold bg-rose-600 hover:bg-rose-700 text-white shadow-lg shadow-rose-600/30 flex items-center gap-2 transition-all self-start sm:self-auto"
-        >
-          {savedSuccess ? (
-            <>
-              <Check className="w-4 h-4 text-emerald-300" />
-              <span>Draft Saved!</span>
-            </>
-          ) : (
-            <>
-              <Save className="w-4 h-4" />
-              <span>{isSaving ? 'Saving...' : 'Save Customizer Draft'}</span>
-            </>
-          )}
-        </button>
+        <div className="flex items-center gap-3 self-start sm:self-auto">
+          <div className="flex items-center" title="Toggle Light / Dark Theme">
+            <ThemeToggle id="admin-customizer-theme-toggle" />
+          </div>
+
+          <button
+            onClick={handleSave}
+            disabled={isSaving}
+            className="px-5 py-2.5 rounded-xl text-sm font-semibold bg-rose-600 hover:bg-rose-700 text-white shadow-lg shadow-rose-600/30 flex items-center gap-2 transition-all"
+          >
+            {savedSuccess ? (
+              <>
+                <Check className="w-4 h-4 text-emerald-300" />
+                <span>Draft Saved!</span>
+              </>
+            ) : (
+              <>
+                <Save className="w-4 h-4" />
+                <span>{isSaving ? 'Saving...' : 'Save Customizer Draft'}</span>
+              </>
+            )}
+          </button>
+        </div>
       </div>
 
       {/* Sub-Navigation Tabs */}

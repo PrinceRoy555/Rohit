@@ -13,7 +13,7 @@ import {
   updateDoc,
   onSnapshot
 } from 'firebase/firestore';
-import { db, isFirebaseConfigured, FIREBASE_FALLBACK_CONTACT, getFirebaseConfigDetails } from '../../lib/firebase';
+import { db, auth, isFirebaseConfigured, FIREBASE_FALLBACK_CONTACT, getFirebaseConfigDetails } from '../../lib/firebase';
 import {
   normalizeEmail,
   sanitizeText,
@@ -618,19 +618,27 @@ export async function fetchLiveSiteConfigFromFirestore(): Promise<SiteConfig | n
 
 export async function saveLiveSiteConfigToFirestore(config: SiteConfig): Promise<ServiceResponse<SiteConfig>> {
   if (!isFirebaseConfigured() || !db) return { success: false, error: 'Firestore unconfigured' };
+  if (!auth?.currentUser) {
+    // Client-side Firebase Auth session not present; handled by server CMS endpoints
+    return { success: false, error: 'User is not authenticated with Firebase Auth' };
+  }
   try {
     const docRef = doc(db, 'siteConfig', 'live');
     const cleanConfig = removeUndefinedValues(JSON.parse(JSON.stringify(config)));
     await setDoc(docRef, cleanConfig, { merge: true });
     return { success: true, data: config };
   } catch (err: any) {
-    console.error('[Firestore] Error saving live siteConfig:', err);
+    if (err?.code === 'permission-denied' || err?.message?.includes('Missing or insufficient permissions')) {
+      console.warn('[Firestore] Note: Saving live siteConfig requires administrator permissions');
+    } else {
+      console.error('[Firestore] Error saving live siteConfig:', err);
+    }
     return { success: false, error: err.message || 'Failed to save live config' };
   }
 }
 
 export async function fetchDraftSiteConfigFromFirestore(): Promise<SiteConfig | null> {
-  if (!isFirebaseConfigured() || !db) return null;
+  if (!isFirebaseConfigured() || !db || !auth?.currentUser) return null;
   try {
     const docRef = doc(db, 'siteConfig', 'draft');
     const snap = await Promise.race([
@@ -649,42 +657,58 @@ export async function fetchDraftSiteConfigFromFirestore(): Promise<SiteConfig | 
 
 export async function saveDraftSiteConfigToFirestore(config: SiteConfig): Promise<ServiceResponse<SiteConfig>> {
   if (!isFirebaseConfigured() || !db) return { success: false, error: 'Firestore unconfigured' };
+  if (!auth?.currentUser) {
+    // Client-side Firebase Auth session not present; handled by server CMS endpoints
+    return { success: false, error: 'User is not authenticated with Firebase Auth' };
+  }
   try {
     const docRef = doc(db, 'siteConfig', 'draft');
     const cleanConfig = removeUndefinedValues(JSON.parse(JSON.stringify(config)));
     await setDoc(docRef, cleanConfig, { merge: true });
     return { success: true, data: config };
   } catch (err: any) {
-    console.error('[Firestore] Error saving draft siteConfig:', err);
+    if (err?.code === 'permission-denied' || err?.message?.includes('Missing or insufficient permissions')) {
+      console.warn('[Firestore] Note: Saving draft siteConfig requires administrator permissions');
+    } else {
+      console.error('[Firestore] Error saving draft siteConfig:', err);
+    }
     return { success: false, error: err.message || 'Failed to save draft config' };
   }
 }
 
 export async function clearDraftSiteConfigInFirestore(): Promise<void> {
-  if (!isFirebaseConfigured() || !db) return;
+  if (!isFirebaseConfigured() || !db || !auth?.currentUser) return;
   try {
     const docRef = doc(db, 'siteConfig', 'draft');
     await deleteDoc(docRef);
   } catch (err) {
-    console.warn('[Firestore] Error clearing draft doc:', err);
+    console.warn('[Firestore] Note: Clearing draft doc requires administrator permissions');
   }
 }
 
 export async function createSiteRevisionInFirestore(revision: SiteRevision): Promise<ServiceResponse<SiteRevision>> {
   if (!isFirebaseConfigured() || !db) return { success: false, error: 'Firestore unconfigured' };
+  if (!auth?.currentUser) {
+    // Client-side Firebase Auth session not present; handled by server CMS endpoints
+    return { success: false, error: 'User is not authenticated with Firebase Auth' };
+  }
   try {
     const docRef = doc(db, 'siteRevisions', revision.id);
     const cleanRev = removeUndefinedValues(JSON.parse(JSON.stringify(revision)));
     await setDoc(docRef, cleanRev);
     return { success: true, data: revision };
   } catch (err: any) {
-    console.error('[Firestore] Error creating revision:', err);
+    if (err?.code === 'permission-denied' || err?.message?.includes('Missing or insufficient permissions')) {
+      console.warn('[Firestore] Note: Creating revision requires administrator permissions');
+    } else {
+      console.error('[Firestore] Error creating revision:', err);
+    }
     return { success: false, error: err.message || 'Failed to save revision' };
   }
 }
 
 export async function fetchSiteRevisionsFromFirestore(): Promise<SiteRevision[]> {
-  if (!isFirebaseConfigured() || !db) return [];
+  if (!isFirebaseConfigured() || !db || !auth?.currentUser) return [];
   try {
     const colRef = collection(db, 'siteRevisions');
     const snap = await getDocs(colRef);

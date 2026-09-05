@@ -1837,164 +1837,118 @@ section[id] {
 }
 
 /* ==========================================================================
-   Animated Sun / Moon Theme Toggle Switch (Brand Theme Integrated)
+   Uiverse.io Sun/Moon Theme Toggle (by ami-hp)
    ========================================================================== */
 
-.theme-switch-container {
+.my-body {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-}
-
-.switch {
-  font-size: 17px;
-  position: relative;
-  display: inline-block;
-  width: 64px;
-  height: 34px;
-  user-select: none;
-  cursor: pointer;
   vertical-align: middle;
 }
 
-.switch input.input {
+.darkThemeBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.darkThemeBtn * {
+  transition: all 0.3s;
+}
+
+.darkThemeBtn input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
   opacity: 0;
-  width: 0;
-  height: 0;
-  position: absolute;
   pointer-events: none;
 }
 
-/* Base Light Mode Track */
-.slider {
-  position: absolute;
+.darkThemeBtn input:focus-visible + label {
+  outline: 2px solid var(--accent-primary, #A50C18);
+  outline-offset: 2px;
+}
+
+.darkThemeBtn label {
+  border: 1px solid rgba(26, 9, 10, 0.14);
+  background: rgba(239, 239, 239, 0.7);
+  border-radius: 10px;
+  height: 46px;
+  width: 46px;
+  margin: auto;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
   cursor: pointer;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: var(--bg-secondary, #EFE8E5);
-  border: 1px solid var(--border-color, rgba(26, 9, 10, 0.14));
-  border-radius: 30px;
-  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.08);
-  transition:
-    background-color 0.35s cubic-bezier(0.4, 0, 0.2, 1),
-    border-color 0.35s cubic-bezier(0.4, 0, 0.2, 1),
-    box-shadow 0.25s ease;
+  box-sizing: border-box;
+  flex-shrink: 0;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 }
 
-/* Base Light Mode Thumb */
-.slider:before {
-  position: absolute;
-  content: "";
-  height: 28px;
-  width: 28px;
-  border-radius: 50%;
-  left: 2px;
-  bottom: 2px;
-  z-index: 2;
-  background-color: var(--bg-card, #FFFFFF);
-  border: 1px solid var(--border-color, rgba(26, 9, 10, 0.10));
-  box-shadow: 0 2px 6px rgba(26, 9, 10, 0.16);
-  transition:
-    transform 0.35s cubic-bezier(0.4, 0, 0.2, 1),
-    background-color 0.35s cubic-bezier(0.4, 0, 0.2, 1),
-    border-color 0.35s cubic-bezier(0.4, 0, 0.2, 1),
-    box-shadow 0.35s ease;
+.dark .darkThemeBtn label {
+  border-color: rgba(255, 255, 255, 0.16);
+  background: rgba(255, 255, 255, 0.08);
 }
 
-/* Sun Icon */
-.sun svg {
+.darkThemeBtn label:active {
+  border-radius: 5px;
+  transform: scale(0.96);
+}
+
+.darkThemeBtn label svg {
   position: absolute;
-  top: 5px;
-  left: 35px;
+  width: 16px;
+  height: 16px;
+  transition: 0.3s;
   z-index: 1;
-  width: 22px;
-  height: 22px;
+  fill: #1A090A;
   pointer-events: none;
-  fill: var(--accent-primary, #A50C18);
-  opacity: 0.95;
-  transition: fill 0.35s ease, opacity 0.35s ease;
-  animation: rotate 15s linear infinite;
 }
 
-/* Moon Icon */
-.moon svg {
-  fill: var(--text-muted, rgba(26, 9, 10, 0.45));
-  position: absolute;
-  top: 5px;
-  left: 6px;
-  z-index: 1;
-  width: 22px;
-  height: 22px;
-  pointer-events: none;
-  opacity: 0.5;
-  transition: fill 0.35s ease, opacity 0.35s ease;
-  animation: tilt 5s linear infinite;
+.dark .darkThemeBtn label svg {
+  fill: #FFFFFF;
 }
 
-@keyframes rotate {
-  0% {
-    transform: rotate(0);
-  }
-  100% {
-    transform: rotate(360deg);
-  }
+.darkThemeBtn label svg.sun {
+  width: 20px;
+  height: 20px;
+  opacity: 0;
+  fill: #fff;
 }
 
-@keyframes tilt {
-  0% {
-    transform: rotate(0deg);
-  }
-  25% {
-    transform: rotate(-10deg);
-  }
-  75% {
-    transform: rotate(10deg);
-  }
-  100% {
-    transform: rotate(0deg);
-  }
-}
-
-/* Checked (Dark Mode) State */
-.input:checked ~ .slider {
-  background-color: var(--bg-card, #1D0709);
-  border-color: rgba(211, 19, 34, 0.35);
-  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.45);
-}
-
-.input:checked ~ .slider:before {
-  transform: translateX(30px);
-  background-color: var(--accent-primary, #D31322);
-  border-color: rgba(255, 255, 255, 0.18);
-  box-shadow: 0 2px 10px rgba(211, 19, 34, 0.50);
-}
-
-.input:checked ~ .moon svg {
-  fill: var(--text-primary, #FFFFFF);
+.darkThemeBtn label svg.moon {
   opacity: 1;
 }
 
-.input:checked ~ .sun svg {
-  fill: var(--text-muted, rgba(255, 255, 255, 0.40));
-  opacity: 0.35;
+.darkThemeBtn input:checked + label {
+  background: var(--accent-primary, #A50C18);
+  border-color: var(--accent-primary, #A50C18);
+  box-shadow: 0 2px 10px rgba(165, 12, 24, 0.35);
 }
 
-/* Accessible Focus Ring */
-.input:focus-visible ~ .slider,
-.input:focus ~ .slider {
-  box-shadow: 0 0 0 2px var(--bg-primary, #F8F5F2), 0 0 0 4px var(--accent-primary, #A50C18);
+.darkThemeBtn input:checked + label svg.sun {
+  opacity: 1;
+  fill: #fff;
+}
+
+.darkThemeBtn input:checked + label svg.moon {
+  opacity: 0;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .sun svg,
-  .moon svg {
-    animation: none !important;
-  }
-  .slider,
-  .slider:before {
-    transition-duration: 0.01ms !important;
+  .darkThemeBtn *,
+  .darkThemeBtn label,
+  .darkThemeBtn label svg {
+    transition: none !important;
   }
 }
 

@@ -1223,12 +1223,17 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose, onLogout }) => 
             })}
           </div>
 
-          <div className="pt-4 border-t border-border-color text-[11px] text-text-muted">
-            <div className="flex items-center gap-1.5 text-text-primary font-medium">
-              <UserCheck className="w-3.5 h-3.5 text-emerald-500 flex-shrink-0" />
-              <span className="truncate font-mono">{adminEmail}</span>
+          <div className="pt-4 border-t border-border-color text-[11px] text-text-muted flex items-center justify-between gap-2">
+            <div className="min-w-0 flex-1">
+              <div className="flex items-center gap-1.5 text-text-primary font-medium">
+                <UserCheck className="w-3.5 h-3.5 text-emerald-500 flex-shrink-0" />
+                <span className="truncate font-mono">{adminEmail}</span>
+              </div>
+              <div className="text-[10px] text-text-muted mt-1 capitalize">Role: {adminRole.replace('_', ' ')}</div>
             </div>
-            <div className="text-[10px] text-text-muted mt-1 capitalize">Role: {adminRole.replace('_', ' ')}</div>
+            <div title="Toggle Light/Dark Theme" className="flex-shrink-0">
+              <ThemeToggle id="admin-sidebar-theme-toggle" />
+            </div>
           </div>
         </aside>
 

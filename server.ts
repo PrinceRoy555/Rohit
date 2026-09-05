@@ -1,5 +1,6 @@
 import express, { Request, Response, NextFunction } from 'express';
 import path from 'path';
+import fs from 'fs';
 import crypto from 'crypto';
 import cookieParser from 'cookie-parser';
 import multer from 'multer';
@@ -65,6 +66,11 @@ app.get(['/api/health', '/health'], (req, res) => {
     time: new Date().toISOString(),
     environment: process.env.NODE_ENV || 'development'
   });
+});
+
+// Explicit route for serving Rohit Verma's resume PDF directly in browser
+app.get(['/documents/rohit-verma-resume.pdf', '/documents/rohit-resume.pdf', '/resume.pdf', '/resume'], (req, res) => {
+  return res.redirect(302, 'https://ik.imagekit.io/auhuory9w/website%20work/resume/Rohit%20Verma%20(2)%20(3).pdf');
 });
 
 // Initialize Gemini SDK with User-Agent: 'aistudio-build' for telemetry

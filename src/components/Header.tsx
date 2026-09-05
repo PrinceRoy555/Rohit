@@ -34,7 +34,8 @@ export default function Header({ activeSection, theme: propTheme, toggleTheme: p
   const branding = activeConfig?.branding;
   const siteName = branding?.siteName || 'Rohit';
   const avatar = branding?.avatarImage || avatarImg;
-  const resumeUrl = branding?.resumeUrl || contactConfig.resumePdfUrl;
+  const EXACT_RESUME_URL = "https://ik.imagekit.io/auhuory9w/website%20work/resume/Rohit%20Verma%20(2)%20(3).pdf";
+  const resumeUrl = EXACT_RESUME_URL;
 
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -366,10 +367,12 @@ export default function Header({ activeSection, theme: propTheme, toggleTheme: p
 
               {/* View Resume Option inside Drawer */}
               <a
-                href={contactConfig.resumePdfUrl}
+                href={resumeUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                onClick={() => setIsMobileMenuOpen(false)}
+                onClick={() => {
+                  setTimeout(() => setIsMobileMenuOpen(false), 150);
+                }}
                 className="flex items-center justify-center gap-2 text-white font-bold py-3.5 rounded-full text-sm active:scale-95 transition-all duration-200 bg-accent-primary hover:bg-accent-secondary shadow-md"
                 id="mobile-download-resume-btn"
                 aria-label="Open Rohit Verma Resume PDF"

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useSiteConfig } from '../../../context/SiteConfigContext';
 import { InquiryRecord } from '../../../types/cms';
 import { fetchInquiries, updateInquiryCrm, deleteInquiry } from '../../../services/cmsApi';
+import ThemeToggle from '../../ThemeToggle';
 import { TodayDashboardSummary } from '../crm/TodayDashboardSummary';
 import { TodaysFollowUps } from '../crm/TodaysFollowUps';
 import { HotLeadsSection } from '../crm/HotLeadsSection';
@@ -142,6 +143,10 @@ export const DashboardTab: React.FC<DashboardTabProps> = ({ setActiveTab }) => {
           </div>
 
           <div className="flex flex-wrap items-center gap-3">
+            <div title="Toggle Light / Dark Theme" className="flex items-center">
+              <ThemeToggle id="admin-dashboard-theme-toggle" />
+            </div>
+
             <button
               onClick={() => setPreviewMode(!isPreviewMode)}
               className={`px-4 py-2.5 rounded-xl text-sm font-semibold flex items-center gap-2 transition-all border ${
