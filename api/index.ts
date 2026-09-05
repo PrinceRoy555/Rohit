@@ -7,6 +7,7 @@ async function getApp() {
   if (!cachedApp) {
     try {
       // Load the bundled, production-compiled CommonJS server
+      // @ts-ignore - dist/server.cjs is bundled during build
       const serverModule: any = await import('../dist/server.cjs');
       const raw = serverModule?.app || serverModule?.default;
       cachedApp = typeof raw === 'function' ? raw : (raw?.app || raw?.default);

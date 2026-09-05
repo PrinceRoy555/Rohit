@@ -54,6 +54,7 @@ export interface ContactEnquiryPayload {
   attachmentStatus?: string;
   consentAccepted: boolean;
   pageUrl?: string;
+  source?: string;
 }
 
 export interface ChatbotLeadPayload {
@@ -154,7 +155,7 @@ export async function submitContactEnquiry(payload: ContactEnquiryPayload): Prom
     selectedService: sanitizeText(payload.selectedService, 100),
     projectDescription: sanitizeText(payload.projectDescription, 5000),
     consentAccepted: true,
-    source: 'website-contact-form',
+    source: payload.source ? sanitizeText(payload.source, 100) : 'website-contact-form',
     status: 'new',
     createdAt: serverTimestamp()
   };
@@ -197,31 +198,16 @@ export async function submitContactEnquiry(payload: ContactEnquiryPayload): Prom
   }
 
   try {
-    const FIRESTORE_WRITE_TIMEOUT_MS = 15000;
-
-    const writePromise = (async (): Promise<string> => {
-      let submissionId: string;
-      if (payload.submissionId) {
-        const docRef = doc(db, 'contactEnquiries', payload.submissionId);
-        submissionId = docRef.id;
-        await setDoc(docRef, cleanPayload);
-      } else {
-        const colRef = collection(db, 'contactEnquiries');
-        const docRef = await addDoc(colRef, cleanPayload);
-        submissionId = docRef.id;
-      }
-      return submissionId;
-    })();
-
-    const timeoutPromise = new Promise<never>((_, reject) => {
-      setTimeout(() => {
-        const timeoutErr = new Error('deadline-exceeded');
-        (timeoutErr as unknown as { code: string }).code = 'deadline-exceeded';
-        reject(timeoutErr);
-      }, FIRESTORE_WRITE_TIMEOUT_MS);
-    });
-
-    const submissionId = await Promise.race([writePromise, timeoutPromise]);
+    let submissionId: string;
+    if (payload.submissionId) {
+      const docRef = doc(db, 'contactEnquiries', payload.submissionId);
+      submissionId = docRef.id;
+      await setDoc(docRef, cleanPayload);
+    } else {
+      const colRef = collection(db, 'contactEnquiries');
+      const docRef = await addDoc(colRef, cleanPayload);
+      submissionId = docRef.id;
+    }
 
     if (isDev) {
       console.log('[CONTACT-DEBUG] firestore-success', submissionId);

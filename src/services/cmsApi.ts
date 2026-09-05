@@ -15,7 +15,8 @@ import {
   deleteLeadFromFirestore,
   fetchMediaItemsFromFirestore,
   saveMediaItemToFirestore,
-  deleteMediaItemFromFirestore
+  deleteMediaItemFromFirestore,
+  submitContactEnquiry
 } from './firebase/firestore';
 import { DEFAULT_SITE_CONFIG, BUILT_IN_TEMPLATES } from '../data/defaultSiteConfig';
 
@@ -441,13 +442,16 @@ export async function submitContactInquiry(payload: {
   source?: string;
 }): Promise<{ success: boolean; error?: string }> {
   try {
-    const res = await fetch('/api/contact', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload)
+    const res = await submitContactEnquiry({
+      name: payload.name,
+      email: payload.email,
+      phone: payload.phone,
+      selectedService: payload.service || 'General Inquiry',
+      projectDescription: payload.message || 'Website inquiry',
+      consentAccepted: true,
+      source: payload.source || 'website-contact'
     });
-    const data = await res.json();
-    return { success: Boolean(data.success) };
+    return { success: res.success, error: res.error };
   } catch (err: any) {
     return { success: false, error: err.message };
   }

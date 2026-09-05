@@ -126,141 +126,63 @@ export default function ContactSection() {
         return;
       }
 
-      // Step 2: Build payload (FormData if attachment present, JSON if no file)
-      let requestBody: BodyInit;
-      let requestHeaders: HeadersInit = {};
+      // Step 2: Handle optional attachment upload (do not wait for Storage when no attachment exists)
+      let attachmentUrl: string | undefined;
+      let attachmentPath: string | undefined;
 
-      if (file) {
-        const formData = new FormData();
-        formData.append('name', data.name.trim());
-        formData.append('email', data.email.trim());
-        if (data.phone?.trim()) formData.append('phone', data.phone.trim());
-        formData.append('service', data.service);
-        formData.append('budget', data.budget);
-        formData.append('description', data.description.trim());
-        formData.append('consent', String(data.consent));
-        formData.append('attachment', file);
-
-        requestBody = formData;
-        // IMPORTANT: DO NOT set Content-Type header for FormData; browser automatically generates the multipart boundary
-        requestHeaders = {};
-      } else {
-        requestBody = JSON.stringify({
-          name: data.name.trim(),
-          email: data.email.trim(),
-          phone: data.phone?.trim() || '',
-          service: data.service,
-          budget: data.budget,
-          description: data.description.trim(),
-          consent: Boolean(data.consent)
-        });
-        requestHeaders = {
-          'Content-Type': 'application/json'
-        };
+      if (file && isStorageAvailable()) {
+        try {
+          const uploadRes = await uploadProjectBrief(file, (progress) => {
+            setUploadProgress(progress);
+          });
+          if (uploadRes.success) {
+            attachmentUrl = uploadRes.downloadUrl;
+            attachmentPath = uploadRes.storagePath;
+          }
+        } catch (uploadErr) {
+          console.warn('[Contact] Attachment upload skipped or failed, proceeding with enquiry:', uploadErr);
+        }
       }
 
-      // Step 3: API Request with 15-second AbortController timeout
-      const abortController = new AbortController();
-      const timeoutId = setTimeout(() => abortController.abort(), 15000);
-
-      const response = await fetch('/api/project-inquiry', {
-        method: 'POST',
-        headers: requestHeaders,
-        body: requestBody,
-        signal: abortController.signal
+      // Step 3: Write enquiry directly to Firestore collection 'contactEnquiries'
+      const fbRes = await submitContactEnquiry({
+        name: data.name.trim(),
+        email: data.email.trim(),
+        phone: data.phone?.trim() || undefined,
+        selectedService: data.service,
+        budgetRange: data.budget,
+        projectDescription: data.description.trim(),
+        consentAccepted: true,
+        attachmentName: file ? file.name : undefined,
+        attachmentType: file ? file.type : undefined,
+        attachmentSize: file ? file.size : undefined,
+        attachmentUrl,
+        attachmentPath,
+        attachmentStatus: attachmentUrl ? 'uploaded' : (file ? 'pending' : undefined),
+        pageUrl: typeof window !== 'undefined' ? window.location.href : undefined
       });
-      clearTimeout(timeoutId);
 
-      const result = await response.json().catch(() => null);
-
-      if (response.ok && result?.success) {
+      if (fbRes.success) {
         if (isDev) {
-          console.log('[CONTACT-DEBUG] ui-success', result);
+          console.log('[CONTACT-DEBUG] ui-success', fbRes);
         }
+        // When Firestore succeeds:
+        // - show success immediately
+        // - reset the form
+        // - set isSubmitting to false
         setSubmitSuccess(true);
         setSubmitErrorMessage(null);
         reset();
         setFile(null);
         if (fileInputRef.current) fileInputRef.current.value = '';
-      } else if (response.status >= 500 && isFirebaseConfigured()) {
-        // Resilient fallback directly to client-side Firestore
-        if (isDev) console.log('[CONTACT] Server unavailable, falling back to direct Firestore submission...');
-        const fbRes = await submitContactEnquiry({
-          name: data.name.trim(),
-          email: data.email.trim(),
-          phone: data.phone?.trim() || undefined,
-          selectedService: data.service,
-          budgetRange: data.budget,
-          projectDescription: data.description.trim(),
-          consentAccepted: true,
-          attachmentName: file ? file.name : undefined,
-          attachmentType: file ? file.type : undefined,
-          attachmentSize: file ? file.size : undefined
-        });
-
-        if (fbRes.success) {
-          setSubmitSuccess(true);
-          setSubmitErrorMessage(null);
-          reset();
-          setFile(null);
-          if (fileInputRef.current) fileInputRef.current.value = '';
-        } else {
-          setSubmitErrorMessage(fbRes.error || 'Unable to submit your project right now. Please check your connection and try again.');
-        }
       } else {
-        // Precise status-code error mapping
-        let errorMsg = result?.message || 'Unable to process your project submission';
-        if (response.status === 400 || response.status === 422) {
-          errorMsg = result?.message || 'Please check your entries and try again.';
-        } else if (response.status === 413) {
-          errorMsg = 'The attached file is too large. Maximum allowed size is 15 MB.';
-        } else if (response.status === 429) {
-          errorMsg = 'Too many requests. Please wait a moment and try again.';
-        } else if (response.status >= 500) {
-          errorMsg = result?.message || 'Unable to submit your project right now. Please check your connection and try again.';
-        }
-
-        console.error('[PROJECT INQUIRY ERROR]', {
-          status: response.status,
-          message: errorMsg,
-          result
-        });
-        setSubmitErrorMessage(errorMsg);
+        setSubmitErrorMessage(
+          fbRes.error || 'Unable to submit your project right now. Please check your connection and try again.'
+        );
       }
     } catch (err: any) {
-      if (err.name === 'AbortError') {
-        console.error('[PROJECT INQUIRY ERROR] Request timed out after 15s');
-        setSubmitErrorMessage('Submission timed out. Please check your connection and try again.');
-      } else {
-        console.error('[PROJECT INQUIRY ERROR] Submission network or client error:', err);
-        // Direct Firestore fallback on network error
-        if (isFirebaseConfigured()) {
-          try {
-            const fbRes = await submitContactEnquiry({
-              name: data.name.trim(),
-              email: data.email.trim(),
-              phone: data.phone?.trim() || undefined,
-              selectedService: data.service,
-              budgetRange: data.budget,
-              projectDescription: data.description.trim(),
-              consentAccepted: true,
-              attachmentName: file ? file.name : undefined,
-              attachmentType: file ? file.type : undefined,
-              attachmentSize: file ? file.size : undefined
-            });
-
-            if (fbRes.success) {
-              setSubmitSuccess(true);
-              setSubmitErrorMessage(null);
-              reset();
-              setFile(null);
-              if (fileInputRef.current) fileInputRef.current.value = '';
-              return;
-            }
-          } catch {}
-        }
-        setSubmitErrorMessage('Unable to submit your project right now. Please check your connection and try again.');
-      }
+      console.error('[PROJECT INQUIRY ERROR] Submission error:', err);
+      setSubmitErrorMessage('Unable to submit your project right now. Please check your connection and try again.');
     } finally {
       if (isDev) {
         console.log('[CONTACT-DEBUG] submit-finally');
