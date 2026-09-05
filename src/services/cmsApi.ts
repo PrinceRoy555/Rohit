@@ -12,6 +12,7 @@ import {
   saveSiteTemplateToFirestore,
   fetchAllLeadsFromFirestore,
   updateLeadStatusInFirestore,
+  updateLeadCrmDataInFirestore,
   deleteLeadFromFirestore,
   fetchMediaItemsFromFirestore,
   saveMediaItemToFirestore,
@@ -530,6 +531,36 @@ export async function updateInquiry(id: string, updates: { status?: string; note
   } catch (err: any) {
     return { success: true, inquiry: { id, ...updates } as any };
   }
+}
+
+export async function updateInquiryCrm(id: string, crmUpdates: Partial<InquiryRecord>): Promise<{ success: boolean; error?: string }> {
+  // 1. Update in Firestore directly
+  try {
+    const res = await updateLeadCrmDataInFirestore(id, crmUpdates);
+    if (!res.success) {
+      console.warn('[CMS] Firestore update error:', res.error);
+    }
+  } catch (e) {
+    console.warn('[CMS] Firestore lead CRM update error:', e);
+  }
+
+  // 2. Sync with server API if available
+  try {
+    const res = await fetch(`/api/admin/inquiries/${id}`, {
+      method: 'PUT',
+      headers: getAuthHeaders(),
+      credentials: 'include',
+      body: JSON.stringify(crmUpdates)
+    });
+    if (res.status === 401) {
+      setAdminToken(null);
+      return { success: false, error: 'SESSION_EXPIRED' };
+    }
+  } catch {
+    // server API might not exist or be needed if running on pure Firestore
+  }
+
+  return { success: true };
 }
 
 export async function deleteInquiry(id: string): Promise<{ success: boolean; error?: string }> {

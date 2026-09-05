@@ -471,7 +471,16 @@ export async function fetchAllLeadsFromFirestore(): Promise<any[]> {
           createdAt: d.createdAtIso || (d.createdAt?.toDate ? d.createdAt.toDate().toISOString() : new Date().toISOString()),
           notes: d.notes || '',
           budgetRange: d.budgetRange || d.budget || '',
-          attachmentUrl: d.attachmentUrl || null
+          attachmentUrl: d.attachmentUrl || null,
+          followUpAt: d.followUpAt?.toDate ? d.followUpAt.toDate().toISOString() : (d.followUpAt || null),
+          followUpStatus: d.followUpStatus || (d.followUpAt ? 'pending' : null),
+          nextAction: d.nextAction || '',
+          lastContactedAt: d.lastContactedAt?.toDate ? d.lastContactedAt.toDate().toISOString() : (d.lastContactedAt || null),
+          priority: d.priority || 'medium',
+          leadScore: typeof d.leadScore === 'number' ? d.leadScore : undefined,
+          isHotLead: typeof d.isHotLead === 'boolean' ? d.isHotLead : undefined,
+          tags: Array.isArray(d.tags) ? d.tags : [],
+          internalNotes: d.internalNotes || d.notes || ''
         });
       });
     } catch (e) {
@@ -499,7 +508,16 @@ export async function fetchAllLeadsFromFirestore(): Promise<any[]> {
             createdAt: d.createdAtIso || (d.createdAt?.toDate ? d.createdAt.toDate().toISOString() : (d.createdAt ? String(d.createdAt) : new Date().toISOString())),
             notes: d.notes || '',
             budgetRange: d.budgetRange || d.budget || '',
-            attachmentUrl: d.attachmentUrl || null
+            attachmentUrl: d.attachmentUrl || null,
+            followUpAt: d.followUpAt?.toDate ? d.followUpAt.toDate().toISOString() : (d.followUpAt || null),
+            followUpStatus: d.followUpStatus || (d.followUpAt ? 'pending' : null),
+            nextAction: d.nextAction || '',
+            lastContactedAt: d.lastContactedAt?.toDate ? d.lastContactedAt.toDate().toISOString() : (d.lastContactedAt || null),
+            priority: d.priority || 'medium',
+            leadScore: typeof d.leadScore === 'number' ? d.leadScore : undefined,
+            isHotLead: typeof d.isHotLead === 'boolean' ? d.isHotLead : undefined,
+            tags: Array.isArray(d.tags) ? d.tags : [],
+            internalNotes: d.internalNotes || d.notes || ''
           });
         }
       });
@@ -532,6 +550,26 @@ export async function updateLeadStatusInFirestore(leadId: string, status: string
   } catch (err) {
     console.error('[Firestore] Error updating lead:', err);
     return { success: false, error: 'Failed to update lead status' };
+  }
+}
+
+export async function updateLeadCrmDataInFirestore(leadId: string, updates: Record<string, unknown>): Promise<ServiceResponse> {
+  if (!isFirebaseConfigured() || !db) return { success: false, error: 'Database unconfigured' };
+  try {
+    const cleanUpdates = removeUndefinedValues(updates);
+
+    try {
+      const docRef = doc(db, 'leads', leadId);
+      await updateDoc(docRef, cleanUpdates);
+    } catch (errLeads) {
+      // Fallback to contactEnquiries
+      const enquiryRef = doc(db, 'contactEnquiries', leadId);
+      await updateDoc(enquiryRef, cleanUpdates);
+    }
+    return { success: true, id: leadId };
+  } catch (err) {
+    console.error('[Firestore] Error updating CRM fields on lead:', err);
+    return { success: false, error: 'Failed to update CRM data' };
   }
 }
 

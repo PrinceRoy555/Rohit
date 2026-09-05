@@ -68,6 +68,9 @@ import { SeoMetaTab } from './tabs/SeoMetaTab';
 import { RevisionsTab } from './tabs/RevisionsTab';
 import { UsersRolesTab } from './tabs/UsersRolesTab';
 import AdminInsightsDashboard from './AdminInsightsDashboard';
+import { CrmNotificationsPopover } from './crm/CrmNotificationsPopover';
+import { fetchInquiries } from '../../services/cmsApi';
+import { InquiryRecord } from '../../types/cms';
 
 interface AdminPanelProps {
   onClose: () => void;
@@ -136,10 +139,43 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose, onLogout }) => 
 
   // Tab & Modal State
   const [activeTab, setActiveTab] = useState<string>('dashboard');
+  const [inquiriesView, setInquiriesView] = useState<'inbox' | 'followups' | 'hot_leads'>('inbox');
+  const [inquiriesFollowUpFilter, setInquiriesFollowUpFilter] = useState<'today' | 'overdue' | 'upcoming' | 'completed'>('today');
+  const [inquiriesStatusFilter, setInquiriesStatusFilter] = useState<'all' | 'new' | 'contacted' | 'closed'>('all');
+  const [leadsForNotifications, setLeadsForNotifications] = useState<InquiryRecord[]>([]);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [showPublishModal, setShowPublishModal] = useState(false);
   const [publishSummary, setPublishSummary] = useState('');
   const [publishSuccessMsg, setPublishSuccessMsg] = useState(false);
+
+  const handleSwitchTab = (tab: string, options?: {
+    view?: 'inbox' | 'followups' | 'hot_leads';
+    followUpFilter?: 'today' | 'overdue' | 'upcoming' | 'completed';
+    statusFilter?: 'all' | 'new' | 'contacted' | 'closed';
+  }) => {
+    setActiveTab(tab);
+    if (options?.view) setInquiriesView(options.view);
+    if (options?.followUpFilter) setInquiriesFollowUpFilter(options.followUpFilter);
+    if (options?.statusFilter) setInquiriesStatusFilter(options.statusFilter);
+    setMobileMenuOpen(false);
+  };
+
+  const loadNotificationsData = async () => {
+    try {
+      const res = await fetchInquiries();
+      if (res.success && res.inquiries) {
+        setLeadsForNotifications(res.inquiries);
+      }
+    } catch {
+      // ignore
+    }
+  };
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      loadNotificationsData();
+    }
+  }, [isAuthenticated, activeTab]);
 
   const {
     config,
@@ -1060,6 +1096,22 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose, onLogout }) => 
             </div>
           )}
 
+          {/* In-App CRM Notifications Indicator (Section 38) */}
+          <CrmNotificationsPopover
+            leads={leadsForNotifications}
+            onNavigateToInquiries={(filterTab) => {
+              if (filterTab === 'followups_today') {
+                handleSwitchTab('inquiries', { view: 'followups', followUpFilter: 'today' });
+              } else if (filterTab === 'followups_overdue') {
+                handleSwitchTab('inquiries', { view: 'followups', followUpFilter: 'overdue' });
+              } else if (filterTab === 'new') {
+                handleSwitchTab('inquiries', { view: 'inbox', statusFilter: 'new' });
+              } else {
+                handleSwitchTab('inquiries');
+              }
+            }}
+          />
+
           {/* Synchronized Theme Switcher */}
           <div className="flex items-center">
             <ThemeToggle id="admin-header-theme-toggle" />
@@ -1189,7 +1241,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose, onLogout }) => 
             </div>
           )}
 
-          {activeTab === 'dashboard' && <DashboardTab setActiveTab={setActiveTab} />}
+          {activeTab === 'dashboard' && <DashboardTab setActiveTab={handleSwitchTab} />}
           {activeTab === 'customizer' && <CustomizerTab />}
           {activeTab === 'templates' && <TemplateSystemTab />}
           {activeTab === 'sections' && <SectionsManagerTab />}
@@ -1200,7 +1252,13 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose, onLogout }) => 
           {activeTab === 'insights' && (
             <AdminInsightsDashboard onClose={() => setActiveTab('dashboard')} />
           )}
-          {activeTab === 'inquiries' && <InquiriesInboxTab />}
+          {activeTab === 'inquiries' && (
+            <InquiriesInboxTab
+              initialView={inquiriesView}
+              initialFollowUpFilter={inquiriesFollowUpFilter}
+              initialStatusFilter={inquiriesStatusFilter}
+            />
+          )}
           {activeTab === 'media' && <MediaLibraryTab />}
           {activeTab === 'navigation' && <NavigationFooterTab />}
           {activeTab === 'seo' && <SeoMetaTab />}

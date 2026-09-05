@@ -1,5 +1,11 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useSiteConfig } from '../../../context/SiteConfigContext';
+import { InquiryRecord } from '../../../types/cms';
+import { fetchInquiries, updateInquiryCrm, deleteInquiry } from '../../../services/cmsApi';
+import { TodayDashboardSummary } from '../crm/TodayDashboardSummary';
+import { TodaysFollowUps } from '../crm/TodaysFollowUps';
+import { HotLeadsSection } from '../crm/HotLeadsSection';
+import { LeadDetailDrawer } from '../crm/LeadDetailDrawer';
 import {
   LayoutDashboard,
   Layers,
@@ -9,21 +15,81 @@ import {
   FileCheck,
   Palette,
   ArrowRight,
-  TrendingUp,
-  Clock,
-  CheckCircle2,
-  AlertCircle,
   Briefcase,
   Wrench,
-  MessageSquare
+  MessageSquare,
+  CheckCircle2,
+  AlertCircle
 } from 'lucide-react';
 
 interface DashboardTabProps {
-  setActiveTab: (tab: string) => void;
+  setActiveTab: (tab: string, options?: {
+    view?: 'inbox' | 'followups' | 'hot_leads';
+    followUpFilter?: 'today' | 'overdue' | 'upcoming' | 'completed';
+    statusFilter?: 'all' | 'new' | 'contacted' | 'closed';
+  }) => void;
 }
 
 export const DashboardTab: React.FC<DashboardTabProps> = ({ setActiveTab }) => {
-  const { config, draftConfig, hasUnpublishedChanges, isPublishing, publish, isPreviewMode, setPreviewMode } = useSiteConfig();
+  const { config, hasUnpublishedChanges, isPublishing, publish, isPreviewMode, setPreviewMode } = useSiteConfig();
+
+  const [leads, setLeads] = useState<InquiryRecord[]>([]);
+  const [selectedLead, setSelectedLead] = useState<InquiryRecord | null>(null);
+
+  // Fetch real Firestore leads
+  const loadLeads = async () => {
+    try {
+      const res = await fetchInquiries();
+      if (res.success && res.inquiries) {
+        setLeads(res.inquiries);
+      }
+    } catch (e) {
+      console.warn('[Dashboard] Could not fetch inquiries:', e);
+    }
+  };
+
+  useEffect(() => {
+    loadLeads();
+  }, []);
+
+  const handleUpdateLeadCrm = async (id: string, updates: Partial<InquiryRecord>) => {
+    await updateInquiryCrm(id, updates);
+    setLeads((prev) =>
+      prev.map((l) => (l.id === id ? { ...l, ...updates } : l))
+    );
+    if (selectedLead?.id === id) {
+      setSelectedLead((prev) => (prev ? { ...prev, ...updates } : null));
+    }
+  };
+
+  const handleMarkFollowUpDone = async (id: string) => {
+    await handleUpdateLeadCrm(id, {
+      followUpStatus: 'completed',
+      lastContactedAt: new Date().toISOString()
+    });
+  };
+
+  const handleDeleteLead = async (id: string) => {
+    const res = await deleteInquiry(id);
+    if (res.success) {
+      setLeads((prev) => prev.filter((l) => l.id !== id));
+      if (selectedLead?.id === id) {
+        setSelectedLead(null);
+      }
+    }
+  };
+
+  const handleMetricClick = (metric: 'new' | 'followups_today' | 'overdue' | 'hot_leads') => {
+    if (metric === 'new') {
+      setActiveTab('inquiries', { view: 'inbox', statusFilter: 'new' });
+    } else if (metric === 'followups_today') {
+      setActiveTab('inquiries', { view: 'followups', followUpFilter: 'today' });
+    } else if (metric === 'overdue') {
+      setActiveTab('inquiries', { view: 'followups', followUpFilter: 'overdue' });
+    } else if (metric === 'hot_leads') {
+      setActiveTab('inquiries', { view: 'hot_leads' });
+    }
+  };
 
   const stats = [
     {
@@ -58,20 +124,20 @@ export const DashboardTab: React.FC<DashboardTabProps> = ({ setActiveTab }) => {
 
   return (
     <div className="space-y-8 max-w-6xl mx-auto">
-      {/* Top Welcome Banner */}
+      {/* 1. PAGE HEADER (Section 39) */}
       <div id="d4x7qm" className="relative overflow-hidden rounded-2xl p-6 sm:p-8 border border-border-color bg-bg-card text-text-primary shadow-sm transition-colors duration-200">
         <div className="absolute top-0 right-0 -mr-16 -mt-16 w-64 h-64 bg-rose-500/5 dark:bg-rose-600/15 rounded-full blur-3xl pointer-events-none" />
         <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div>
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-500/20 mb-3">
               <Sparkles className="w-3.5 h-3.5 text-rose-600 dark:text-rose-400" />
-              <span>Full CMS & Template Control Suite</span>
+              <span>Executive CRM & CMS Command Suite</span>
             </div>
             <h1 id="e3m1cz" className="text-2xl sm:text-3xl font-bold tracking-tight text-text-primary">
-              Website Management Overview
+              Management & Operations Overview
             </h1>
             <p className="mt-1 text-sm sm:text-base text-text-muted max-w-xl">
-              Live site name: <span className="font-semibold text-text-primary">{config.branding?.siteName || 'Rohit Verma'}</span> • Version {config.version || 1} • Theme: <span className="font-semibold text-text-primary">{config.theme?.presetName || 'Scarlet Prestige'}</span>
+              Live site: <span className="font-semibold text-text-primary">{config.branding?.siteName || 'Rohit Verma'}</span> • Version {config.version || 1} • Preset: <span className="font-semibold text-text-primary">{config.theme?.presetName || 'Scarlet Prestige'}</span>
             </p>
           </div>
 
@@ -110,37 +176,63 @@ export const DashboardTab: React.FC<DashboardTabProps> = ({ setActiveTab }) => {
         ) : (
           <div className="mt-6 pt-6 border-t border-border-color flex items-center gap-3 text-emerald-700 dark:text-emerald-400 text-sm">
             <CheckCircle2 className="w-5 h-5 flex-shrink-0 text-emerald-600 dark:text-emerald-400" />
-            <span>All changes are published and live on the public website.</span>
+            <span>All CMS changes are published and live on the public website.</span>
           </div>
         )}
       </div>
 
-      {/* KPI Stats Grid */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
-        {stats.map((stat, idx) => {
-          const Icon = stat.icon;
-          return (
-            <div
-              key={idx}
-              onClick={stat.action}
-              className="bg-bg-card hover:bg-bg-card-hover border border-border-color hover:border-rose-500/40 rounded-2xl p-5 cursor-pointer transition-all duration-200 group shadow-sm hover:shadow-md"
-            >
-              <div className="flex items-center justify-between">
-                <div className={`w-10 h-10 rounded-xl flex items-center justify-center border ${stat.color}`}>
-                  <Icon className="w-5 h-5" />
+      {/* 2. TODAY SUMMARY (Section 35 & 39) */}
+      <TodayDashboardSummary
+        leads={leads}
+        onSelectMetric={handleMetricClick}
+      />
+
+      {/* 3. TODAY'S FOLLOW-UPS (Section 27 & 39) */}
+      <TodaysFollowUps
+        leads={leads}
+        onOpenLead={(lead) => setSelectedLead(lead)}
+        onMarkComplete={handleMarkFollowUpDone}
+        onViewAll={() => setActiveTab('inquiries', { view: 'followups', followUpFilter: 'today' })}
+      />
+
+      {/* 4. HOT LEADS (Section 31 & 39) */}
+      <HotLeadsSection
+        leads={leads}
+        onOpenLead={(lead) => setSelectedLead(lead)}
+        onViewAll={() => setActiveTab('inquiries', { view: 'hot_leads' })}
+      />
+
+      {/* 5. MAIN CONTENT KPIs (Section 39) */}
+      <div className="space-y-3">
+        <div className="text-[11px] font-bold uppercase tracking-wider text-text-muted">
+          Website Content Overview
+        </div>
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+          {stats.map((stat, idx) => {
+            const Icon = stat.icon;
+            return (
+              <div
+                key={idx}
+                onClick={stat.action}
+                className="bg-bg-card hover:bg-bg-card-hover border border-border-color hover:border-rose-500/40 rounded-2xl p-5 cursor-pointer transition-all duration-200 group shadow-sm hover:shadow-md"
+              >
+                <div className="flex items-center justify-between">
+                  <div className={`w-10 h-10 rounded-xl flex items-center justify-center border ${stat.color}`}>
+                    <Icon className="w-5 h-5" />
+                  </div>
+                  <ArrowRight className="w-4 h-4 text-text-muted group-hover:text-text-primary group-hover:translate-x-0.5 transition-all" />
                 </div>
-                <ArrowRight className="w-4 h-4 text-text-muted group-hover:text-text-primary group-hover:translate-x-0.5 transition-all" />
+                <div className="mt-4">
+                  <div className="text-2xl sm:text-3xl font-bold text-text-primary tracking-tight font-mono">{stat.value}</div>
+                  <div className="text-xs sm:text-sm text-text-muted font-medium mt-1">{stat.label}</div>
+                </div>
               </div>
-              <div className="mt-4">
-                <div className="text-2xl sm:text-3xl font-bold text-text-primary tracking-tight">{stat.value}</div>
-                <div className="text-xs sm:text-sm text-text-muted font-medium mt-1">{stat.label}</div>
-              </div>
-            </div>
-          );
-        })}
+            );
+          })}
+        </div>
       </div>
 
-      {/* Quick Access Modules Grid */}
+      {/* 6. QUICK ACCESS MODULES (Section 39) */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {/* Module 1: Website Customizer */}
         <div
@@ -203,7 +295,7 @@ export const DashboardTab: React.FC<DashboardTabProps> = ({ setActiveTab }) => {
         </div>
       </div>
 
-      {/* Quick Launchpad & Safety Guarantees */}
+      {/* 7. SYSTEM STATUS & ARCHITECTURE (Section 39) */}
       <div className="bg-bg-card border border-border-color rounded-2xl p-6 shadow-sm transition-colors duration-200">
         <h3 className="text-base font-semibold text-text-primary mb-4 flex items-center gap-2">
           <FileCheck className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
@@ -215,7 +307,7 @@ export const DashboardTab: React.FC<DashboardTabProps> = ({ setActiveTab }) => {
             <div className="text-text-primary font-semibold mt-1 truncate">/ (Live Website)</div>
             <div className="text-xs text-emerald-600 dark:text-emerald-400 mt-1 flex items-center gap-1">
               <span className="w-2 h-2 rounded-full bg-emerald-500 inline-block animate-ping" />
-              <span>Synced with CMS</span>
+              <span>Synced with Firestore</span>
             </div>
           </div>
           <div className="p-4 rounded-xl bg-bg-secondary border border-border-color">
@@ -225,11 +317,21 @@ export const DashboardTab: React.FC<DashboardTabProps> = ({ setActiveTab }) => {
           </div>
           <div className="p-4 rounded-xl bg-bg-secondary border border-border-color">
             <div className="text-text-muted text-xs font-medium">Security Access</div>
-            <div className="text-text-primary font-semibold mt-1">HTTP-Only Admin Cookie</div>
-            <div className="text-xs text-text-muted mt-1">No plaintext frontend keys</div>
+            <div className="text-text-primary font-semibold mt-1">Role-Based Access</div>
+            <div className="text-xs text-text-muted mt-1">CRM fields protected for admin</div>
           </div>
         </div>
       </div>
+
+      {/* Lead Detail Drawer on Dashboard */}
+      {selectedLead && (
+        <LeadDetailDrawer
+          lead={selectedLead}
+          onClose={() => setSelectedLead(null)}
+          onUpdateLead={handleUpdateLeadCrm}
+          onDeleteLead={handleDeleteLead}
+        />
+      )}
     </div>
   );
 };

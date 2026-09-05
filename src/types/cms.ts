@@ -225,18 +225,33 @@ export interface MediaItem {
 }
 
 export type InquiryStatus = 'new' | 'contacted' | 'in_progress' | 'completed' | 'archived' | 'closed';
+export type FollowUpStatus = 'pending' | 'completed';
+export type LeadPriority = 'low' | 'medium' | 'high';
 
 export interface InquiryRecord {
   id: string;
   name: string;
   email: string;
   phone?: string;
+  businessName?: string;
   service: string;
   message: string;
   status: InquiryStatus;
-  source: 'contact_form' | 'ai_chat';
+  source: 'contact_form' | 'ai_chat' | 'website-contact-form' | string;
   createdAt: string;
   notes?: string;
+  budgetRange?: string;
+  attachmentUrl?: string | null;
+  // Optional CRM-specific fields
+  followUpAt?: string | null;
+  followUpStatus?: FollowUpStatus | null;
+  nextAction?: string;
+  lastContactedAt?: string | null;
+  priority?: LeadPriority;
+  leadScore?: number;
+  isHotLead?: boolean;
+  tags?: string[];
+  internalNotes?: string;
 }
 
 export type AdminRole = 'super_admin' | 'admin' | 'editor';
