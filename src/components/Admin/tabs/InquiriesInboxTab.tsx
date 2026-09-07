@@ -16,6 +16,8 @@ import {
 } from '../../../utils/leadScoring';
 import { LeadDetailDrawer } from '../crm/LeadDetailDrawer';
 import { TodaysFollowUps } from '../crm/TodaysFollowUps';
+import { InquiriesDataTable } from '../crm/InquiriesDataTable';
+import { PageHeader } from '../layout/PageHeader';
 import {
   Inbox,
   Clock,
@@ -176,16 +178,16 @@ export const InquiriesInboxTab: React.FC<InquiriesInboxTabProps> = ({
   });
 
   return (
-    <div className="space-y-6 max-w-6xl mx-auto">
+    <div className="space-y-4 sm:space-y-6 max-w-6xl mx-auto">
       {/* Top Header & View Navigator */}
-      <div className="bg-bg-card border border-border-color rounded-2xl p-5 sm:p-6 shadow-sm space-y-5">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="bg-bg-card border border-border-color rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-xs space-y-3.5 sm:space-y-5">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4">
           <div>
-            <h2 className="text-xl sm:text-2xl font-bold text-text-primary flex items-center gap-2.5">
-              <Inbox className="w-6 h-6 text-rose-600 dark:text-rose-400" />
+            <h2 className="text-lg sm:text-2xl font-bold text-text-primary flex items-center gap-2 sm:gap-2.5">
+              <Inbox className="w-5 sm:w-6 h-5 sm:h-6 text-rose-600 dark:text-rose-400" />
               <span>Lead Inquiries & CRM Suite</span>
             </h2>
-            <p className="text-xs sm:text-sm text-text-muted mt-1">
+            <p className="text-xs sm:text-sm text-text-muted mt-0.5 sm:mt-1">
               Live submissions from contact forms, Uni AI assistant, and direct quote requests.
             </p>
           </div>
@@ -193,40 +195,40 @@ export const InquiriesInboxTab: React.FC<InquiriesInboxTabProps> = ({
           <button
             onClick={handleExportCsv}
             disabled={!inquiries.length}
-            className="px-4 py-2 rounded-xl text-xs font-semibold bg-bg-secondary hover:bg-bg-card-hover text-text-primary border border-border-color flex items-center gap-2 transition-all self-start sm:self-auto"
+            className="min-h-[40px] px-3.5 sm:px-4 py-2 rounded-xl text-xs font-semibold bg-bg-secondary hover:bg-bg-card-hover text-text-primary border border-border-color flex items-center justify-center gap-2 transition-all self-start sm:self-auto active:scale-98"
           >
             <Download className="w-4 h-4" />
-            <span>Export CRM CSV</span>
+            <span>Export CSV</span>
           </button>
         </div>
 
         {/* Navigation Tabs (Sections 36 & 37) */}
-        <div className="flex flex-wrap items-center gap-2 pt-2 border-t border-border-color">
+        <div className="flex overflow-x-auto no-scrollbar items-center gap-2 pt-2 border-t border-border-color pb-1 sm:pb-0">
           <button
             onClick={() => setMainView('inbox')}
-            className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 ${
+            className={`flex-shrink-0 whitespace-nowrap min-h-[40px] px-3.5 sm:px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 active:scale-98 ${
               mainView === 'inbox'
-                ? 'bg-rose-600 text-white shadow-md shadow-rose-600/20'
+                ? 'bg-rose-600 text-white shadow-xs'
                 : 'bg-bg-secondary text-text-muted hover:text-text-primary border border-border-color'
             }`}
           >
             <Inbox className="w-3.5 h-3.5" />
             <span>All Inquiries</span>
-            <span className="px-1.5 py-0.5 rounded-md bg-black/20 text-[10px]">{inquiries.length}</span>
+            <span className="px-1.5 py-0.2 rounded-md bg-black/20 text-[10px]">{inquiries.length}</span>
           </button>
 
           <button
             onClick={() => setMainView('followups')}
-            className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 ${
+            className={`flex-shrink-0 whitespace-nowrap min-h-[40px] px-3.5 sm:px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 active:scale-98 ${
               mainView === 'followups'
-                ? 'bg-rose-600 text-white shadow-md shadow-rose-600/20'
+                ? 'bg-rose-600 text-white shadow-xs'
                 : 'bg-bg-secondary text-text-muted hover:text-text-primary border border-border-color'
             }`}
           >
             <Clock className="w-3.5 h-3.5" />
-            <span>Today&apos;s Follow-ups</span>
+            <span>Due Follow-ups</span>
             {followUpCount > 0 && (
-              <span className="px-1.5 py-0.5 rounded-full bg-amber-500 text-neutral-950 font-extrabold text-[10px]">
+              <span className="px-1.5 py-0.2 rounded-full bg-amber-500 text-neutral-950 font-extrabold text-[10px]">
                 {followUpCount}
               </span>
             )}
@@ -234,16 +236,16 @@ export const InquiriesInboxTab: React.FC<InquiriesInboxTabProps> = ({
 
           <button
             onClick={() => setMainView('hot_leads')}
-            className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 ${
+            className={`flex-shrink-0 whitespace-nowrap min-h-[40px] px-3.5 sm:px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 active:scale-98 ${
               mainView === 'hot_leads'
-                ? 'bg-rose-600 text-white shadow-md shadow-rose-600/20'
+                ? 'bg-rose-600 text-white shadow-xs'
                 : 'bg-bg-secondary text-text-muted hover:text-text-primary border border-border-color'
             }`}
           >
             <Flame className="w-3.5 h-3.5 fill-current" />
             <span>Hot Leads</span>
             {hotCount > 0 && (
-              <span className="px-1.5 py-0.5 rounded-full bg-rose-500 text-white text-[10px] font-bold">
+              <span className="px-1.5 py-0.2 rounded-full bg-rose-500 text-white text-[10px] font-bold">
                 {hotCount}
               </span>
             )}
@@ -269,26 +271,26 @@ export const InquiriesInboxTab: React.FC<InquiriesInboxTabProps> = ({
       {/* VIEW 2: HOT LEADS VIEW (Section 37)                                       */}
       {/* ========================================================================= */}
       {mainView === 'hot_leads' && (
-        <div className="space-y-6 animate-in fade-in duration-200">
+        <div className="space-y-4 sm:space-y-6 animate-in fade-in duration-200">
           {/* Controls */}
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 rounded-2xl bg-bg-card border border-border-color">
-            <div className="flex items-center gap-2 flex-wrap">
-              <span className="text-xs font-bold text-text-muted mr-1">Classification:</span>
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3.5 sm:p-4 rounded-xl sm:rounded-2xl bg-bg-card border border-border-color">
+            <div className="flex overflow-x-auto no-scrollbar items-center gap-1.5 sm:gap-2 pb-1 sm:pb-0">
+              <span className="text-xs font-bold text-text-muted mr-1 flex-shrink-0 hidden xs:inline">Type:</span>
               <button
                 onClick={() => setHotFilter('all')}
-                className={`px-3 py-1.5 rounded-xl text-xs font-semibold ${
+                className={`flex-shrink-0 whitespace-nowrap min-h-[38px] px-3.5 py-1.5 rounded-xl text-xs font-semibold ${
                   hotFilter === 'all'
-                    ? 'bg-rose-600 text-white shadow-sm'
+                    ? 'bg-rose-600 text-white shadow-xs'
                     : 'bg-bg-secondary text-text-muted hover:text-text-primary border border-border-color'
                 }`}
               >
-                All Hot Leads ({hotCount})
+                All ({hotCount})
               </button>
               <button
                 onClick={() => setHotFilter('manual')}
-                className={`px-3 py-1.5 rounded-xl text-xs font-semibold ${
+                className={`flex-shrink-0 whitespace-nowrap min-h-[38px] px-3.5 py-1.5 rounded-xl text-xs font-semibold ${
                   hotFilter === 'manual'
-                    ? 'bg-rose-600 text-white shadow-sm'
+                    ? 'bg-rose-600 text-white shadow-xs'
                     : 'bg-bg-secondary text-text-muted hover:text-text-primary border border-border-color'
                 }`}
               >
@@ -296,9 +298,9 @@ export const InquiriesInboxTab: React.FC<InquiriesInboxTabProps> = ({
               </button>
               <button
                 onClick={() => setHotFilter('suggested')}
-                className={`px-3 py-1.5 rounded-xl text-xs font-semibold ${
+                className={`flex-shrink-0 whitespace-nowrap min-h-[38px] px-3.5 py-1.5 rounded-xl text-xs font-semibold ${
                   hotFilter === 'suggested'
-                    ? 'bg-rose-600 text-white shadow-sm'
+                    ? 'bg-rose-600 text-white shadow-xs'
                     : 'bg-bg-secondary text-text-muted hover:text-text-primary border border-border-color'
                 }`}
               >
@@ -313,17 +315,17 @@ export const InquiriesInboxTab: React.FC<InquiriesInboxTabProps> = ({
                 placeholder="Search hot leads..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full bg-bg-secondary border border-border-color rounded-xl pl-9 pr-3 py-1.5 text-xs text-text-primary focus:border-rose-500 focus:outline-none"
+                className="w-full min-h-[40px] bg-bg-secondary border border-border-color rounded-xl pl-9 pr-3 py-1.5 text-xs text-text-primary focus:border-rose-500 focus:outline-none"
               />
             </div>
           </div>
 
           {/* Hot Leads Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3.5 sm:gap-4">
             {hotLeadsFiltered.length === 0 ? (
-              <div className="col-span-full py-12 text-center rounded-2xl bg-bg-card border border-border-color p-6">
-                <Flame className="w-10 h-10 text-neutral-400 mx-auto mb-2 opacity-50" />
-                <h4 className="text-base font-bold text-text-primary">No hot leads match your filters</h4>
+              <div className="col-span-full py-10 text-center rounded-xl sm:rounded-2xl bg-bg-card border border-border-color p-5">
+                <Flame className="w-9 h-9 text-neutral-400 mx-auto mb-2 opacity-50" />
+                <h4 className="text-sm sm:text-base font-bold text-text-primary">No hot leads match your filters</h4>
                 <p className="text-xs text-text-muted mt-1">
                   You can mark any lead as a Hot Lead inside the Lead Details drawer.
                 </p>
@@ -340,10 +342,10 @@ export const InquiriesInboxTab: React.FC<InquiriesInboxTabProps> = ({
                   <div
                     key={lead.id}
                     onClick={() => setSelectedInquiry(lead)}
-                    className="p-5 rounded-2xl bg-bg-card hover:bg-bg-card-hover border border-border-color hover:border-rose-500/40 transition-all cursor-pointer group flex flex-col justify-between space-y-4 shadow-sm"
+                    className="p-4 sm:p-5 rounded-xl sm:rounded-2xl bg-bg-card hover:bg-bg-card-hover border border-border-color hover:border-rose-500/40 transition-all cursor-pointer group flex flex-col justify-between space-y-3.5 shadow-xs select-none active:scale-99"
                   >
                     <div className="flex items-center justify-between gap-2">
-                      <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold ${
+                      <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold ${
                         hotInfo.isManual
                           ? 'bg-rose-500/20 text-rose-600 dark:text-rose-400 border border-rose-500/30'
                           : 'bg-amber-500/15 text-amber-600 dark:text-amber-400 border border-amber-500/30'
@@ -358,13 +360,13 @@ export const InquiriesInboxTab: React.FC<InquiriesInboxTabProps> = ({
                     </div>
 
                     <div className="space-y-1">
-                      <h4 className="text-base font-bold text-text-primary group-hover:text-rose-600 dark:group-hover:text-rose-400 transition-colors">
+                      <h4 className="text-sm sm:text-base font-bold text-text-primary group-hover:text-rose-600 dark:group-hover:text-rose-400 transition-colors truncate">
                         {lead.name}
                       </h4>
                       {lead.businessName && (
                         <div className="text-xs text-text-muted truncate">{lead.businessName}</div>
                       )}
-                      <div className="text-xs text-text-secondary font-medium">{lead.service}</div>
+                      <div className="text-xs text-text-secondary font-medium truncate">{lead.service}</div>
                       {lead.budgetRange && (
                         <div className="text-xs font-bold text-emerald-600 dark:text-emerald-400">
                           {lead.budgetRange}
@@ -372,7 +374,7 @@ export const InquiriesInboxTab: React.FC<InquiriesInboxTabProps> = ({
                       )}
                     </div>
 
-                    <div className="pt-3 border-t border-border-color space-y-2 text-xs">
+                    <div className="pt-2.5 border-t border-border-color space-y-2 text-xs">
                       <div className="flex items-center justify-between text-text-muted">
                         <span>Status: <strong className="text-text-primary capitalize">{lead.status}</strong></span>
                         <span className="capitalize">{lead.priority || 'medium'} priority</span>
@@ -380,7 +382,7 @@ export const InquiriesInboxTab: React.FC<InquiriesInboxTabProps> = ({
 
                       <div className="p-2 rounded-lg bg-bg-secondary border border-border-color text-[11px] text-text-muted">
                         {lead.followUpAt ? (
-                          <span className="text-text-primary font-medium">
+                          <span className="text-text-primary font-medium truncate block">
                             Follow-up: {formatFollowUpDateTime(lead.followUpAt)}
                           </span>
                         ) : (
@@ -391,7 +393,7 @@ export const InquiriesInboxTab: React.FC<InquiriesInboxTabProps> = ({
 
                     {/* Quick Action Buttons */}
                     <div
-                      className="flex items-center justify-between gap-2 pt-2"
+                      className="flex items-center justify-between gap-2 pt-2 border-t border-border-color/50"
                       onClick={(e) => e.stopPropagation()}
                     >
                       <div className="flex items-center gap-1.5">
@@ -399,8 +401,9 @@ export const InquiriesInboxTab: React.FC<InquiriesInboxTabProps> = ({
                           <>
                             <a
                               href={`tel:${cleanPhone}`}
-                              className="p-2 rounded-lg bg-bg-secondary hover:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border border-border-color transition-colors"
+                              className="w-9 h-9 rounded-xl bg-bg-secondary hover:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border border-border-color transition-colors flex items-center justify-center active:scale-95"
                               title="Call"
+                              aria-label="Call Client"
                             >
                               <Phone className="w-3.5 h-3.5" />
                             </a>
@@ -408,8 +411,9 @@ export const InquiriesInboxTab: React.FC<InquiriesInboxTabProps> = ({
                               href={`https://wa.me/${waPhone}`}
                               target="_blank"
                               rel="noopener noreferrer"
-                              className="p-2 rounded-lg bg-bg-secondary hover:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border border-border-color transition-colors"
+                              className="w-9 h-9 rounded-xl bg-bg-secondary hover:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border border-border-color transition-colors flex items-center justify-center active:scale-95"
                               title="WhatsApp"
+                              aria-label="WhatsApp"
                             >
                               <MessageCircle className="w-3.5 h-3.5" />
                             </a>
@@ -417,8 +421,9 @@ export const InquiriesInboxTab: React.FC<InquiriesInboxTabProps> = ({
                         )}
                         <a
                           href={`mailto:${lead.email}`}
-                          className="p-2 rounded-lg bg-bg-secondary hover:bg-rose-500/20 text-rose-600 dark:text-rose-400 border border-border-color transition-colors"
+                          className="w-9 h-9 rounded-xl bg-bg-secondary hover:bg-rose-500/20 text-rose-600 dark:text-rose-400 border border-border-color transition-colors flex items-center justify-center active:scale-95"
                           title="Email"
+                          aria-label="Email Client"
                         >
                           <Mail className="w-3.5 h-3.5" />
                         </a>
@@ -426,7 +431,7 @@ export const InquiriesInboxTab: React.FC<InquiriesInboxTabProps> = ({
 
                       <button
                         onClick={() => setSelectedInquiry(lead)}
-                        className="px-3 py-1.5 rounded-xl text-xs font-semibold bg-bg-secondary hover:bg-bg-card-hover text-text-primary border border-border-color transition-colors"
+                        className="min-h-[38px] px-3.5 py-1.5 rounded-xl text-xs font-semibold bg-bg-secondary hover:bg-bg-card-hover text-text-primary border border-border-color transition-colors active:scale-95"
                       >
                         Open Lead
                       </button>
@@ -440,189 +445,19 @@ export const InquiriesInboxTab: React.FC<InquiriesInboxTabProps> = ({
       )}
 
       {/* ========================================================================= */}
-      {/* VIEW 3: ALL INQUIRIES VIEW                                                */}
+      {/* VIEW 3: ALL INQUIRIES DATA TABLE VIEW                                     */}
       {/* ========================================================================= */}
       {mainView === 'inbox' && (
-        <div className="space-y-4 animate-in fade-in duration-200">
-          {/* Search & Filter Toolbar */}
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 rounded-2xl bg-bg-card border border-border-color shadow-sm">
-            <div className="flex flex-wrap gap-2">
-              {(['all', 'new', 'contacted', 'closed'] as const).map((status) => {
-                const count = status === 'all' ? inquiries.length : inquiries.filter((i) => i.status === status).length;
-                return (
-                  <button
-                    key={status}
-                    onClick={() => setFilterStatus(status)}
-                    className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-all flex items-center gap-1.5 ${
-                      filterStatus === status
-                        ? 'bg-rose-600 text-white shadow-sm'
-                        : 'bg-bg-secondary text-text-muted hover:text-text-primary border border-border-color'
-                    }`}
-                  >
-                    <span className="capitalize">{status}</span>
-                    <span className="px-1.5 py-0.5 rounded-md bg-black/20 text-[10px]">{count}</span>
-                  </button>
-                );
-              })}
-            </div>
-
-            <div className="relative w-full sm:w-72">
-              <Search className="w-3.5 h-3.5 text-text-muted absolute left-3 top-1/2 -translate-y-1/2" />
-              <input
-                type="text"
-                placeholder="Search leads, email, scope..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full bg-bg-secondary border border-border-color rounded-xl pl-9 pr-3 py-1.5 text-xs text-text-primary focus:border-rose-500 focus:outline-none"
-              />
-            </div>
-          </div>
-
-          {/* Inquiries List */}
-          {loading ? (
-            <div className="p-12 text-center text-text-muted text-sm bg-bg-card rounded-2xl border border-border-color">
-              Loading inquiries from Firestore...
-            </div>
-          ) : inboxFiltered.length === 0 ? (
-            <div className="p-12 text-center bg-bg-card border border-border-color rounded-2xl">
-              <Inbox className="w-10 h-10 text-neutral-400 mx-auto mb-3 opacity-60" />
-              <h4 className="text-base font-bold text-text-primary">No inquiries found</h4>
-              <p className="text-xs text-text-muted mt-1">
-                Submissions from the public website contact form will appear here automatically.
-              </p>
-            </div>
-          ) : (
-            <div className="space-y-3">
-              {inboxFiltered.map((inq) => {
-                const isNew = inq.status === 'new';
-                const hotInfo = isLeadHot(inq);
-                const followUpCategory = getLeadFollowUpCategory(inq);
-                const isOverdue = followUpCategory === 'overdue';
-                const cleanPhone = (inq.phone || '').replace(/[^0-9+]/g, '');
-                const waPhone = cleanPhone.replace(/^\+/, '');
-
-                return (
-                  <div
-                    key={inq.id}
-                    onClick={() => setSelectedInquiry(inq)}
-                    className={`p-4 sm:p-5 rounded-2xl border cursor-pointer transition-all flex flex-col md:flex-row md:items-center justify-between gap-4 group ${
-                      isNew
-                        ? 'bg-bg-card border-rose-500/40 hover:border-rose-500 shadow-sm'
-                        : 'bg-bg-card hover:bg-bg-card-hover border-border-color hover:border-rose-500/30'
-                    }`}
-                  >
-                    <div className="space-y-1.5 flex-1 min-w-0">
-                      <div className="flex items-center gap-2.5 flex-wrap">
-                        <h4 className="text-sm sm:text-base font-bold text-text-primary group-hover:text-rose-600 dark:group-hover:text-rose-400 transition-colors truncate">
-                          {inq.name}
-                        </h4>
-
-                        {inq.businessName && (
-                          <span className="text-xs text-text-muted hidden sm:inline truncate">
-                            • {inq.businessName}
-                          </span>
-                        )}
-
-                        {isNew && (
-                          <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-rose-600 text-white">
-                            NEW
-                          </span>
-                        )}
-
-                        {hotInfo.isHot && (
-                          <span className="inline-flex items-center gap-0.5 px-2 py-0.5 rounded-full text-[10px] font-bold bg-rose-500/15 text-rose-600 dark:text-rose-400 border border-rose-500/30">
-                            <Flame className="w-2.5 h-2.5 fill-current" />
-                            <span>HOT</span>
-                          </span>
-                        )}
-
-                        {inq.followUpAt && (
-                          <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-semibold ${
-                            isOverdue
-                              ? 'bg-rose-500/20 text-rose-600 dark:text-rose-400 font-bold'
-                              : 'bg-bg-secondary text-text-muted border border-border-color'
-                          }`}>
-                            <Clock className="w-2.5 h-2.5" />
-                            <span>{formatFollowUpDateTime(inq.followUpAt)}</span>
-                          </span>
-                        )}
-                      </div>
-
-                      <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-text-muted">
-                        <span className="flex items-center gap-1">
-                          <Mail className="w-3.5 h-3.5" />
-                          <span className="truncate">{inq.email}</span>
-                        </span>
-                        {inq.phone && (
-                          <span className="flex items-center gap-1">
-                            <Phone className="w-3.5 h-3.5" />
-                            <span>{inq.phone}</span>
-                          </span>
-                        )}
-                        <span className="text-text-primary font-medium">{inq.service}</span>
-                        {inq.budgetRange && (
-                          <span className="font-bold text-emerald-600 dark:text-emerald-400">
-                            {inq.budgetRange}
-                          </span>
-                        )}
-                      </div>
-
-                      <p className="text-xs text-text-muted line-clamp-1 mt-1 max-w-2xl">
-                        {inq.message || inq.nextAction || 'No message provided.'}
-                      </p>
-                    </div>
-
-                    {/* Actions on row */}
-                    <div
-                      className="flex items-center gap-2 self-end md:self-center flex-wrap"
-                      onClick={(e) => e.stopPropagation()}
-                    >
-                      {inq.phone && (
-                        <>
-                          <a
-                            href={`tel:${cleanPhone}`}
-                            className="p-2 rounded-xl bg-bg-secondary hover:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border border-border-color transition-colors"
-                            title="Call"
-                          >
-                            <Phone className="w-3.5 h-3.5" />
-                          </a>
-                          <a
-                            href={`https://wa.me/${waPhone}`}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="p-2 rounded-xl bg-bg-secondary hover:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border border-border-color transition-colors"
-                            title="WhatsApp"
-                          >
-                            <MessageCircle className="w-3.5 h-3.5" />
-                          </a>
-                        </>
-                      )}
-
-                      <select
-                        value={inq.status}
-                        onChange={(e) => handleStatusChange(inq.id, e.target.value as InquiryStatus)}
-                        className="bg-bg-secondary border border-border-color rounded-xl px-2.5 py-1.5 text-xs text-text-primary focus:border-rose-500 focus:outline-none"
-                      >
-                        <option value="new">Mark New</option>
-                        <option value="contacted">Mark Contacted</option>
-                        <option value="in_progress">In Progress</option>
-                        <option value="completed">Completed</option>
-                        <option value="closed">Mark Closed</option>
-                      </select>
-
-                      <button
-                        onClick={() => handleDelete(inq.id)}
-                        className="p-2 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-600 dark:text-rose-400 transition-colors"
-                        title="Delete Inquiry"
-                      >
-                        <Trash2 className="w-3.5 h-3.5" />
-                      </button>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          )}
+        <div className="animate-in fade-in duration-200">
+          <InquiriesDataTable
+            inquiries={inquiries}
+            loading={loading}
+            onSelectLead={(lead) => setSelectedInquiry(lead)}
+            onUpdateStatus={handleStatusChange}
+            onDeleteLead={handleDelete}
+            onExportCsv={handleExportCsv}
+            initialFilterStatus={filterStatus}
+          />
         </div>
       )}
 

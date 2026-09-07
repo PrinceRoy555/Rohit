@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useSiteConfig } from '../../../context/SiteConfigContext';
 import { SkillItem, ExperienceItem } from '../../../types/cms';
+import { PageHeader } from '../layout/PageHeader';
 import {
   Sparkles,
   Briefcase,
@@ -159,112 +160,107 @@ export const SkillsExperienceTab: React.FC = () => {
   };
 
   return (
-    <div className="space-y-8 max-w-5xl mx-auto">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-white/10 pb-6">
-        <div>
-          <h2 className="text-xl sm:text-2xl font-bold text-white flex items-center gap-2.5">
-            <Sparkles className="w-6 h-6 text-emerald-400" />
-            <span>Skills & Experience Timeline</span>
-          </h2>
-          <p className="text-sm text-neutral-400 mt-1">
-            Highlight technical proficiencies, software masteries, and career trajectory.
-          </p>
-        </div>
-
-        <button
-          onClick={handleSave}
-          disabled={isSaving}
-          className="px-5 py-2.5 rounded-xl text-sm font-semibold bg-rose-600 hover:bg-rose-700 text-white shadow-lg shadow-rose-600/30 flex items-center gap-2 transition-all self-start sm:self-auto"
-        >
-          {savedSuccess ? (
-            <>
-              <Check className="w-4 h-4 text-emerald-300" />
-              <span>Draft Saved!</span>
-            </>
-          ) : (
-            <>
-              <Save className="w-4 h-4" />
-              <span>{isSaving ? 'Saving...' : 'Save Draft'}</span>
-            </>
-          )}
-        </button>
-      </div>
+    <div className="space-y-6 max-w-5xl mx-auto">
+      <PageHeader
+        title="Skills & Experience Timeline"
+        description="Highlight technical proficiencies, software masteries, and career trajectory."
+        actions={
+          <button
+            onClick={handleSave}
+            disabled={isSaving}
+            className="h-9 px-3.5 rounded-lg text-xs font-semibold bg-accent-primary hover:bg-accent-secondary text-white flex items-center justify-center gap-2 shadow-xs transition-all cursor-pointer select-none"
+          >
+            {savedSuccess ? (
+              <>
+                <Check className="w-3.5 h-3.5 text-emerald-300" />
+                <span>Draft Saved!</span>
+              </>
+            ) : (
+              <>
+                <Save className="w-3.5 h-3.5" />
+                <span>{isSaving ? 'Saving...' : 'Save Draft'}</span>
+              </>
+            )}
+          </button>
+        }
+      />
 
       {/* Sub-nav */}
-      <div className="flex flex-wrap gap-2 p-1.5 bg-neutral-900/80 border border-white/10 rounded-2xl">
+      <div className="flex overflow-x-auto no-scrollbar gap-1.5 sm:gap-2 p-1.5 bg-bg-card border border-border-color rounded-xl sm:rounded-2xl shadow-xs">
         <button
           onClick={() => setActiveSubTab('skills')}
-          className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs sm:text-sm font-semibold transition-all ${
+          className={`flex-shrink-0 whitespace-nowrap min-h-[38px] flex items-center gap-2 px-3.5 sm:px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all active:scale-98 ${
             activeSubTab === 'skills'
-              ? 'bg-emerald-600 text-white shadow-md shadow-emerald-600/20'
-              : 'text-neutral-400 hover:text-white hover:bg-white/5'
+              ? 'bg-emerald-600 text-white shadow-xs'
+              : 'text-text-muted hover:text-text-primary hover:bg-bg-secondary'
           }`}
         >
-          <Sparkles className="w-4 h-4" />
-          <span>Technical Skills ({skills.length})</span>
+          <Sparkles className="w-3.5 sm:w-4 h-3.5 sm:h-4" />
+          <span>Skills ({skills.length})</span>
         </button>
         <button
           onClick={() => setActiveSubTab('experience')}
-          className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs sm:text-sm font-semibold transition-all ${
+          className={`flex-shrink-0 whitespace-nowrap min-h-[38px] flex items-center gap-2 px-3.5 sm:px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all active:scale-98 ${
             activeSubTab === 'experience'
-              ? 'bg-emerald-600 text-white shadow-md shadow-emerald-600/20'
-              : 'text-neutral-400 hover:text-white hover:bg-white/5'
+              ? 'bg-emerald-600 text-white shadow-xs'
+              : 'text-text-muted hover:text-text-primary hover:bg-bg-secondary'
           }`}
         >
-          <Briefcase className="w-4 h-4" />
-          <span>Experience Timeline ({experience.length})</span>
+          <Briefcase className="w-3.5 sm:w-4 h-3.5 sm:h-4" />
+          <span>Experience ({experience.length})</span>
         </button>
       </div>
 
       {/* SKILLS SUB-TAB */}
       {activeSubTab === 'skills' && (
-        <div className="space-y-6">
-          <div className="flex items-center justify-between">
-            <h3 className="text-base font-bold text-white">Skills Matrix</h3>
+        <div className="space-y-3.5 sm:space-y-5">
+          <div className="flex items-center justify-between gap-3">
+            <h3 className="text-sm sm:text-base font-bold text-text-primary">Skills Matrix</h3>
             <button
               onClick={handleOpenAddSkill}
-              className="px-4 py-2 rounded-xl text-xs font-semibold bg-emerald-600 hover:bg-emerald-700 text-white shadow-md shadow-emerald-600/20 flex items-center gap-1.5"
+              className="min-h-[38px] sm:min-h-[40px] px-3 sm:px-4 py-2 rounded-xl text-xs font-semibold bg-emerald-600 hover:bg-emerald-700 text-white shadow-xs flex items-center gap-1.5 active:scale-98"
             >
-              <Plus className="w-4 h-4" />
+              <Plus className="w-3.5 sm:w-4 h-3.5 sm:h-4" />
               <span>Add Skill</span>
             </button>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2.5 sm:gap-4">
             {skills.map((s) => (
               <div
                 key={s.id}
-                className="p-5 rounded-2xl bg-neutral-900/80 border border-white/10 hover:border-white/20 transition-all flex flex-col justify-between"
+                className="p-3.5 sm:p-5 rounded-xl sm:rounded-2xl bg-bg-card border border-border-color hover:border-emerald-500/40 transition-all flex flex-col justify-between shadow-xs"
               >
                 <div>
                   <div className="flex items-center justify-between">
-                    <h4 className="text-sm font-bold text-white">{s.name}</h4>
-                    <span className="text-xs font-mono font-bold text-emerald-400">{s.level}%</span>
+                    <h4 className="text-xs sm:text-sm font-bold text-text-primary">{s.name}</h4>
+                    <span className="text-xs font-bold text-emerald-600 dark:text-emerald-400 tabular-nums">{s.level}%</span>
                   </div>
 
-                  <div className="w-full bg-neutral-800 rounded-full h-1.5 mt-3 overflow-hidden">
+                  <div className="w-full bg-bg-secondary rounded-full h-1.5 mt-2.5 sm:mt-3 overflow-hidden">
                     <div
                       className="bg-emerald-500 h-1.5 rounded-full"
                       style={{ width: `${s.level}%` }}
                     />
                   </div>
 
-                  <div className="text-[11px] text-neutral-400 mt-2 font-medium">
+                  <div className="text-[11px] text-text-muted mt-2 font-medium">
                     {s.category}
                   </div>
                 </div>
 
-                <div className="mt-4 pt-3 border-t border-white/5 flex items-center justify-end gap-1.5">
+                <div className="mt-3.5 pt-2.5 border-t border-border-color flex items-center justify-end gap-1.5">
                   <button
                     onClick={() => handleOpenEditSkill(s)}
-                    className="p-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-neutral-300 hover:text-white"
+                    className="min-w-[34px] min-h-[34px] p-1.5 rounded-lg bg-bg-secondary hover:bg-bg-card-hover text-text-secondary hover:text-text-primary border border-border-color flex items-center justify-center active:scale-95"
+                    title="Edit skill"
                   >
                     <Edit2 className="w-3.5 h-3.5" />
                   </button>
                   <button
                     onClick={() => handleDeleteSkill(s.id)}
-                    className="p-1.5 rounded-lg bg-rose-500/10 hover:bg-rose-500/20 text-rose-400"
+                    className="min-w-[34px] min-h-[34px] p-1.5 rounded-lg bg-bg-secondary hover:bg-rose-500/10 text-text-muted hover:text-rose-600 dark:hover:text-rose-400 border border-border-color flex items-center justify-center active:scale-95"
+                    title="Delete skill"
                   >
                     <Trash2 className="w-3.5 h-3.5" />
                   </button>
@@ -277,45 +273,45 @@ export const SkillsExperienceTab: React.FC = () => {
 
       {/* EXPERIENCE SUB-TAB */}
       {activeSubTab === 'experience' && (
-        <div className="space-y-6">
-          <div className="flex items-center justify-between">
-            <h3 className="text-base font-bold text-white">Career Milestones</h3>
+        <div className="space-y-3.5 sm:space-y-5">
+          <div className="flex items-center justify-between gap-3">
+            <h3 className="text-sm sm:text-base font-bold text-text-primary">Career Milestones</h3>
             <button
               onClick={handleOpenAddExp}
-              className="px-4 py-2 rounded-xl text-xs font-semibold bg-emerald-600 hover:bg-emerald-700 text-white shadow-md shadow-emerald-600/20 flex items-center gap-1.5"
+              className="min-h-[38px] sm:min-h-[40px] px-3 sm:px-4 py-2 rounded-xl text-xs font-semibold bg-emerald-600 hover:bg-emerald-700 text-white shadow-xs flex items-center gap-1.5 active:scale-98"
             >
-              <Plus className="w-4 h-4" />
+              <Plus className="w-3.5 sm:w-4 h-3.5 sm:h-4" />
               <span>Add Milestone</span>
             </button>
           </div>
 
-          <div className="space-y-4">
+          <div className="space-y-2.5 sm:space-y-4">
             {experience.map((ex) => (
               <div
                 key={ex.id}
-                className="p-6 rounded-2xl bg-neutral-900/80 border border-white/10 hover:border-white/20 transition-all flex flex-col md:flex-row md:items-start justify-between gap-4"
+                className="p-4 sm:p-5 rounded-xl sm:rounded-2xl bg-bg-card border border-border-color hover:border-emerald-500/40 transition-all flex flex-col md:flex-row md:items-start justify-between gap-3 sm:gap-4 shadow-xs"
               >
-                <div className="space-y-2">
-                  <div className="flex flex-wrap items-center gap-2">
-                    <h4 className="text-base font-bold text-white">{ex.role}</h4>
-                    <span className="text-sm font-semibold text-emerald-400">@ {ex.company}</span>
-                    <span className="px-2.5 py-0.5 rounded-full text-xs font-mono bg-white/5 text-neutral-300 border border-white/10">
+                <div className="space-y-1.5 sm:space-y-2 flex-1 min-w-0">
+                  <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
+                    <h4 className="text-sm sm:text-base font-bold text-text-primary">{ex.role}</h4>
+                    <span className="text-xs sm:text-sm font-semibold text-emerald-600 dark:text-emerald-400">@ {ex.company}</span>
+                    <span className="px-2 py-0.5 rounded-full text-[11px] sm:text-xs font-medium tabular-nums bg-bg-secondary text-text-secondary border border-border-color">
                       {ex.period}
                     </span>
                     {ex.isCurrent && (
-                      <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+                      <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30">
                         CURRENT ROLE
                       </span>
                     )}
                   </div>
 
-                  <p className="text-xs sm:text-sm text-neutral-300">{ex.description}</p>
+                  <p className="text-xs sm:text-sm text-text-secondary leading-relaxed">{ex.description}</p>
 
                   {ex.highlights && (
                     <ul className="mt-2 space-y-1">
                       {ex.highlights.map((h, idx) => (
-                        <li key={idx} className="text-xs text-neutral-400 flex items-center gap-1.5">
-                          <CheckCircle2 className="w-3 h-3 text-emerald-400 flex-shrink-0" />
+                        <li key={idx} className="text-xs text-text-muted flex items-center gap-1.5">
+                          <CheckCircle2 className="w-3 h-3 text-emerald-500 flex-shrink-0" />
                           <span>{h}</span>
                         </li>
                       ))}
@@ -323,16 +319,18 @@ export const SkillsExperienceTab: React.FC = () => {
                   )}
                 </div>
 
-                <div className="flex items-center gap-2 self-end md:self-start">
+                <div className="flex items-center gap-2 self-end md:self-start pt-1 md:pt-0">
                   <button
                     onClick={() => handleOpenEditExp(ex)}
-                    className="p-2 rounded-lg bg-white/5 hover:bg-white/10 text-neutral-300 hover:text-white"
+                    className="min-w-[36px] min-h-[36px] p-2 rounded-xl bg-bg-secondary hover:bg-bg-card-hover text-text-secondary hover:text-text-primary border border-border-color flex items-center justify-center active:scale-95"
+                    title="Edit milestone"
                   >
                     <Edit2 className="w-3.5 h-3.5" />
                   </button>
                   <button
                     onClick={() => handleDeleteExp(ex.id)}
-                    className="p-2 rounded-lg bg-rose-500/10 hover:bg-rose-500/20 text-rose-400"
+                    className="min-w-[36px] min-h-[36px] p-2 rounded-xl bg-bg-secondary hover:bg-rose-500/10 text-text-muted hover:text-rose-600 dark:hover:text-rose-400 border border-border-color flex items-center justify-center active:scale-95"
+                    title="Delete milestone"
                   >
                     <Trash2 className="w-3.5 h-3.5" />
                   </button>
@@ -345,27 +343,27 @@ export const SkillsExperienceTab: React.FC = () => {
 
       {/* MODAL: Skill */}
       {isSkillModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
-          <div className="bg-neutral-900 border border-white/15 rounded-2xl max-w-md w-full p-6 space-y-4 shadow-2xl">
-            <h3 className="text-lg font-bold text-white">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/60 dark:bg-black/80 backdrop-blur-xs">
+          <div className="bg-bg-card border border-border-color rounded-xl sm:rounded-2xl max-w-md w-full p-4 sm:p-6 space-y-3.5 sm:space-y-4 shadow-xl text-text-primary">
+            <h3 className="text-base sm:text-lg font-bold text-text-primary">
               {editingSkillId ? 'Edit Skill' : 'Add Technical Skill'}
             </h3>
 
-            <form onSubmit={handleSaveSkill} className="space-y-4">
+            <form onSubmit={handleSaveSkill} className="space-y-3.5 sm:space-y-4">
               <div>
-                <label className="block text-xs font-semibold text-neutral-300 mb-1">Skill Name</label>
+                <label className="block text-xs font-semibold text-text-secondary mb-1">Skill Name</label>
                 <input
                   type="text"
                   required
                   placeholder="e.g. Adobe Premiere Pro"
                   value={skillName}
                   onChange={(e) => setSkillName(e.target.value)}
-                  className="w-full bg-black/40 border border-white/10 rounded-xl px-3 py-2 text-sm text-white focus:border-emerald-500 focus:outline-none"
+                  className="w-full min-h-[42px] bg-bg-secondary border border-border-color rounded-xl px-3 py-2 text-sm text-text-primary focus:border-emerald-500 focus:outline-none"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-neutral-300 mb-1">
+                <label className="block text-xs font-semibold text-text-secondary mb-1">
                   Proficiency Level ({skillLevel}%)
                 </label>
                 <input
@@ -380,27 +378,27 @@ export const SkillsExperienceTab: React.FC = () => {
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-neutral-300 mb-1">Category</label>
+                <label className="block text-xs font-semibold text-text-secondary mb-1">Category</label>
                 <input
                   type="text"
                   placeholder="e.g. Video Editing, UI Design"
                   value={skillCategory}
                   onChange={(e) => setSkillCategory(e.target.value)}
-                  className="w-full bg-black/40 border border-white/10 rounded-xl px-3 py-2 text-sm text-white focus:border-emerald-500 focus:outline-none"
+                  className="w-full min-h-[42px] bg-bg-secondary border border-border-color rounded-xl px-3 py-2 text-sm text-text-primary focus:border-emerald-500 focus:outline-none"
                 />
               </div>
 
-              <div className="flex items-center justify-end gap-3 pt-2">
+              <div className="flex items-center justify-end gap-2.5 pt-2 border-t border-border-color">
                 <button
                   type="button"
                   onClick={() => setIsSkillModalOpen(false)}
-                  className="px-4 py-2 rounded-xl text-xs font-semibold bg-white/10 hover:bg-white/15 text-white"
+                  className="min-h-[42px] px-4 py-2 rounded-xl text-xs font-semibold bg-bg-secondary hover:bg-bg-card-hover text-text-primary border border-border-color active:scale-98"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 rounded-xl text-xs font-semibold bg-emerald-600 hover:bg-emerald-700 text-white shadow-md shadow-emerald-600/30"
+                  className="min-h-[42px] px-5 py-2 rounded-xl text-xs font-semibold bg-emerald-600 hover:bg-emerald-700 text-white shadow-xs active:scale-98"
                 >
                   Save Skill
                 </button>
@@ -412,92 +410,92 @@ export const SkillsExperienceTab: React.FC = () => {
 
       {/* MODAL: Experience */}
       {isExpModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
-          <div className="bg-neutral-900 border border-white/15 rounded-2xl max-w-md w-full p-6 space-y-4 shadow-2xl">
-            <h3 className="text-lg font-bold text-white">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/60 dark:bg-black/80 backdrop-blur-xs">
+          <div className="bg-bg-card border border-border-color rounded-xl sm:rounded-2xl max-w-md w-full p-4 sm:p-6 space-y-3.5 sm:space-y-4 shadow-xl max-h-[92vh] overflow-y-auto text-text-primary">
+            <h3 className="text-base sm:text-lg font-bold text-text-primary">
               {editingExpId ? 'Edit Milestone' : 'Add Career Milestone'}
             </h3>
 
-            <form onSubmit={handleSaveExp} className="space-y-4">
+            <form onSubmit={handleSaveExp} className="space-y-3 sm:space-y-4">
               <div>
-                <label className="block text-xs font-semibold text-neutral-300 mb-1">Role Title</label>
+                <label className="block text-xs font-semibold text-text-secondary mb-1">Role Title</label>
                 <input
                   type="text"
                   required
                   placeholder="e.g. Lead Video Editor"
                   value={expRole}
                   onChange={(e) => setExpRole(e.target.value)}
-                  className="w-full bg-black/40 border border-white/10 rounded-xl px-3 py-2 text-sm text-white focus:border-emerald-500 focus:outline-none"
+                  className="w-full min-h-[42px] bg-bg-secondary border border-border-color rounded-xl px-3 py-2 text-sm text-text-primary focus:border-emerald-500 focus:outline-none"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-neutral-300 mb-1">Company / Studio</label>
+                <label className="block text-xs font-semibold text-text-secondary mb-1">Company / Studio</label>
                 <input
                   type="text"
                   required
                   placeholder="e.g. Unicivix Global"
                   value={expCompany}
                   onChange={(e) => setExpCompany(e.target.value)}
-                  className="w-full bg-black/40 border border-white/10 rounded-xl px-3 py-2 text-sm text-white focus:border-emerald-500 focus:outline-none"
+                  className="w-full min-h-[42px] bg-bg-secondary border border-border-color rounded-xl px-3 py-2 text-sm text-text-primary focus:border-emerald-500 focus:outline-none"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-neutral-300 mb-1">Period</label>
+                <label className="block text-xs font-semibold text-text-secondary mb-1">Period</label>
                 <input
                   type="text"
                   placeholder="e.g. 2023 - Present"
                   value={expPeriod}
                   onChange={(e) => setExpPeriod(e.target.value)}
-                  className="w-full bg-black/40 border border-white/10 rounded-xl px-3 py-2 text-sm text-white focus:border-emerald-500 focus:outline-none"
+                  className="w-full min-h-[42px] bg-bg-secondary border border-border-color rounded-xl px-3 py-2 text-sm text-text-primary focus:border-emerald-500 focus:outline-none"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-neutral-300 mb-1">Description</label>
+                <label className="block text-xs font-semibold text-text-secondary mb-1">Description</label>
                 <textarea
                   rows={2}
                   value={expDesc}
                   onChange={(e) => setExpDesc(e.target.value)}
-                  className="w-full bg-black/40 border border-white/10 rounded-xl px-3 py-2 text-sm text-white focus:border-emerald-500 focus:outline-none resize-none"
+                  className="w-full bg-bg-secondary border border-border-color rounded-xl p-3 text-sm text-text-primary focus:border-emerald-500 focus:outline-none resize-none"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-neutral-300 mb-1">Highlights (comma separated)</label>
+                <label className="block text-xs font-semibold text-text-secondary mb-1">Highlights (comma separated)</label>
                 <input
                   type="text"
                   value={expHighlights}
                   onChange={(e) => setExpHighlights(e.target.value)}
-                  className="w-full bg-black/40 border border-white/10 rounded-xl px-3 py-2 text-sm text-white focus:border-emerald-500 focus:outline-none"
+                  className="w-full min-h-[42px] bg-bg-secondary border border-border-color rounded-xl px-3 py-2 text-sm text-text-primary focus:border-emerald-500 focus:outline-none"
                 />
               </div>
 
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-2.5 pt-1">
                 <input
                   type="checkbox"
                   id="currentRoleCheck"
                   checked={expIsCurrent}
                   onChange={(e) => setExpIsCurrent(e.target.checked)}
-                  className="w-4 h-4 text-emerald-600 rounded bg-black/40 border-white/20 focus:ring-emerald-500"
+                  className="w-4 h-4 text-emerald-600 rounded bg-bg-secondary border-border-color focus:ring-emerald-500"
                 />
-                <label htmlFor="currentRoleCheck" className="text-xs font-semibold text-white cursor-pointer">
+                <label htmlFor="currentRoleCheck" className="text-xs font-semibold text-text-primary cursor-pointer">
                   I currently work in this role
                 </label>
               </div>
 
-              <div className="flex items-center justify-end gap-3 pt-2">
+              <div className="flex items-center justify-end gap-2.5 pt-2 border-t border-border-color">
                 <button
                   type="button"
                   onClick={() => setIsExpModalOpen(false)}
-                  className="px-4 py-2 rounded-xl text-xs font-semibold bg-white/10 hover:bg-white/15 text-white"
+                  className="min-h-[42px] px-4 py-2 rounded-xl text-xs font-semibold bg-bg-secondary hover:bg-bg-card-hover text-text-primary border border-border-color active:scale-98"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 rounded-xl text-xs font-semibold bg-emerald-600 hover:bg-emerald-700 text-white shadow-md shadow-emerald-600/30"
+                  className="min-h-[42px] px-5 py-2 rounded-xl text-xs font-semibold bg-emerald-600 hover:bg-emerald-700 text-white shadow-xs active:scale-98"
                 >
                   Save Milestone
                 </button>

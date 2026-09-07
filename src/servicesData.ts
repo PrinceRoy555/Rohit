@@ -620,3 +620,7 @@ export function getServicesByCategory(category: ServiceCategory | 'All Services'
 export function getServiceByTitle(title: string): DetailedService | undefined {
   return SERVICES_LIST.find((s) => s.title.toLowerCase() === title.toLowerCase());
 }
+
+export function getServiceById(id: string): DetailedService | undefined {
+  return SERVICES_LIST.find((s) => s.id.toLowerCase() === id.toLowerCase());
+}

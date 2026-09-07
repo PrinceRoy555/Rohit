@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { MediaItem } from '../../../types/cms';
+import { PageHeader } from '../layout/PageHeader';
 import {
   fetchMediaItems,
   uploadMediaItem,
@@ -84,50 +85,43 @@ export const MediaLibraryTab: React.FC = () => {
   });
 
   return (
-    <div className="space-y-8 max-w-6xl mx-auto">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-white/10 pb-6">
-        <div>
-          <h2 className="text-xl sm:text-2xl font-bold text-white flex items-center gap-2.5">
-            <ImageIcon className="w-6 h-6 text-rose-500" />
-            <span>Media Assets & Image Library</span>
-          </h2>
-          <p className="text-sm text-neutral-400 mt-1">
-            Store and organize high-resolution images, brand vectors, logos, and video thumbnails.
-          </p>
-        </div>
-
-        <button
-          onClick={() => setIsAddModalOpen(true)}
-          className="px-4 py-2.5 rounded-xl text-xs sm:text-sm font-semibold bg-rose-600 hover:bg-rose-700 text-white shadow-lg shadow-rose-600/30 flex items-center gap-2 transition-all self-start sm:self-auto"
-        >
-          <Plus className="w-4 h-4" />
-          <span>Add Media Asset</span>
-        </button>
-      </div>
+    <div className="space-y-6 max-w-6xl mx-auto">
+      <PageHeader
+        title="Media Assets & Image Library"
+        description="Store and organize high-resolution images, brand vectors, logos, and video thumbnails."
+        actions={
+          <button
+            onClick={() => setIsAddModalOpen(true)}
+            className="h-9 px-3.5 rounded-lg text-xs font-semibold bg-accent-primary hover:bg-accent-secondary text-white flex items-center justify-center gap-1.5 shadow-xs transition-all cursor-pointer select-none"
+          >
+            <Plus className="w-4 h-4" />
+            <span>Add Media Asset</span>
+          </button>
+        }
+      />
 
       {/* Filter & Search Toolbar */}
-      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4">
+      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2.5 sm:gap-4">
         <div className="relative flex-1 max-w-md">
-          <Search className="w-4 h-4 text-neutral-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+          <Search className="w-4 h-4 text-text-muted absolute left-3 top-1/2 -translate-y-1/2" />
           <input
             type="text"
-            placeholder="Search media files by name..."
+            placeholder="Search media files..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full bg-neutral-900/80 border border-white/10 rounded-xl pl-10 pr-4 py-2 text-xs sm:text-sm text-white focus:border-rose-500 focus:outline-none"
+            className="w-full min-h-[42px] bg-bg-card border border-border-color rounded-xl pl-9 pr-3.5 py-2 text-xs sm:text-sm text-text-primary placeholder:text-text-muted focus:border-rose-500 focus:outline-none"
           />
         </div>
 
-        <div className="flex flex-wrap gap-2">
+        <div className="flex overflow-x-auto no-scrollbar gap-1.5 sm:gap-2 pb-0.5 sm:pb-0">
           {['all', 'branding', 'portfolio', 'marketing'].map((cat) => (
             <button
               key={cat}
               onClick={() => setFilterCategory(cat)}
-              className={`px-3 py-1.5 rounded-xl text-xs font-semibold capitalize transition-all ${
+              className={`flex-shrink-0 whitespace-nowrap min-h-[38px] px-3.5 py-1.5 rounded-xl text-xs font-semibold capitalize transition-all active:scale-98 ${
                 filterCategory === cat
-                  ? 'bg-rose-600 text-white'
-                  : 'bg-neutral-900 text-neutral-400 hover:text-white border border-white/10'
+                  ? 'bg-rose-600 text-white shadow-xs'
+                  : 'bg-bg-card text-text-secondary hover:text-text-primary border border-border-color hover:bg-bg-secondary'
               }`}
             >
               {cat}
@@ -138,51 +132,51 @@ export const MediaLibraryTab: React.FC = () => {
 
       {/* Grid */}
       {loading ? (
-        <div className="p-12 text-center text-neutral-400 text-sm">Loading media assets...</div>
+        <div className="p-8 sm:p-12 text-center text-text-muted text-xs sm:text-sm">Loading media assets...</div>
       ) : filtered.length === 0 ? (
-        <div className="p-12 text-center bg-neutral-900/40 border border-white/10 rounded-2xl">
-          <ImageIcon className="w-10 h-10 text-neutral-600 mx-auto mb-3" />
-          <h4 className="text-base font-bold text-white">No media items found</h4>
-          <p className="text-xs text-neutral-400 mt-1">Add your first image URL to store it here.</p>
+        <div className="p-8 sm:p-12 text-center bg-bg-card border border-border-color rounded-xl sm:rounded-2xl">
+          <ImageIcon className="w-8 sm:w-10 h-8 sm:h-10 text-text-muted mx-auto mb-2 sm:mb-3 opacity-60" />
+          <h4 className="text-sm sm:text-base font-bold text-text-primary">No media items found</h4>
+          <p className="text-xs text-text-muted mt-1">Add your first image URL to store it here.</p>
         </div>
       ) : (
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4">
           {filtered.map((item) => {
             const isCopied = copiedId === item.id;
             return (
               <div
                 key={item.id}
-                className="bg-neutral-900/80 border border-white/10 hover:border-white/20 rounded-2xl overflow-hidden transition-all flex flex-col justify-between group"
+                className="bg-bg-card border border-border-color hover:border-rose-500/40 rounded-xl sm:rounded-2xl overflow-hidden transition-all flex flex-col justify-between group shadow-xs"
               >
-                <div className="relative h-36 w-full bg-black/60 overflow-hidden">
+                <div className="relative h-36 sm:h-40 w-full bg-black/10 dark:bg-black/60 overflow-hidden">
                   <img
                     src={item.url}
                     alt={item.name}
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                   />
                   <div className="absolute top-2 left-2">
-                    <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-black/70 backdrop-blur-md text-white border border-white/20 capitalize">
+                    <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-black/75 backdrop-blur-md text-white border border-white/20 capitalize">
                       {item.category}
                     </span>
                   </div>
                 </div>
 
                 <div className="p-3">
-                  <h4 className="text-xs font-bold text-white truncate" title={item.name}>
+                  <h4 className="text-xs font-bold text-text-primary truncate" title={item.name}>
                     {item.name}
                   </h4>
-                  <p className="text-[11px] text-neutral-500 truncate mt-0.5 font-mono">
+                  <p className="text-[11px] text-text-muted truncate mt-0.5 font-mono">
                     {item.url}
                   </p>
                 </div>
 
-                <div className="p-3 pt-0 flex items-center justify-between gap-1.5 border-t border-white/5">
+                <div className="p-3 pt-0 flex items-center justify-between gap-1.5 border-t border-border-color">
                   <button
                     onClick={() => handleCopyUrl(item)}
-                    className={`flex-1 py-1.5 px-2 rounded-lg text-xs font-semibold flex items-center justify-center gap-1 transition-all ${
+                    className={`flex-1 min-h-[38px] py-1.5 px-2 rounded-xl text-xs font-semibold flex items-center justify-center gap-1 transition-all active:scale-98 ${
                       isCopied
                         ? 'bg-emerald-500 text-black'
-                        : 'bg-white/5 hover:bg-white/10 text-neutral-300 hover:text-white'
+                        : 'bg-bg-secondary hover:bg-bg-card-hover text-text-secondary hover:text-text-primary border border-border-color'
                     }`}
                   >
                     {isCopied ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
@@ -191,7 +185,7 @@ export const MediaLibraryTab: React.FC = () => {
 
                   <button
                     onClick={() => handleDelete(item.id, item.name)}
-                    className="p-1.5 rounded-lg bg-rose-500/10 hover:bg-rose-500/20 text-rose-400"
+                    className="min-w-[38px] min-h-[38px] p-1.5 rounded-xl bg-bg-secondary hover:bg-rose-500/10 text-text-muted hover:text-rose-600 dark:hover:text-rose-400 border border-border-color flex items-center justify-center active:scale-95"
                     title="Delete"
                   >
                     <Trash2 className="w-3.5 h-3.5" />
@@ -205,41 +199,41 @@ export const MediaLibraryTab: React.FC = () => {
 
       {/* MODAL: Add Media */}
       {isAddModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
-          <div className="bg-neutral-900 border border-white/15 rounded-2xl max-w-md w-full p-6 space-y-4 shadow-2xl">
-            <h3 className="text-lg font-bold text-white">Add Media Asset</h3>
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/60 dark:bg-black/80 backdrop-blur-xs">
+          <div className="bg-bg-card border border-border-color rounded-xl sm:rounded-2xl max-w-md w-full p-4 sm:p-6 space-y-3.5 sm:space-y-4 shadow-xl max-h-[92vh] overflow-y-auto text-text-primary">
+            <h3 className="text-base sm:text-lg font-bold text-text-primary">Add Media Asset</h3>
 
-            <form onSubmit={handleAddMedia} className="space-y-4">
+            <form onSubmit={handleAddMedia} className="space-y-3.5 sm:space-y-4">
               <div>
-                <label className="block text-xs font-semibold text-neutral-300 mb-1">Asset Name</label>
+                <label className="block text-xs font-semibold text-text-secondary mb-1">Asset Name</label>
                 <input
                   type="text"
                   required
                   placeholder="e.g. Agency Hero Header Dark"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  className="w-full bg-black/40 border border-white/10 rounded-xl px-3 py-2 text-sm text-white focus:border-rose-500 focus:outline-none"
+                  className="w-full min-h-[42px] bg-bg-secondary border border-border-color rounded-xl px-3 py-2 text-sm text-text-primary focus:border-rose-500 focus:outline-none"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-neutral-300 mb-1">Image URL</label>
+                <label className="block text-xs font-semibold text-text-secondary mb-1">Image URL</label>
                 <input
                   type="text"
                   required
                   placeholder="https://images.unsplash.com/..."
                   value={url}
                   onChange={(e) => setUrl(e.target.value)}
-                  className="w-full bg-black/40 border border-white/10 rounded-xl px-3 py-2 text-sm text-white focus:border-rose-500 focus:outline-none"
+                  className="w-full min-h-[42px] bg-bg-secondary border border-border-color rounded-xl px-3 py-2 text-sm text-text-primary focus:border-rose-500 focus:outline-none"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-neutral-300 mb-1">Category</label>
+                <label className="block text-xs font-semibold text-text-secondary mb-1">Category</label>
                 <select
                   value={category}
                   onChange={(e) => setCategory(e.target.value)}
-                  className="w-full bg-black/40 border border-white/10 rounded-xl px-3 py-2 text-sm text-white focus:border-rose-500 focus:outline-none"
+                  className="w-full min-h-[42px] bg-bg-secondary border border-border-color rounded-xl px-3 py-2 text-sm text-text-primary focus:border-rose-500 focus:outline-none"
                 >
                   <option value="portfolio">Portfolio</option>
                   <option value="branding">Branding</option>
@@ -249,27 +243,27 @@ export const MediaLibraryTab: React.FC = () => {
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-neutral-300 mb-1">Tags (comma separated)</label>
+                <label className="block text-xs font-semibold text-text-secondary mb-1">Tags (comma separated)</label>
                 <input
                   type="text"
                   placeholder="e.g. 4k, mockup, dark-theme"
                   value={tagsStr}
                   onChange={(e) => setTagsStr(e.target.value)}
-                  className="w-full bg-black/40 border border-white/10 rounded-xl px-3 py-2 text-sm text-white focus:border-rose-500 focus:outline-none"
+                  className="w-full min-h-[42px] bg-bg-secondary border border-border-color rounded-xl px-3 py-2 text-sm text-text-primary focus:border-rose-500 focus:outline-none"
                 />
               </div>
 
-              <div className="flex items-center justify-end gap-3 pt-2">
+              <div className="flex items-center justify-end gap-2.5 pt-2 border-t border-border-color">
                 <button
                   type="button"
                   onClick={() => setIsAddModalOpen(false)}
-                  className="px-4 py-2 rounded-xl text-xs font-semibold bg-white/10 hover:bg-white/15 text-white"
+                  className="min-h-[42px] px-4 py-2 rounded-xl text-xs font-semibold bg-bg-secondary hover:bg-bg-card-hover text-text-primary border border-border-color active:scale-98"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 rounded-xl text-xs font-semibold bg-rose-600 hover:bg-rose-700 text-white shadow-md shadow-rose-600/30"
+                  className="min-h-[42px] px-5 py-2 rounded-xl text-xs font-semibold bg-rose-600 hover:bg-rose-700 text-white shadow-xs active:scale-98"
                 >
                   Save Asset
                 </button>

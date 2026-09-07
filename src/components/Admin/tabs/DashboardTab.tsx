@@ -124,34 +124,34 @@ export const DashboardTab: React.FC<DashboardTabProps> = ({ setActiveTab }) => {
   ];
 
   return (
-    <div className="space-y-8 max-w-6xl mx-auto">
+    <div className="space-y-5 sm:space-y-8 max-w-6xl mx-auto">
       {/* 1. PAGE HEADER (Section 39) */}
-      <div id="d4x7qm" className="relative overflow-hidden rounded-2xl p-6 sm:p-8 border border-border-color bg-bg-card text-text-primary shadow-sm transition-colors duration-200">
+      <div id="d4x7qm" className="relative overflow-hidden rounded-xl sm:rounded-2xl p-4 sm:p-7 lg:p-8 border border-border-color bg-bg-card text-text-primary shadow-xs transition-colors duration-200">
         <div className="absolute top-0 right-0 -mr-16 -mt-16 w-64 h-64 bg-rose-500/5 dark:bg-rose-600/15 rounded-full blur-3xl pointer-events-none" />
-        <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
+        <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-4 sm:gap-6">
           <div>
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-500/20 mb-3">
+            <div className="inline-flex items-center gap-2 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-500/20 mb-2 sm:mb-2.5">
               <Sparkles className="w-3.5 h-3.5 text-rose-600 dark:text-rose-400" />
               <span>Executive CRM & CMS Command Suite</span>
             </div>
-            <h1 id="e3m1cz" className="text-2xl sm:text-3xl font-bold tracking-tight text-text-primary">
+            <h1 id="e3m1cz" className="text-lg sm:text-2xl lg:text-3xl font-bold tracking-tight text-text-primary">
               Management & Operations Overview
             </h1>
-            <p className="mt-1 text-sm sm:text-base text-text-muted max-w-xl">
+            <p className="mt-1 text-xs sm:text-sm text-text-muted max-w-xl">
               Live site: <span className="font-semibold text-text-primary">{config.branding?.siteName || 'Rohit Verma'}</span> • Version {config.version || 1} • Preset: <span className="font-semibold text-text-primary">{config.theme?.presetName || 'Scarlet Prestige'}</span>
             </p>
           </div>
 
-          <div className="flex flex-wrap items-center gap-3">
-            <div title="Toggle Light / Dark Theme" className="flex items-center">
+          <div className="flex flex-col xs:flex-row items-stretch xs:items-center gap-2 sm:gap-3">
+            <div title="Toggle Light / Dark Theme" className="hidden xs:flex items-center justify-center">
               <ThemeToggle id="admin-dashboard-theme-toggle" />
             </div>
 
             <button
               onClick={() => setPreviewMode(!isPreviewMode)}
-              className={`px-4 py-2.5 rounded-xl text-sm font-semibold flex items-center gap-2 transition-all border ${
+              className={`min-h-[42px] px-3.5 sm:px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold flex items-center justify-center gap-2 transition-all border select-none active:scale-98 ${
                 isPreviewMode
-                  ? 'bg-amber-500 text-neutral-950 border-amber-400 shadow-md shadow-amber-500/20'
+                  ? 'bg-amber-500 text-neutral-950 border-amber-400 shadow-xs font-bold'
                   : 'bg-bg-secondary hover:bg-bg-card-hover text-text-primary border-border-color'
               }`}
             >
@@ -163,7 +163,7 @@ export const DashboardTab: React.FC<DashboardTabProps> = ({ setActiveTab }) => {
               <button
                 onClick={() => publish()}
                 disabled={isPublishing}
-                className="px-5 py-2.5 rounded-xl text-sm font-semibold bg-rose-600 hover:bg-rose-700 text-white shadow-lg shadow-rose-600/30 flex items-center gap-2 transition-all"
+                className="min-h-[42px] px-4 sm:px-5 py-2 rounded-xl text-xs sm:text-sm font-semibold bg-rose-600 hover:bg-rose-700 text-white shadow-md shadow-rose-600/30 flex items-center justify-center gap-2 transition-all select-none active:scale-98"
               >
                 <Send className="w-4 h-4" />
                 <span>{isPublishing ? 'Publishing...' : 'Publish Changes'}</span>
@@ -174,13 +174,13 @@ export const DashboardTab: React.FC<DashboardTabProps> = ({ setActiveTab }) => {
 
         {/* Status Callout */}
         {hasUnpublishedChanges ? (
-          <div className="mt-6 pt-6 border-t border-border-color flex items-center gap-3 text-amber-700 dark:text-amber-300 text-sm">
-            <AlertCircle className="w-5 h-5 flex-shrink-0 animate-pulse text-amber-600 dark:text-amber-400" />
-            <span>You have working draft changes. Click <strong className="font-semibold text-amber-800 dark:text-amber-200">Publish Changes</strong> to push them live to all visitors.</span>
+          <div className="mt-3.5 sm:mt-5 pt-3.5 sm:pt-5 border-t border-border-color flex items-center gap-2 sm:gap-3 text-amber-700 dark:text-amber-300 text-xs sm:text-sm">
+            <AlertCircle className="w-4 sm:w-5 h-4 sm:h-5 flex-shrink-0 animate-pulse text-amber-600 dark:text-amber-400" />
+            <span>You have working draft changes. Tap <strong className="font-semibold text-amber-800 dark:text-amber-200">Publish Changes</strong> to push them live to all visitors.</span>
           </div>
         ) : (
-          <div className="mt-6 pt-6 border-t border-border-color flex items-center gap-3 text-emerald-700 dark:text-emerald-400 text-sm">
-            <CheckCircle2 className="w-5 h-5 flex-shrink-0 text-emerald-600 dark:text-emerald-400" />
+          <div className="mt-3.5 sm:mt-5 pt-3.5 sm:pt-5 border-t border-border-color flex items-center gap-2 sm:gap-3 text-emerald-700 dark:text-emerald-400 text-xs sm:text-sm">
+            <CheckCircle2 className="w-4 sm:w-5 h-4 sm:h-5 flex-shrink-0 text-emerald-600 dark:text-emerald-400" />
             <span>All CMS changes are published and live on the public website.</span>
           </div>
         )}
@@ -208,28 +208,28 @@ export const DashboardTab: React.FC<DashboardTabProps> = ({ setActiveTab }) => {
       />
 
       {/* 5. MAIN CONTENT KPIs (Section 39) */}
-      <div className="space-y-3">
+      <div className="space-y-2.5">
         <div className="text-[11px] font-bold uppercase tracking-wider text-text-muted">
           Website Content Overview
         </div>
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-4">
           {stats.map((stat, idx) => {
             const Icon = stat.icon;
             return (
               <div
                 key={idx}
                 onClick={stat.action}
-                className="bg-bg-card hover:bg-bg-card-hover border border-border-color hover:border-rose-500/40 rounded-2xl p-5 cursor-pointer transition-all duration-200 group shadow-sm hover:shadow-md"
+                className="bg-bg-card hover:bg-bg-card-hover border border-border-color hover:border-rose-500/40 rounded-xl sm:rounded-2xl p-3.5 sm:p-5 cursor-pointer transition-all duration-200 group shadow-xs hover:shadow-md select-none active:scale-98"
               >
                 <div className="flex items-center justify-between">
-                  <div className={`w-10 h-10 rounded-xl flex items-center justify-center border ${stat.color}`}>
-                    <Icon className="w-5 h-5" />
+                  <div className={`w-8 sm:w-10 h-8 sm:h-10 rounded-lg sm:rounded-xl flex items-center justify-center border ${stat.color}`}>
+                    <Icon className="w-4 sm:w-5 h-4 sm:h-5" />
                   </div>
-                  <ArrowRight className="w-4 h-4 text-text-muted group-hover:text-text-primary group-hover:translate-x-0.5 transition-all" />
+                  <ArrowRight className="w-3.5 sm:w-4 h-3.5 sm:h-4 text-text-muted group-hover:text-text-primary group-hover:translate-x-0.5 transition-all hidden xs:block" />
                 </div>
-                <div className="mt-4">
-                  <div className="text-2xl sm:text-3xl font-bold text-text-primary tracking-tight font-mono">{stat.value}</div>
-                  <div className="text-xs sm:text-sm text-text-muted font-medium mt-1">{stat.label}</div>
+                <div className="mt-2.5 sm:mt-3">
+                  <div className="text-xl sm:text-2xl font-bold text-text-primary tracking-tight tabular-nums">{stat.value}</div>
+                  <div className="text-xs sm:text-sm text-text-muted font-medium mt-0.5 truncate">{stat.label}</div>
                 </div>
               </div>
             );
@@ -238,22 +238,22 @@ export const DashboardTab: React.FC<DashboardTabProps> = ({ setActiveTab }) => {
       </div>
 
       {/* 6. QUICK ACCESS MODULES (Section 39) */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-3.5 sm:gap-5">
         {/* Module 1: Website Customizer */}
         <div
           onClick={() => setActiveTab('customizer')}
-          className="bg-bg-card hover:bg-bg-card-hover border border-border-color hover:border-rose-500/40 rounded-2xl p-6 cursor-pointer group transition-all shadow-sm hover:shadow-md"
+          className="bg-bg-card hover:bg-bg-card-hover border border-border-color hover:border-rose-500/40 rounded-xl sm:rounded-2xl p-4 sm:p-6 cursor-pointer group transition-all shadow-xs hover:shadow-md select-none active:scale-99"
         >
-          <div className="w-12 h-12 rounded-xl bg-rose-500/10 border border-rose-500/20 text-rose-600 dark:text-rose-400 flex items-center justify-center mb-4 group-hover:scale-105 transition-transform">
-            <Palette className="w-6 h-6" />
+          <div className="w-10 sm:w-12 h-10 sm:h-12 rounded-xl bg-rose-500/10 border border-rose-500/20 text-rose-600 dark:text-rose-400 flex items-center justify-center mb-3 sm:mb-4 group-hover:scale-105 transition-transform">
+            <Palette className="w-5 sm:w-6 h-5 sm:h-6" />
           </div>
-          <h3 className="text-lg font-bold text-text-primary group-hover:text-rose-600 dark:group-hover:text-rose-400 transition-colors">
+          <h3 className="text-base sm:text-lg font-bold text-text-primary group-hover:text-rose-600 dark:group-hover:text-rose-400 transition-colors">
             Website Customizer & Theme
           </h3>
-          <p className="text-sm text-text-muted mt-2">
+          <p className="text-xs sm:text-sm text-text-muted mt-1.5 sm:mt-2">
             Change color schemes, typography, border radius, site logos, bio text, and branding without writing code.
           </p>
-          <div className="mt-4 flex items-center gap-2 text-xs font-semibold text-rose-600 dark:text-rose-400 group-hover:underline">
+          <div className="mt-3 sm:mt-4 flex items-center gap-1.5 text-xs font-semibold text-rose-600 dark:text-rose-400 group-hover:underline">
             <span>Open Customizer</span>
             <ArrowRight className="w-3.5 h-3.5" />
           </div>
@@ -262,18 +262,18 @@ export const DashboardTab: React.FC<DashboardTabProps> = ({ setActiveTab }) => {
         {/* Module 2: Template System */}
         <div
           onClick={() => setActiveTab('templates')}
-          className="bg-bg-card hover:bg-bg-card-hover border border-border-color hover:border-indigo-500/40 rounded-2xl p-6 cursor-pointer group transition-all shadow-sm hover:shadow-md"
+          className="bg-bg-card hover:bg-bg-card-hover border border-border-color hover:border-indigo-500/40 rounded-xl sm:rounded-2xl p-4 sm:p-6 cursor-pointer group transition-all shadow-xs hover:shadow-md select-none active:scale-99"
         >
-          <div className="w-12 h-12 rounded-xl bg-indigo-500/10 border border-indigo-500/20 text-indigo-600 dark:text-indigo-400 flex items-center justify-center mb-4 group-hover:scale-105 transition-transform">
-            <Layers className="w-6 h-6" />
+          <div className="w-10 sm:w-12 h-10 sm:h-12 rounded-xl bg-indigo-500/10 border border-indigo-500/20 text-indigo-600 dark:text-indigo-400 flex items-center justify-center mb-3 sm:mb-4 group-hover:scale-105 transition-transform">
+            <Layers className="w-5 sm:w-6 h-5 sm:h-6" />
           </div>
-          <h3 className="text-lg font-bold text-text-primary group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
+          <h3 className="text-base sm:text-lg font-bold text-text-primary group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
             Template Reselling System
           </h3>
-          <p className="text-sm text-text-muted mt-2">
+          <p className="text-xs sm:text-sm text-text-muted mt-1.5 sm:mt-2">
             1-click switch between pre-built creator, agency, or minimal themes. Export and import templates to sell to clients.
           </p>
-          <div className="mt-4 flex items-center gap-2 text-xs font-semibold text-indigo-600 dark:text-indigo-400 group-hover:underline">
+          <div className="mt-3 sm:mt-4 flex items-center gap-1.5 text-xs font-semibold text-indigo-600 dark:text-indigo-400 group-hover:underline">
             <span>Browse Templates</span>
             <ArrowRight className="w-3.5 h-3.5" />
           </div>
@@ -282,18 +282,18 @@ export const DashboardTab: React.FC<DashboardTabProps> = ({ setActiveTab }) => {
         {/* Module 3: Page & Section Manager */}
         <div
           onClick={() => setActiveTab('sections')}
-          className="bg-bg-card hover:bg-bg-card-hover border border-border-color hover:border-amber-500/40 rounded-2xl p-6 cursor-pointer group transition-all shadow-sm hover:shadow-md"
+          className="bg-bg-card hover:bg-bg-card-hover border border-border-color hover:border-amber-500/40 rounded-xl sm:rounded-2xl p-4 sm:p-6 cursor-pointer group transition-all shadow-xs hover:shadow-md select-none active:scale-99"
         >
-          <div className="w-12 h-12 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-600 dark:text-amber-400 flex items-center justify-center mb-4 group-hover:scale-105 transition-transform">
-            <LayoutDashboard className="w-6 h-6" />
+          <div className="w-10 sm:w-12 h-10 sm:h-12 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-600 dark:text-amber-400 flex items-center justify-center mb-3 sm:mb-4 group-hover:scale-105 transition-transform">
+            <LayoutDashboard className="w-5 sm:w-6 h-5 sm:h-6" />
           </div>
-          <h3 className="text-lg font-bold text-text-primary group-hover:text-amber-600 dark:group-hover:text-amber-400 transition-colors">
+          <h3 className="text-base sm:text-lg font-bold text-text-primary group-hover:text-amber-600 dark:group-hover:text-amber-400 transition-colors">
             Page & Section Manager
           </h3>
-          <p className="text-sm text-text-muted mt-2">
+          <p className="text-xs sm:text-sm text-text-muted mt-1.5 sm:mt-2">
             Turn sections on or off, reorder homepage blocks, customize headlines, badges, and standalone pages.
           </p>
-          <div className="mt-4 flex items-center gap-2 text-xs font-semibold text-amber-600 dark:text-amber-400 group-hover:underline">
+          <div className="mt-3 sm:mt-4 flex items-center gap-1.5 text-xs font-semibold text-amber-600 dark:text-amber-400 group-hover:underline">
             <span>Manage Sections</span>
             <ArrowRight className="w-3.5 h-3.5" />
           </div>
@@ -301,13 +301,13 @@ export const DashboardTab: React.FC<DashboardTabProps> = ({ setActiveTab }) => {
       </div>
 
       {/* 7. SYSTEM STATUS & ARCHITECTURE (Section 39) */}
-      <div className="bg-bg-card border border-border-color rounded-2xl p-6 shadow-sm transition-colors duration-200">
-        <h3 className="text-base font-semibold text-text-primary mb-4 flex items-center gap-2">
+      <div className="bg-bg-card border border-border-color rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-xs transition-colors duration-200">
+        <h3 className="text-sm sm:text-base font-semibold text-text-primary mb-3 sm:mb-4 flex items-center gap-2">
           <FileCheck className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
           <span>System Status & Multi-Tenancy Architecture</span>
         </h3>
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-sm">
-          <div className="p-4 rounded-xl bg-bg-secondary border border-border-color">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 sm:gap-4 text-sm">
+          <div className="p-3.5 sm:p-4 rounded-xl bg-bg-secondary border border-border-color">
             <div className="text-text-muted text-xs font-medium">Public Site Link</div>
             <div className="text-text-primary font-semibold mt-1 truncate">/ (Live Website)</div>
             <div className="text-xs text-emerald-600 dark:text-emerald-400 mt-1 flex items-center gap-1">
@@ -315,12 +315,12 @@ export const DashboardTab: React.FC<DashboardTabProps> = ({ setActiveTab }) => {
               <span>Synced with Firestore</span>
             </div>
           </div>
-          <div className="p-4 rounded-xl bg-bg-secondary border border-border-color">
+          <div className="p-3.5 sm:p-4 rounded-xl bg-bg-secondary border border-border-color">
             <div className="text-text-muted text-xs font-medium">Revision Engine</div>
             <div className="text-text-primary font-semibold mt-1">Automatic Snapshots</div>
             <div className="text-xs text-text-muted mt-1">1-Click instant rollback</div>
           </div>
-          <div className="p-4 rounded-xl bg-bg-secondary border border-border-color">
+          <div className="p-3.5 sm:p-4 rounded-xl bg-bg-secondary border border-border-color">
             <div className="text-text-muted text-xs font-medium">Security Access</div>
             <div className="text-text-primary font-semibold mt-1">Role-Based Access</div>
             <div className="text-xs text-text-muted mt-1">CRM fields protected for admin</div>

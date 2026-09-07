@@ -159,8 +159,8 @@ html.dark {
 }
 
 @theme {
-  --font-sans: "Inter", "Manrope", ui-sans-serif, system-ui, sans-serif;
-  --font-display: "Manrope", "Inter", sans-serif;
+  --font-sans: "Manrope", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --font-display: "Manrope", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
 
   /* Custom colors matching the user palette dynamically using CSS custom variables */
@@ -226,22 +226,56 @@ html {
   }
 }
 
+html {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
+  box-sizing: border-box;
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
 html[data-theme="dark"],
 html.dark {
   color-scheme: dark;
+}
+
+html,
+body {
+  font-family: var(--font-sans, "Manrope", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif);
+  font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  letter-spacing: -0.011em;
 }
 
 body {
   margin: 0;
   padding: 0;
   width: 100%;
+  max-width: 100%;
   min-height: 100vh;
   background-color: var(--bg-primary);
   color: var(--text-primary);
-  overflow-x: clip;
+  overflow-x: hidden;
   position: relative;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+/* Ensure form controls, buttons and typography inherit Manrope seamlessly */
+input,
+button,
+select,
+textarea,
+optgroup {
+  font-family: inherit;
+}
+
+/* Numeric Legibility & Alignment for CRM & Metrics */
+.tabular-nums,
+[data-tabular-nums] {
+  font-variant-numeric: tabular-nums;
 }
 
 /* Hardware-accelerated fixed background canvas - eliminates costly scroll repainting while preserving the exact gradient aesthetic */
@@ -262,8 +296,10 @@ main,
 #portfolio-app-root,
 #main-content {
   width: 100%;
+  max-width: 100%;
   min-height: 100%;
-  overflow-x: clip;
+  overflow-x: hidden;
+  box-sizing: border-box;
 }
 
 /* Targeted smooth theme transition on core surface elements */
@@ -406,9 +442,34 @@ main,
   overflow: visible !important;
 }
 
+@media (max-width: 960px) {
+  .site-header {
+    min-height: 60px !important;
+  }
+
+  .header-inner,
+  .header-container {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    min-height: 60px !important;
+    padding: 0 16px !important;
+    box-sizing: border-box !important;
+    column-gap: 8px !important;
+    gap: 8px !important;
+  }
+
+  .header-navigation,
+  .main-navigation {
+    display: none !important;
+  }
+}
+
 @media (max-width: 768px) {
   .site-header {
-    min-height: 64px;
+    min-height: 58px !important;
     box-shadow: 0 6px 18px rgba(26, 9, 10, 0.07) !important;
   }
 
@@ -418,8 +479,21 @@ main,
 
   .header-inner,
   .header-container {
-    min-height: 64px;
-    width: calc(100% - 24px);
+    min-height: 58px !important;
+    padding: 0 14px !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .site-header {
+    min-height: 54px !important;
+  }
+
+  .header-inner,
+  .header-container {
+    min-height: 54px !important;
+    padding: 0 10px !important;
+    gap: 6px !important;
   }
 }
 
@@ -1471,12 +1545,21 @@ a.btn-primary:hover {
   justify-content: space-between;
   position: relative;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  cursor: pointer;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  outline: none;
   transition:
     background-color 0.25s ease,
     border-color 0.25s ease,
     color 0.25s ease,
     box-shadow 0.25s ease,
     transform 0.25s ease;
+}
+
+.service-card:focus-visible {
+  outline: 2px solid var(--accent-primary);
+  outline-offset: 2px;
 }
 
 /* Base Child Elements Default Styles */
@@ -1894,27 +1977,29 @@ section[id] {
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 }
 
-.dark .darkThemeBtn label {
+.dark .darkThemeBtn label,
+[data-theme="dark"] .darkThemeBtn label {
   border-color: rgba(255, 255, 255, 0.16);
   background: rgba(255, 255, 255, 0.08);
 }
 
 .darkThemeBtn label:active {
-  border-radius: 5px;
+  border-radius: 8px;
   transform: scale(0.96);
 }
 
 .darkThemeBtn label svg {
   position: absolute;
-  width: 16px;
-  height: 16px;
-  transition: 0.3s;
+  width: 18px;
+  height: 18px;
+  transition: opacity 0.3s ease, transform 0.3s ease, fill 0.3s ease;
   z-index: 1;
   fill: #1A090A;
   pointer-events: none;
 }
 
-.dark .darkThemeBtn label svg {
+.dark .darkThemeBtn label svg,
+[data-theme="dark"] .darkThemeBtn label svg {
   fill: #FFFFFF;
 }
 
@@ -1922,26 +2007,36 @@ section[id] {
   width: 20px;
   height: 20px;
   opacity: 0;
-  fill: #fff;
+  fill: #FFFFFF;
 }
 
 .darkThemeBtn label svg.moon {
   opacity: 1;
+  fill: #1A090A;
 }
 
 .darkThemeBtn input:checked + label {
-  background: var(--accent-primary, #A50C18);
-  border-color: var(--accent-primary, #A50C18);
+  background: var(--accent-primary, #A50C18) !important;
+  border-color: var(--accent-primary, #A50C18) !important;
   box-shadow: 0 2px 10px rgba(165, 12, 24, 0.35);
 }
 
 .darkThemeBtn input:checked + label svg.sun {
-  opacity: 1;
-  fill: #fff;
+  opacity: 1 !important;
+  fill: #FFFFFF !important;
 }
 
 .darkThemeBtn input:checked + label svg.moon {
-  opacity: 0;
+  opacity: 0 !important;
+}
+
+.darkThemeBtn input:not(:checked) + label svg.sun {
+  opacity: 0 !important;
+}
+
+.darkThemeBtn input:not(:checked) + label svg.moon {
+  opacity: 1 !important;
+  fill: #1A090A !important;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -2005,104 +2100,140 @@ img, video, canvas, svg {
 @media (max-width: 768px) {
   .header-inner,
   .header-container {
-    width: calc(100% - 20px) !important;
-    min-height: 60px !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+    min-height: 58px !important;
   }
 
   .header-avatar,
   .header-brand-image {
-    width: 36px !important;
-    height: 36px !important;
-    min-width: 36px !important;
+    width: 34px !important;
+    height: 34px !important;
+    min-width: 34px !important;
+  }
+
+  .header-actions {
+    gap: 8px !important;
   }
 }
 
-@media (max-width: 380px) {
+/* On mobile screens (<640px), WhatsApp & Resume are accessible via the mobile menu drawer to prevent header clipping */
+@media (max-width: 639px) {
+  .site-header .whatsapp-button {
+    display: none !important;
+  }
+  .site-header .resume-button {
+    display: none !important;
+  }
+}
+
+@media (max-width: 480px) {
   .header-inner,
   .header-container {
-    width: calc(100% - 12px) !important;
-    min-height: 56px !important;
+    padding: 0 12px !important;
+    min-height: 54px !important;
   }
 
   .header-brand-name {
-    font-size: 1.05rem !important;
+    font-size: 0.95rem !important;
   }
 
   .header-actions {
     gap: 6px !important;
   }
+}
 
-  .theme-toggle {
-    width: 38px !important;
-    height: 38px !important;
-    min-height: 38px !important;
+@media (max-width: 360px) {
+  .header-inner,
+  .header-container {
+    padding: 0 8px !important;
+  }
+
+  .header-brand-name {
+    font-size: 0.88rem !important;
+  }
+
+  .header-actions {
+    gap: 4px !important;
   }
 }
 
-/* Mobile Hero Floating Cards (<640px) */
+/* Mobile Hero Elements - Natural Responsive Dimensions (NO transform: scale) */
 @media (max-width: 640px) {
   #portrait-container {
-    width: 290px !important;
-    height: 290px !important;
     max-width: calc(100vw - 32px) !important;
   }
 
-  #portrait-container .software-floating-card {
-    transform: scale(0.85);
-    transform-origin: center center;
+  .software-floating-card {
+    padding: 4px 8px !important;
+    gap: 6px !important;
   }
 
   #hero-floating-badge {
-    transform: scale(0.88);
-    transform-origin: bottom right;
+    padding: 6px 12px !important;
   }
 }
 
 @media (max-width: 480px) {
   #portrait-container {
-    width: 270px !important;
-    height: 270px !important;
     max-width: calc(100vw - 24px) !important;
   }
 
-  #portrait-container .software-floating-card {
-    transform: scale(0.78);
-    padding: 4px 6px !important;
+  .software-floating-card {
+    padding: 3px 6px !important;
+    gap: 4px !important;
+    border-radius: 12px !important;
   }
 
   #hero-floating-badge {
-    transform: scale(0.82);
-    padding: 6px 10px !important;
+    padding: 4px 10px !important;
+    border-radius: 12px !important;
   }
 }
 
 @media (max-width: 360px) {
   #portrait-container {
-    width: 240px !important;
-    height: 240px !important;
+    max-width: calc(100vw - 16px) !important;
   }
 
-  #portrait-container .software-floating-card {
-    transform: scale(0.70);
-  }
-
-  #hero-floating-badge {
-    transform: scale(0.74);
+  .software-floating-card {
+    padding: 2px 5px !important;
+    gap: 4px !important;
   }
 }
 
-/* Floating Controls Responsiveness on small screens */
-@media (max-width: 480px) {
+/* Floating Controls Responsiveness with safe-area support */
+.floating-controls {
+  position: fixed;
+  right: 20px;
+  bottom: max(20px, env(safe-area-inset-bottom, 20px));
+  z-index: 9998;
+  display: flex;
+  flex-direction: column-reverse;
+  align-items: flex-end;
+  gap: 12px;
+  pointer-events: none;
+}
+
+.floating-controls button,
+.floating-controls a {
+  pointer-events: auto;
+}
+
+@media (max-width: 640px) {
   .floating-controls {
-    bottom: 16px !important;
+    bottom: max(16px, env(safe-area-inset-bottom, 16px)) !important;
     right: 14px !important;
-    gap: 8px !important;
+    gap: 10px !important;
   }
 
   .floating-controls button,
   .floating-controls a {
     width: 44px !important;
     height: 44px !important;
+    min-width: 44px !important;
+    min-height: 44px !important;
   }
 }
 

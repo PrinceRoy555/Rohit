@@ -91,40 +91,40 @@ export const TodayDashboardSummary: React.FC<TodayDashboardSummaryProps> = ({
         <span className="text-[11px] text-text-muted">Live sync from Firestore</span>
       </div>
 
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-4">
         {cards.map((card) => {
           const Icon = card.icon;
           return (
             <div
               key={card.id}
               onClick={() => onSelectMetric(card.id)}
-              className={`p-4 rounded-2xl border transition-all cursor-pointer group shadow-sm hover:shadow-md flex flex-col justify-between ${
+              className={`p-3 sm:p-4 rounded-xl border transition-all cursor-pointer group shadow-xs hover:shadow-md flex flex-col justify-between select-none active:scale-98 ${
                 card.isAlert
                   ? 'bg-red-500/5 dark:bg-red-500/10 border-red-500/40 hover:border-red-500'
                   : 'bg-bg-card hover:bg-bg-card-hover border-border-color hover:border-rose-500/40'
               }`}
             >
-              <div className="flex items-start justify-between gap-2">
-                <div className={`w-9 h-9 rounded-xl flex items-center justify-center border ${card.color}`}>
-                  <Icon className="w-4 h-4" />
+              <div className="flex items-start justify-between gap-1.5">
+                <div className={`w-8 sm:w-9 h-8 sm:h-9 rounded-lg sm:rounded-xl flex items-center justify-center border flex-shrink-0 ${card.color}`}>
+                  <Icon className="w-3.5 sm:w-4 h-3.5 sm:h-4" />
                 </div>
 
-                <div className="flex items-center gap-1">
+                <div className="flex items-center gap-1 flex-wrap justify-end">
                   {card.badge && (
-                    <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${card.badgeColor}`}>
+                    <span className={`px-1.5 sm:px-2 py-0.5 rounded-full text-[9px] sm:text-[10px] font-bold ${card.badgeColor}`}>
                       {card.badge}
                     </span>
                   )}
-                  <ArrowUpRight className="w-3.5 h-3.5 text-text-muted group-hover:text-text-primary group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all" />
+                  <ArrowUpRight className="w-3.5 h-3.5 text-text-muted group-hover:text-text-primary group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all flex-shrink-0 hidden xs:block" />
                 </div>
               </div>
 
-              <div className="mt-3">
-                <div className="text-2xl sm:text-3xl font-extrabold text-text-primary tracking-tight font-mono">
+              <div className="mt-2.5 sm:mt-3">
+                <div className="text-xl sm:text-2xl font-bold text-text-primary tracking-tight tabular-nums">
                   {card.count}
                 </div>
-                <div className="text-xs font-bold text-text-primary mt-0.5">{card.label}</div>
-                <div className="text-[11px] text-text-muted mt-0.5 truncate">{card.subtext}</div>
+                <div className="text-xs font-semibold text-text-primary mt-0.5 truncate">{card.label}</div>
+                <div className="text-[10px] sm:text-[11px] text-text-muted mt-0.5 truncate">{card.subtext}</div>
               </div>
             </div>
           );

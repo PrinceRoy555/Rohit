@@ -71,28 +71,28 @@ export const TodaysFollowUps: React.FC<TodaysFollowUpsProps> = ({
   };
 
   return (
-    <div className="bg-bg-card border border-border-color rounded-2xl p-5 sm:p-6 shadow-sm text-text-primary transition-colors duration-200">
+    <div className="bg-bg-card border border-border-color rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-xs text-text-primary transition-colors duration-200">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-border-color">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 pb-3.5 border-b border-border-color">
         <div className="space-y-1">
-          <div className="flex items-center gap-2.5 flex-wrap">
-            <h3 className="text-lg sm:text-xl font-bold text-text-primary flex items-center gap-2">
-              <Clock className="w-5 h-5 text-rose-600 dark:text-rose-400" />
+          <div className="flex items-center gap-2 flex-wrap">
+            <h3 className="text-base sm:text-xl font-bold text-text-primary flex items-center gap-2">
+              <Clock className="w-4 sm:w-5 h-4 sm:h-5 text-rose-600 dark:text-rose-400" />
               <span>Today&apos;s Follow-ups</span>
             </h3>
 
             {overdueLeads.length > 0 && (
-              <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-rose-500/15 text-rose-600 dark:text-rose-400 border border-rose-500/30 flex items-center gap-1">
+              <span className="px-2 py-0.5 rounded-full text-[11px] font-bold bg-rose-500/15 text-rose-600 dark:text-rose-400 border border-rose-500/30 flex items-center gap-1">
                 <span className="w-1.5 h-1.5 rounded-full bg-rose-500 animate-pulse" />
                 <span>{overdueLeads.length} Overdue</span>
               </span>
             )}
 
-            <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-bg-secondary text-text-muted border border-border-color">
+            <span className="px-2 py-0.5 rounded-full text-[11px] font-semibold bg-bg-secondary text-text-muted border border-border-color">
               {todayLeads.length} Due Today
             </span>
           </div>
-          <p className="text-xs text-text-muted">
+          <p className="text-[11px] sm:text-xs text-text-muted">
             Prioritized leads needing client check-in, revised quotes, or call follow-ups.
           </p>
         </div>
@@ -100,7 +100,7 @@ export const TodaysFollowUps: React.FC<TodaysFollowUpsProps> = ({
         {onViewAll && !isFullView && (
           <button
             onClick={onViewAll}
-            className="flex items-center gap-1.5 text-xs font-semibold text-rose-600 dark:text-rose-400 hover:text-rose-700 dark:hover:text-rose-300 transition-colors self-start sm:self-auto py-1"
+            className="flex items-center gap-1.5 text-xs font-semibold text-rose-600 dark:text-rose-400 hover:text-rose-700 dark:hover:text-rose-300 transition-colors self-start sm:self-auto py-1 min-h-[36px]"
           >
             <span>View All ({leads.filter((l) => Boolean(l.followUpAt)).length})</span>
             <ArrowRight className="w-3.5 h-3.5" />
@@ -110,62 +110,62 @@ export const TodaysFollowUps: React.FC<TodaysFollowUpsProps> = ({
 
       {/* Filter Tabs (Enabled for full view mode) */}
       {isFullView && (
-        <div className="flex flex-wrap gap-2 my-4">
+        <div className="flex gap-2 overflow-x-auto pb-1.5 my-3.5 no-scrollbar">
           <button
             onClick={() => setActiveFilter('today')}
-            className={`px-3.5 py-1.5 rounded-xl text-xs font-semibold transition-all flex items-center gap-2 ${
+            className={`min-h-[38px] px-3.5 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition-all flex items-center gap-2 ${
               activeFilter === 'today'
-                ? 'bg-rose-600 text-white shadow-sm'
+                ? 'bg-rose-600 text-white shadow-xs'
                 : 'bg-bg-secondary text-text-muted hover:text-text-primary border border-border-color'
             }`}
           >
             <span>Due Today</span>
-            <span className="px-1.5 py-0.5 rounded-md bg-black/20 text-[10px]">{todayLeads.length}</span>
+            <span className="px-1.5 py-0.2 rounded-md bg-black/20 text-[10px]">{todayLeads.length}</span>
           </button>
 
           <button
             onClick={() => setActiveFilter('overdue')}
-            className={`px-3.5 py-1.5 rounded-xl text-xs font-semibold transition-all flex items-center gap-2 ${
+            className={`min-h-[38px] px-3.5 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition-all flex items-center gap-2 ${
               activeFilter === 'overdue'
-                ? 'bg-rose-600 text-white shadow-sm'
+                ? 'bg-rose-600 text-white shadow-xs'
                 : 'bg-bg-secondary text-text-muted hover:text-text-primary border border-border-color'
             }`}
           >
             <span>Overdue</span>
-            <span className="px-1.5 py-0.5 rounded-md bg-black/20 text-[10px]">{overdueLeads.length}</span>
+            <span className="px-1.5 py-0.2 rounded-md bg-black/20 text-[10px]">{overdueLeads.length}</span>
           </button>
 
           <button
             onClick={() => setActiveFilter('upcoming')}
-            className={`px-3.5 py-1.5 rounded-xl text-xs font-semibold transition-all flex items-center gap-2 ${
+            className={`min-h-[38px] px-3.5 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition-all flex items-center gap-2 ${
               activeFilter === 'upcoming'
-                ? 'bg-rose-600 text-white shadow-sm'
+                ? 'bg-rose-600 text-white shadow-xs'
                 : 'bg-bg-secondary text-text-muted hover:text-text-primary border border-border-color'
             }`}
           >
             <span>Upcoming</span>
-            <span className="px-1.5 py-0.5 rounded-md bg-black/20 text-[10px]">{upcomingLeads.length}</span>
+            <span className="px-1.5 py-0.2 rounded-md bg-black/20 text-[10px]">{upcomingLeads.length}</span>
           </button>
 
           <button
             onClick={() => setActiveFilter('completed')}
-            className={`px-3.5 py-1.5 rounded-xl text-xs font-semibold transition-all flex items-center gap-2 ${
+            className={`min-h-[38px] px-3.5 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition-all flex items-center gap-2 ${
               activeFilter === 'completed'
-                ? 'bg-rose-600 text-white shadow-sm'
+                ? 'bg-rose-600 text-white shadow-xs'
                 : 'bg-bg-secondary text-text-muted hover:text-text-primary border border-border-color'
             }`}
           >
             <span>Completed</span>
-            <span className="px-1.5 py-0.5 rounded-md bg-black/20 text-[10px]">{completedLeads.length}</span>
+            <span className="px-1.5 py-0.2 rounded-md bg-black/20 text-[10px]">{completedLeads.length}</span>
           </button>
         </div>
       )}
 
       {/* Follow-ups List */}
-      <div className="mt-4 space-y-3">
+      <div className="mt-3.5 space-y-3">
         {dashboardDisplayLeads.length === 0 ? (
-          <div className="py-10 text-center rounded-xl bg-bg-secondary border border-border-color p-6">
-            <CheckCircle2 className="w-9 h-9 text-emerald-500 mx-auto mb-2 opacity-80" />
+          <div className="py-8 text-center rounded-xl bg-bg-secondary border border-border-color p-5">
+            <CheckCircle2 className="w-8 h-8 text-emerald-500 mx-auto mb-2 opacity-80" />
             <h4 className="text-sm font-bold text-text-primary">No follow-ups due today</h4>
             <p className="text-xs text-text-muted mt-1 max-w-sm mx-auto">
               You are completely caught up! Schedule next actions from the Lead Inbox to see them here.
@@ -183,7 +183,7 @@ export const TodaysFollowUps: React.FC<TodaysFollowUpsProps> = ({
               <div
                 key={lead.id}
                 onClick={() => onOpenLead(lead)}
-                className={`p-4 sm:p-5 rounded-2xl border transition-all cursor-pointer group flex flex-col md:flex-row md:items-center justify-between gap-4 ${
+                className={`p-3.5 sm:p-5 rounded-xl sm:rounded-2xl border transition-all cursor-pointer group flex flex-col md:flex-row md:items-center justify-between gap-3 sm:gap-4 ${
                   isOverdue
                     ? 'bg-rose-500/5 dark:bg-rose-500/10 border-rose-500/30 hover:border-rose-500/50 shadow-xs'
                     : isCompleted
@@ -193,17 +193,15 @@ export const TodaysFollowUps: React.FC<TodaysFollowUpsProps> = ({
               >
                 {/* Left: Client & Action details */}
                 <div className="space-y-1.5 flex-1 min-w-0">
-                  <div className="flex items-center gap-2.5 flex-wrap">
+                  <div className="flex items-center gap-1.5 sm:gap-2.5 flex-wrap">
                     {/* Time Badge */}
-                    <div className="flex items-center gap-1.5">
-                      <span className={`px-2.5 py-1 rounded-lg text-xs font-bold font-mono ${
-                        isOverdue
-                          ? 'bg-rose-500/20 text-rose-600 dark:text-rose-400'
-                          : 'bg-bg-card text-text-primary border border-border-color'
-                      }`}>
-                        {lead.followUpAt ? formatFollowUpDateTime(lead.followUpAt) : 'Scheduled'}
-                      </span>
-                    </div>
+                    <span className={`px-2 py-0.5 rounded-lg text-xs font-semibold tabular-nums ${
+                      isOverdue
+                        ? 'bg-rose-500/20 text-rose-600 dark:text-rose-400'
+                        : 'bg-bg-card text-text-primary border border-border-color'
+                    }`}>
+                      {lead.followUpAt ? formatFollowUpDateTime(lead.followUpAt) : 'Scheduled'}
+                    </span>
 
                     <h4 className="text-sm font-bold text-text-primary truncate group-hover:text-rose-600 dark:group-hover:text-rose-400 transition-colors">
                       {lead.name}
@@ -225,12 +223,7 @@ export const TodaysFollowUps: React.FC<TodaysFollowUpsProps> = ({
                     {/* Priority Badge */}
                     {lead.priority === 'high' && (
                       <span className="px-2 py-0.5 rounded-md text-[10px] font-bold bg-rose-500/15 text-rose-600 dark:text-rose-400">
-                        High Priority
-                      </span>
-                    )}
-                    {lead.priority === 'low' && (
-                      <span className="px-2 py-0.5 rounded-md text-[10px] font-medium bg-bg-card text-text-muted border border-border-color">
-                        Low
+                        High
                       </span>
                     )}
 
@@ -243,79 +236,83 @@ export const TodaysFollowUps: React.FC<TodaysFollowUpsProps> = ({
                   </div>
 
                   {/* Service & Contact info */}
-                  <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-text-muted">
+                  <div className="flex flex-wrap items-center gap-x-2.5 gap-y-1 text-xs text-text-muted">
                     <span className="text-text-secondary font-medium">{lead.service}</span>
-                    <span className="capitalize px-2 py-0.5 rounded bg-bg-card border border-border-color text-[11px]">
+                    <span className="capitalize px-1.5 py-0.2 rounded bg-bg-card border border-border-color text-[10px]">
                       {lead.status}
                     </span>
-                    {lead.email && <span className="truncate">{lead.email}</span>}
+                    {lead.email && <span className="truncate text-text-muted/80">{lead.email}</span>}
                   </div>
 
                   {/* Next Action */}
                   <div className="mt-1 flex items-start gap-1.5 text-xs">
                     <span className="font-semibold text-text-secondary flex-shrink-0">Next Action:</span>
-                    <span className="text-text-primary font-medium italic">
+                    <span className="text-text-primary font-medium italic truncate">
                       {lead.nextAction || 'Contact client to follow up on inquiry'}
                     </span>
                   </div>
                 </div>
 
-                {/* Right: Quick Actions */}
+                {/* Right: Quick Actions - Full width row on mobile */}
                 <div
-                  className="flex items-center gap-2 flex-wrap self-end md:self-center"
+                  className="w-full md:w-auto flex items-center justify-between md:justify-end gap-2 pt-2 md:pt-0 border-t border-border-color/50 md:border-0"
                   onClick={(e) => e.stopPropagation()}
                 >
-                  {lead.phone && (
-                    <>
-                      <a
-                        href={`tel:${cleanPhone}`}
-                        className="p-2 rounded-xl bg-bg-card hover:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border border-border-color hover:border-emerald-500/30 transition-colors"
-                        title={`Call ${lead.phone}`}
-                        aria-label="Call Client"
-                      >
-                        <Phone className="w-3.5 h-3.5" />
-                      </a>
+                  <div className="flex items-center gap-1.5">
+                    {lead.phone && (
+                      <>
+                        <a
+                          href={`tel:${cleanPhone}`}
+                          className="w-9 h-9 rounded-xl bg-bg-card hover:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border border-border-color hover:border-emerald-500/30 transition-colors flex items-center justify-center active:scale-95"
+                          title={`Call ${lead.phone}`}
+                          aria-label="Call Client"
+                        >
+                          <Phone className="w-4 h-4" />
+                        </a>
 
-                      <a
-                        href={`https://wa.me/${waPhone}?text=${encodeURIComponent(`Hi ${lead.name}, checking in regarding your inquiry for ${lead.service}:`)}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="p-2 rounded-xl bg-bg-card hover:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border border-border-color hover:border-emerald-500/30 transition-colors"
-                        title="Chat on WhatsApp"
-                        aria-label="WhatsApp"
-                      >
-                        <MessageCircle className="w-3.5 h-3.5" />
-                      </a>
-                    </>
-                  )}
+                        <a
+                          href={`https://wa.me/${waPhone}?text=${encodeURIComponent(`Hi ${lead.name}, checking in regarding your inquiry for ${lead.service}:`)}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="w-9 h-9 rounded-xl bg-bg-card hover:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border border-border-color hover:border-emerald-500/30 transition-colors flex items-center justify-center active:scale-95"
+                          title="Chat on WhatsApp"
+                          aria-label="WhatsApp"
+                        >
+                          <MessageCircle className="w-4 h-4" />
+                        </a>
+                      </>
+                    )}
 
-                  <a
-                    href={`mailto:${lead.email}?subject=${encodeURIComponent(`Follow-up: ${lead.service}`)}`}
-                    className="p-2 rounded-xl bg-bg-card hover:bg-rose-500/20 text-rose-600 dark:text-rose-400 border border-border-color hover:border-rose-500/30 transition-colors"
-                    title={`Email ${lead.email}`}
-                    aria-label="Email Client"
-                  >
-                    <Mail className="w-3.5 h-3.5" />
-                  </a>
-
-                  <button
-                    onClick={() => onOpenLead(lead)}
-                    className="px-3 py-1.5 rounded-xl text-xs font-semibold bg-bg-card hover:bg-bg-card-hover text-text-primary border border-border-color transition-colors"
-                  >
-                    Open Lead
-                  </button>
-
-                  {!isCompleted && (
-                    <button
-                      onClick={(e) => handleDone(e, lead.id)}
-                      disabled={completingId === lead.id}
-                      className="px-3.5 py-1.5 rounded-xl text-xs font-semibold bg-emerald-600 hover:bg-emerald-700 text-white shadow-sm flex items-center gap-1.5 transition-all"
-                      title="Mark follow-up completed"
+                    <a
+                      href={`mailto:${lead.email}?subject=${encodeURIComponent(`Follow-up: ${lead.service}`)}`}
+                      className="w-9 h-9 rounded-xl bg-bg-card hover:bg-rose-500/20 text-rose-600 dark:text-rose-400 border border-border-color hover:border-rose-500/30 transition-colors flex items-center justify-center active:scale-95"
+                      title={`Email ${lead.email}`}
+                      aria-label="Email Client"
                     >
-                      <CheckCircle2 className="w-3.5 h-3.5" />
-                      <span>{completingId === lead.id ? 'Saving...' : 'Done'}</span>
+                      <Mail className="w-4 h-4" />
+                    </a>
+                  </div>
+
+                  <div className="flex items-center gap-1.5">
+                    <button
+                      onClick={() => onOpenLead(lead)}
+                      className="min-h-[38px] px-3 py-1.5 rounded-xl text-xs font-semibold bg-bg-card hover:bg-bg-card-hover text-text-primary border border-border-color transition-colors active:scale-95"
+                    >
+                      Open Lead
                     </button>
-                  )}
+
+                    {!isCompleted && (
+                      <button
+                        onClick={(e) => handleDone(e, lead.id)}
+                        disabled={completingId === lead.id}
+                        className="min-h-[38px] px-3.5 py-1.5 rounded-xl text-xs font-semibold bg-emerald-600 hover:bg-emerald-700 text-white shadow-xs flex items-center gap-1.5 transition-all active:scale-95"
+                        title="Mark follow-up completed"
+                      >
+                        <CheckCircle2 className="w-3.5 h-3.5" />
+                        <span>{completingId === lead.id ? 'Saving...' : 'Done'}</span>
+                      </button>
+                    )}
+                  </div>
                 </div>
               </div>
             );

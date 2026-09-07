@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
+import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'motion/react';
-import { Instagram, Linkedin, Github, MessageSquare, ArrowRight, CheckCircle2, X, Phone, Mail, Lock } from 'lucide-react';
+import { Instagram, Linkedin, Github, MessageSquare, ArrowRight, CheckCircle2, X, Phone, Mail, Lock, FileText } from 'lucide-react';
 import { WHATSAPP_BUSINESS_URL, contactConfig } from '../data';
+import { useBodyScrollLock } from '../lib/scrollLock';
 import WhatsAppIcon from './WhatsAppIcon';
 import { subscribeToNewsletter } from '../services/firebase/firestore';
 import PrivacyPolicyContent from './PrivacyPolicyContent';
@@ -18,6 +20,8 @@ export default function Footer({ onNavigate }: FooterProps = {}) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState('');
   const [activeModal, setActiveModal] = useState<'privacy' | 'terms' | null>(null);
+
+  useBodyScrollLock(activeModal !== null);
 
   const handleHomeNav = (e?: React.MouseEvent) => {
     if (e) e.preventDefault();
@@ -206,6 +210,17 @@ export default function Footer({ onNavigate }: FooterProps = {}) {
                 </button>
               </li>
             ))}
+            <li>
+              <a
+                href={contactConfig.resumePdfUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hover:text-accent-primary transition-colors text-left cursor-pointer text-text-secondary inline-flex items-center gap-1.5"
+                title="Download Rohit Verma's Resume"
+              >
+                <span>Resume (PDF)</span>
+              </a>
+            </li>
           </ul>
         </div>
 
@@ -329,46 +344,49 @@ export default function Footer({ onNavigate }: FooterProps = {}) {
         </div>
       </div>
 
-      {/* Custom Policy Modal overlay */}
-      <AnimatePresence>
-        {activeModal && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 md:p-6"
-            onClick={() => setActiveModal(null)}
-          >
+      {/* Custom Policy Modal overlay portalled to document.body */}
+      {typeof document !== 'undefined' && createPortal(
+        <AnimatePresence>
+          {activeModal && (
             <motion.div
-              initial={{ scale: 0.95, y: 20 }}
-              animate={{ scale: 1, y: 0 }}
-              exit={{ scale: 0.95, y: 20 }}
-              onClick={(e) => e.stopPropagation()}
-              className="bg-bg-card border border-border-color rounded-2xl w-full shadow-2xl relative flex flex-col max-w-4xl max-h-[85vh] p-6 md:p-8"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 z-[99999] bg-black/80 backdrop-blur-md flex items-center justify-center p-4 md:p-6"
+              onClick={() => setActiveModal(null)}
             >
-              <button
-                onClick={() => setActiveModal(null)}
-                className="absolute top-4 right-4 p-1.5 rounded-full bg-bg-primary hover:bg-accent-primary/20 border border-border-color text-text-secondary hover:text-accent-primary cursor-pointer transition-colors z-20"
-                aria-label="Close"
+              <motion.div
+                initial={{ scale: 0.95, y: 20 }}
+                animate={{ scale: 1, y: 0 }}
+                exit={{ scale: 0.95, y: 20 }}
+                onClick={(e) => e.stopPropagation()}
+                className="bg-bg-card border border-border-color rounded-2xl w-full shadow-2xl relative flex flex-col max-w-4xl max-h-[85vh] p-6 md:p-8"
               >
-                <X className="w-4 h-4" />
-              </button>
-
-              <div className="overflow-y-auto pr-2 custom-scrollbar flex-1 mb-4">
-                {activeModal === 'privacy' ? <PrivacyPolicyContent /> : <TermsAndConditionsContent />}
-              </div>
-              <div className="pt-4 border-t border-border-color flex justify-end">
                 <button
                   onClick={() => setActiveModal(null)}
-                  className="px-6 py-2.5 rounded-xl bg-accent-primary text-white font-bold text-xs hover:bg-accent-secondary active:scale-95 transition-all cursor-pointer"
+                  className="absolute top-4 right-4 p-1.5 rounded-full bg-bg-primary hover:bg-accent-primary/20 border border-border-color text-text-secondary hover:text-accent-primary cursor-pointer transition-colors z-20"
+                  aria-label="Close"
                 >
-                  Close
+                  <X className="w-4 h-4" />
                 </button>
-              </div>
+
+                <div className="overflow-y-auto pr-2 custom-scrollbar flex-1 mb-4">
+                  {activeModal === 'privacy' ? <PrivacyPolicyContent /> : <TermsAndConditionsContent />}
+                </div>
+                <div className="pt-4 border-t border-border-color flex justify-end">
+                  <button
+                    onClick={() => setActiveModal(null)}
+                    className="px-6 py-2.5 rounded-xl bg-accent-primary text-white font-bold text-xs hover:bg-accent-secondary active:scale-95 transition-all cursor-pointer"
+                  >
+                    Close
+                  </button>
+                </div>
+              </motion.div>
             </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+          )}
+        </AnimatePresence>,
+        document.body
+      )}
     </footer>
   );
 }

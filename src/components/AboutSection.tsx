@@ -58,7 +58,7 @@ function AnimatedCounter({ value, suffix = '', duration = 1500 }: CounterProps) 
   }, [isVisible, value, duration]);
 
   return (
-    <span ref={elementRef} className="text-2xl min-[380px]:text-3xl sm:text-4xl md:text-5xl font-extrabold text-accent-primary" id={`counter-${value}`}>
+    <span ref={elementRef} className="text-2xl sm:text-3xl font-bold text-accent-primary tabular-nums tracking-tight" id={`counter-${value}`}>
       {count}
       {suffix}
     </span>
@@ -170,26 +170,23 @@ export default function AboutSection({ onNavigate }: AboutSectionProps = {}) {
               Rohit Verma is a Jaipur-based Graphic Designer, Video Editor, Brand Strategist and Founder of Unicivix Solutions, with more than five years of experience in creative and digital services.
             </motion.p>
 
-            {/* Achievement Counters */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-6 mb-6 sm:mb-8" id="about-achievements">
+              {/* Achievement Counters */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 mb-6 sm:mb-8" id="about-achievements">
               {achievements.map((item, idx) => (
                 <motion.div
-                  initial={{ opacity: 0, y: 20 }}
+                  initial={{ opacity: 0, y: 15 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
-                  transition={{ duration: 0.5, delay: 0.1 * idx }}
+                  transition={{ duration: 0.4, delay: 0.08 * idx }}
                   key={idx}
-                  className="bg-bg-card border border-border-color p-3 sm:p-4 rounded-xl sm:rounded-2xl flex flex-col items-center text-center hover:border-accent-primary/52 transition-all duration-300 hover:shadow-[0_18px_48px_var(--shadow-color)] hover:-translate-y-1"
+                  className="bg-bg-card border border-border-color p-3.5 sm:p-4 rounded-xl flex flex-col items-center text-center hover:border-border-color/90 hover:shadow-xs transition-all duration-150"
                   id={`achievement-${idx}`}
                 >
-                  <div
-                    className="w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center mb-2 sm:mb-3"
-                    style={{ backgroundColor: 'var(--shadow-color)', color: 'var(--accent-primary)' }}
-                  >
-                    <item.icon className="w-4 h-4 sm:w-5 sm:h-5" />
+                  <div className="w-8 h-8 rounded-lg bg-accent-primary/10 text-accent-primary flex items-center justify-center mb-2.5">
+                    <item.icon className="w-4 h-4" />
                   </div>
                   <AnimatedCounter value={item.value} suffix={item.suffix} />
-                  <span className="text-text-secondary text-[10px] sm:text-[11px] font-medium uppercase tracking-wider mt-1.5 sm:mt-2">
+                  <span className="text-text-muted text-[10px] sm:text-[11px] font-semibold uppercase tracking-wider mt-1.5">
                     {item.label}
                   </span>
                 </motion.div>
@@ -205,7 +202,7 @@ export default function AboutSection({ onNavigate }: AboutSectionProps = {}) {
             >
               <button
                 onClick={handleNavigateToAbout}
-                className="w-full sm:w-auto bg-accent-primary hover:bg-accent-secondary text-white font-extrabold px-7 py-3.5 sm:px-8 sm:py-4 rounded-full transition-all duration-200 shadow-lg hover:shadow-[0_12px_32px_var(--shadow-color)] active:scale-95 cursor-pointer text-sm sm:text-base text-center"
+                className="w-full sm:w-auto bg-accent-primary hover:bg-accent-secondary text-white font-semibold px-6 py-3 sm:px-7 sm:py-3.5 rounded-xl transition-all duration-150 shadow-xs active:scale-[0.98] cursor-pointer text-sm sm:text-base text-center"
                 id="about-me-btn"
               >
                 Know More About Me

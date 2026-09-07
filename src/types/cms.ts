@@ -49,8 +49,8 @@ export interface ThemeConfig {
   textPrimary: string;       // e.g. #1A090A or #FFFFFF
   textSecondary: string;     // e.g. rgba(26,9,10,0.82) or rgba(255,255,255,0.85)
   borderColor: string;       // e.g. rgba(26,9,10,0.12)
-  fontHeading: string;       // e.g. 'Plus Jakarta Sans', 'Syne', 'Outfit', 'Space Grotesk'
-  fontBody: string;          // e.g. 'Plus Jakarta Sans', 'Inter', 'Manrope'
+  fontHeading: string;       // e.g. 'Manrope', 'Plus Jakarta Sans', 'Syne', 'Outfit', 'Space Grotesk'
+  fontBody: string;          // e.g. 'Manrope', 'Plus Jakarta Sans', 'Inter'
   borderRadius: ThemeBorderRadius;
   mode: 'light' | 'dark' | 'system';
 }

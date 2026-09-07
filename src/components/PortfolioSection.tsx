@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'motion/react';
 import { ArrowLeft, ArrowRight, ChevronLeft, ChevronRight, X, ExternalLink, Calendar, User, Briefcase, Eye, Image as ImageIcon, Layers } from 'lucide-react';
 import { PROJECTS_DATA, PORTFOLIO_CATEGORIES } from '../data';
@@ -239,13 +240,13 @@ export default function PortfolioSection() {
       <div className="max-w-7xl mx-auto px-6 relative z-10">
         
         {/* Section Header */}
-        <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-6" id="portfolio-header">
+        <div className="flex flex-col md:flex-row md:items-end justify-between mb-10 gap-6" id="portfolio-header">
           <div className="max-w-xl">
             <motion.span
               initial={{ opacity: 0, y: 15 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              className="text-accent-primary font-bold text-xs uppercase tracking-widest bg-accent-primary/10 px-3 py-1.5 rounded-full inline-block mb-4"
+              className="text-accent-primary font-semibold text-xs tracking-widest uppercase mb-2 block"
             >
               My Works
             </motion.span>
@@ -254,7 +255,7 @@ export default function PortfolioSection() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: 0.1 }}
-              className="text-4xl md:text-5xl font-extrabold text-text-primary tracking-tight mb-4"
+              className="text-3xl md:text-4xl font-extrabold text-text-primary tracking-tight mb-3"
             >
               Recent Work<span className="text-accent-primary">.</span>
             </motion.h2>
@@ -270,12 +271,12 @@ export default function PortfolioSection() {
           </div>
 
           {/* Controls & Behance Link */}
-          <div className="flex flex-wrap items-center gap-3" id="portfolio-carousel-controls">
+          <div className="flex flex-wrap items-center gap-2.5" id="portfolio-carousel-controls">
             <a
               href="https://www.behance.net/gallery/254351431/Rohit-Verma-Creative-Portfolio-2026"
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center gap-2 bg-accent-primary hover:bg-accent-secondary text-white text-xs font-bold px-5 py-3.5 rounded-full transition-all shadow-md active:scale-95 cursor-pointer"
+              className="flex items-center gap-2 bg-accent-primary hover:bg-accent-secondary text-white text-xs font-semibold px-4 py-2.5 rounded-lg transition-all shadow-xs active:scale-[0.98] cursor-pointer"
               id="portfolio-behance-main-btn"
             >
               <span>View Behance Portfolio</span>
@@ -283,10 +284,10 @@ export default function PortfolioSection() {
             </a>
 
             {filteredProjects.length > 1 && (
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-1.5">
                 <button
                   onClick={handlePrev}
-                  className="w-11 h-11 rounded-full bg-bg-card border border-border-color flex items-center justify-center text-text-secondary hover:text-accent-primary hover:border-accent-primary hover:bg-bg-primary transition-all cursor-pointer"
+                  className="w-9 h-9 rounded-lg bg-bg-card border border-border-color flex items-center justify-center text-text-secondary hover:text-text-primary hover:bg-bg-secondary transition-colors cursor-pointer"
                   id="prev-slide-btn"
                   aria-label="Previous Project"
                 >
@@ -294,7 +295,7 @@ export default function PortfolioSection() {
                 </button>
                 <button
                   onClick={handleNext}
-                  className="w-11 h-11 rounded-full bg-bg-card border border-border-color flex items-center justify-center text-text-secondary hover:text-accent-primary hover:border-accent-primary hover:bg-bg-primary transition-all cursor-pointer"
+                  className="w-9 h-9 rounded-lg bg-bg-card border border-border-color flex items-center justify-center text-text-secondary hover:text-text-primary hover:bg-bg-secondary transition-colors cursor-pointer"
                   id="next-slide-btn"
                   aria-label="Next Project"
                 >
@@ -364,8 +365,8 @@ export default function PortfolioSection() {
             </div>
           ) : (
             <div className="relative" id="portfolio-slider-inner">
-              {/* Desktop Slider Mode - 3 Card Grid or Horizontal Carousel Layout */}
-              <div className="hidden lg:grid lg:grid-cols-3 gap-8">
+              {/* Desktop Slider Mode - 3 Card Grid */}
+              <div className="hidden lg:grid lg:grid-cols-3 gap-6">
                 {/* We show three items starting from the current index, wrapping around */}
                 {Array.from({ length: Math.min(3, filteredProjects.length) }).map((_, stepIdx) => {
                   const projectIdx = (currentIndex + stepIdx) % filteredProjects.length;
@@ -374,41 +375,41 @@ export default function PortfolioSection() {
                     <motion.div
                       key={`${project.id}-${projectIdx}`}
                       layout
-                      initial={{ opacity: 0, scale: 0.95 }}
+                      initial={{ opacity: 0, scale: 0.98 }}
                       animate={{ opacity: 1, scale: 1 }}
-                      exit={{ opacity: 0, scale: 0.95 }}
-                      transition={{ duration: 0.4 }}
+                      exit={{ opacity: 0, scale: 0.98 }}
+                      transition={{ duration: 0.3 }}
                       onClick={() => setSelectedProject(project)}
-                      className="bg-bg-card border border-border-color rounded-3xl overflow-hidden cursor-pointer group hover:border-accent-primary/20 transition-colors duration-200"
+                      className="bg-bg-card border border-border-color rounded-xl overflow-hidden cursor-pointer group hover:border-border-color/90 hover:shadow-sm transition-all duration-150"
                       id={`project-card-desktop-${project.id}`}
                     >
                       {/* Image Frame */}
                       <div className="aspect-[4/3] w-full overflow-hidden relative">
                         {/* Overlay with details */}
-                        <div className="absolute inset-0 bg-gradient-to-t from-bg-primary/95 via-bg-primary/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-6 z-10 pointer-events-none">
-                          <span className="text-xs text-accent-primary font-bold uppercase tracking-wider mb-1.5">
+                        <div className="absolute inset-0 bg-gradient-to-t from-bg-primary/90 via-bg-primary/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex flex-col justify-end p-5 z-10 pointer-events-none">
+                          <span className="text-xs text-accent-primary font-semibold uppercase tracking-wider mb-1">
                             {project.category}
                           </span>
-                          <h4 className="text-lg font-bold text-text-primary mb-4 line-clamp-1">
+                          <h4 className="text-base font-bold text-text-primary mb-3 line-clamp-1">
                             {project.title}
                           </h4>
-                          <span className="inline-flex items-center gap-2 bg-accent-primary text-white text-xs font-bold px-4 py-2 rounded-full self-start">
+                          <span className="inline-flex items-center gap-1.5 bg-accent-primary text-white text-xs font-semibold px-3 py-1.5 rounded-lg self-start">
                             View Project
                             <Eye className="w-3.5 h-3.5" />
                           </span>
                         </div>
                         <ProjectImage
                           project={project}
-                          imgClassName="group-hover:scale-105 transition-transform duration-500"
+                          imgClassName="group-hover:scale-105 transition-transform duration-300"
                         />
                       </div>
 
                       {/* Info Panel under card */}
-                      <div className="p-6">
-                        <span className="text-xs text-text-muted font-bold uppercase tracking-wider block mb-1">
+                      <div className="p-4 sm:p-5">
+                        <span className="text-[11px] text-text-muted font-semibold uppercase tracking-wider block mb-1">
                           {project.category}
                         </span>
-                        <h3 className="text-lg font-bold text-text-primary group-hover:text-accent-primary transition-colors line-clamp-1">
+                        <h3 className="text-base font-bold text-text-primary group-hover:text-accent-primary transition-colors line-clamp-1">
                           {project.title}
                         </h3>
                       </div>
@@ -423,18 +424,18 @@ export default function PortfolioSection() {
                   {filteredProjects[currentIndex] && (
                     <motion.div
                       key={filteredProjects[currentIndex].id}
-                      initial={{ opacity: 0, x: 30 }}
+                      initial={{ opacity: 0, x: 20 }}
                       animate={{ opacity: 1, x: 0 }}
-                      exit={{ opacity: 0, x: -30 }}
-                      transition={{ duration: 0.25 }}
+                      exit={{ opacity: 0, x: -20 }}
+                      transition={{ duration: 0.2 }}
                       onClick={() => setSelectedProject(filteredProjects[currentIndex])}
-                      className="bg-bg-card border border-border-color rounded-3xl overflow-hidden cursor-pointer group active:scale-[0.99] transition-transform"
+                      className="bg-bg-card border border-border-color rounded-xl overflow-hidden cursor-pointer group active:scale-[0.99] transition-transform"
                       id={`project-card-mobile-${filteredProjects[currentIndex].id}`}
                     >
                       <div className="aspect-[4/3] w-full overflow-hidden relative">
                         <div className="absolute top-3 right-3 z-10">
-                          <span className="bg-bg-primary/90 backdrop-blur-xs text-accent-primary font-bold text-xs px-3 py-1.5 rounded-full border border-border-color flex items-center gap-1.5 shadow-sm">
-                            <Eye className="w-3.5 h-3.5" />
+                          <span className="bg-bg-primary/90 backdrop-blur-xs text-text-primary font-semibold text-xs px-2.5 py-1 rounded-lg border border-border-color flex items-center gap-1.5 shadow-xs">
+                            <Eye className="w-3.5 h-3.5 text-accent-primary" />
                             View
                           </span>
                         </div>
@@ -442,11 +443,11 @@ export default function PortfolioSection() {
                           project={filteredProjects[currentIndex]}
                         />
                       </div>
-                      <div className="p-5 sm:p-6">
-                        <span className="text-xs text-accent-primary font-bold uppercase tracking-wider block mb-1">
+                      <div className="p-4 sm:p-5">
+                        <span className="text-[11px] text-text-muted font-semibold uppercase tracking-wider block mb-1">
                           {filteredProjects[currentIndex].category}
                         </span>
-                        <h3 className="text-lg sm:text-xl font-bold text-text-primary mb-2 line-clamp-1">
+                        <h3 className="text-base sm:text-lg font-bold text-text-primary mb-1 line-clamp-1">
                           {filteredProjects[currentIndex].title}
                         </h3>
                         <p className="text-text-secondary text-xs sm:text-sm line-clamp-2 mb-3">
@@ -505,26 +506,28 @@ export default function PortfolioSection() {
 
       </div>
 
-      {/* Project Detail Modal */}
-      <AnimatePresence>
-        {selectedProject && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/85 backdrop-blur-md overflow-y-auto"
-            onClick={() => setSelectedProject(null)}
-            id="project-detail-modal-bg"
-          >
-            <motion.div
-              initial={{ scale: 0.92, y: 15 }}
-              animate={{ scale: 1, y: 0 }}
-              exit={{ scale: 0.92, y: 15 }}
-              transition={{ type: 'spring', duration: 0.4 }}
-              onClick={(e) => e.stopPropagation()}
-              className="bg-bg-primary border border-border-color rounded-3xl w-full max-w-3xl max-h-[calc(100dvh-24px)] sm:max-h-[calc(100dvh-32px)] overflow-y-auto shadow-2xl relative my-auto"
-              id="project-detail-modal-card"
-            >
+      {/* Project Detail Modal Portaled to document.body */}
+      {typeof document !== 'undefined' &&
+        createPortal(
+          <AnimatePresence>
+            {selectedProject && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="fixed inset-0 z-[99999] flex items-center justify-center p-3 sm:p-4 bg-black/85 backdrop-blur-md overflow-y-auto"
+                onClick={() => setSelectedProject(null)}
+                id="project-detail-modal-bg"
+              >
+                <motion.div
+                  initial={{ scale: 0.92, y: 15 }}
+                  animate={{ scale: 1, y: 0 }}
+                  exit={{ scale: 0.92, y: 15 }}
+                  transition={{ type: 'spring', duration: 0.4 }}
+                  onClick={(e) => e.stopPropagation()}
+                  className="bg-bg-primary border border-border-color rounded-3xl w-full max-w-3xl max-h-[calc(100dvh-24px)] sm:max-h-[calc(100dvh-32px)] overflow-y-auto shadow-2xl relative my-auto"
+                  id="project-detail-modal-card"
+                >
               {/* Close Button - 44x44px Touch Target */}
               <button
                 onClick={() => setSelectedProject(null)}
@@ -606,7 +609,9 @@ export default function PortfolioSection() {
             </motion.div>
           </motion.div>
         )}
-      </AnimatePresence>
+      </AnimatePresence>,
+      document.body
+    )}
     </section>
   );
 }

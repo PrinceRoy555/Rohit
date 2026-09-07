@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useSiteConfig } from '../../../context/SiteConfigContext';
 import { NavigationItem, SocialLinkItem } from '../../../types/cms';
+import { PageHeader } from '../layout/PageHeader';
 import {
   Menu,
   Globe,
@@ -187,48 +188,41 @@ export const NavigationFooterTab: React.FC = () => {
   };
 
   return (
-    <div className="space-y-8 max-w-5xl mx-auto">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-border-color pb-6">
-        <div>
-          <h2 className="text-xl sm:text-2xl font-bold text-text-primary flex items-center gap-2.5">
-            <Menu className="w-6 h-6 text-rose-500" />
-            <span>Navigation, Footer & Social Profiles</span>
-          </h2>
-          <p className="text-sm text-text-muted mt-1">
-            Configure header menu items, contact CTA buttons, social handles, and footer copywriting.
-          </p>
-        </div>
-
-        <button
-          onClick={handleSave}
-          disabled={isSaving}
-          className="px-5 py-2.5 rounded-xl text-sm font-semibold bg-rose-600 hover:bg-rose-700 text-white shadow-lg shadow-rose-600/30 flex items-center gap-2 transition-all self-start sm:self-auto"
-        >
-          {savedSuccess ? (
-            <>
-              <Check className="w-4 h-4 text-emerald-300" />
-              <span>Draft Saved!</span>
-            </>
-          ) : (
-            <>
-              <Save className="w-4 h-4" />
-              <span>{isSaving ? 'Saving...' : 'Save Draft'}</span>
-            </>
-          )}
-        </button>
-      </div>
+    <div className="space-y-6 max-w-5xl mx-auto">
+      <PageHeader
+        title="Navigation, Footer & Social Profiles"
+        description="Configure header menu items, contact CTA buttons, social handles, and footer copywriting."
+        actions={
+          <button
+            onClick={handleSave}
+            disabled={isSaving}
+            className="h-9 px-3.5 rounded-lg text-xs font-semibold bg-accent-primary hover:bg-accent-secondary text-white flex items-center justify-center gap-2 shadow-xs transition-all cursor-pointer select-none"
+          >
+            {savedSuccess ? (
+              <>
+                <Check className="w-3.5 h-3.5 text-emerald-300" />
+                <span>Draft Saved!</span>
+              </>
+            ) : (
+              <>
+                <Save className="w-3.5 h-3.5" />
+                <span>{isSaving ? 'Saving...' : 'Save Draft'}</span>
+              </>
+            )}
+          </button>
+        }
+      />
 
       {/* SECTION 1: HEADER NAVIGATION */}
-      <div className="bg-bg-card border border-border-color rounded-2xl p-6 space-y-5">
-        <div className="flex items-center justify-between">
+      <div className="bg-bg-card border border-border-color rounded-xl sm:rounded-2xl p-4 sm:p-6 space-y-4 sm:space-y-5 shadow-xs">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div>
-            <h3 className="text-base font-bold text-text-primary">Header Menu Items</h3>
+            <h3 className="text-sm sm:text-base font-bold text-text-primary">Header Menu Items</h3>
             <p className="text-xs text-text-muted">Navigation links displayed on top of the website.</p>
           </div>
           <button
             onClick={() => setIsModalOpen(true)}
-            className="px-3.5 py-1.5 rounded-xl text-xs font-semibold bg-rose-600 hover:bg-rose-700 text-white shadow-md flex items-center gap-1.5"
+            className="min-h-[38px] sm:min-h-[40px] px-3.5 py-2 rounded-xl text-xs font-semibold bg-rose-600 hover:bg-rose-700 text-white shadow-xs flex items-center justify-center gap-1.5 self-stretch sm:self-auto transition-all active:scale-98"
           >
             <Plus className="w-3.5 h-3.5" />
             <span>Add Menu Link</span>
@@ -237,22 +231,22 @@ export const NavigationFooterTab: React.FC = () => {
 
         {navItems.length === 0 ? (
           <div className="p-6 rounded-xl border border-dashed border-border-color text-center text-text-muted text-xs">
-            No navigation items configured. Click "Add Menu Link" to create one.
+            No navigation items configured. Click &quot;Add Menu Link&quot; to create one.
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 sm:gap-3">
             {navItems.map((item) => (
               <div
                 key={item.id}
-                className="p-3.5 rounded-xl bg-black/20 dark:bg-black/40 border border-border-color flex items-center justify-between"
+                className="p-3 sm:p-3.5 rounded-xl bg-bg-secondary border border-border-color flex items-center justify-between gap-2"
               >
-                <div>
-                  <span className="text-sm font-bold text-text-primary">{item.label}</span>
-                  <span className="text-xs text-text-muted font-mono ml-2">{item.path || item.route || '/'}</span>
+                <div className="min-w-0">
+                  <span className="text-xs sm:text-sm font-bold text-text-primary truncate block">{item.label}</span>
+                  <span className="text-[11px] sm:text-xs text-text-muted font-mono">{item.path || item.route || '/'}</span>
                 </div>
                 <button
                   onClick={() => handleDeleteNavItem(item.id)}
-                  className="p-1.5 rounded-lg bg-rose-500/10 text-rose-500 hover:bg-rose-500/20"
+                  className="w-8 h-8 rounded-lg bg-rose-500/10 text-rose-500 hover:bg-rose-500/20 border border-rose-500/20 flex items-center justify-center transition-colors flex-shrink-0 active:scale-95"
                   aria-label={`Delete ${item.label}`}
                 >
                   <Trash2 className="w-3.5 h-3.5" />
@@ -262,50 +256,50 @@ export const NavigationFooterTab: React.FC = () => {
           </div>
         )}
 
-        <div className="pt-4 border-t border-border-color grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div className="pt-3.5 sm:pt-4 border-t border-border-color grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
           <div>
-            <label className="block text-xs font-semibold text-text-primary mb-1">Header CTA Button Text</label>
+            <label className="block text-xs font-semibold text-text-secondary mb-1">Header CTA Button Text</label>
             <input
               type="text"
               value={ctaButton.text || ctaButton.label || ''}
               onChange={(e) => handleUpdateHeaderCta('text', e.target.value)}
-              className="w-full bg-input-bg border border-border-color rounded-xl px-3 py-2 text-sm text-text-primary focus:border-rose-500 focus:outline-none"
+              className="w-full min-h-[42px] bg-bg-secondary border border-border-color rounded-xl px-3 py-2 text-sm text-text-primary focus:border-rose-500 focus:outline-none"
             />
           </div>
           <div>
-            <label className="block text-xs font-semibold text-text-primary mb-1">Header CTA Link Target</label>
+            <label className="block text-xs font-semibold text-text-secondary mb-1">Header CTA Link Target</label>
             <input
               type="text"
               value={ctaButton.link || ctaButton.route || ''}
               onChange={(e) => handleUpdateHeaderCta('link', e.target.value)}
-              className="w-full bg-input-bg border border-border-color rounded-xl px-3 py-2 text-sm text-text-primary focus:border-rose-500 focus:outline-none"
+              className="w-full min-h-[42px] bg-bg-secondary border border-border-color rounded-xl px-3 py-2 text-sm text-text-primary focus:border-rose-500 focus:outline-none"
             />
           </div>
         </div>
       </div>
 
       {/* SECTION 2: SOCIAL PROFILES */}
-      <div className="bg-bg-card border border-border-color rounded-2xl p-6 space-y-5">
+      <div className="bg-bg-card border border-border-color rounded-xl sm:rounded-2xl p-4 sm:p-6 space-y-4 sm:space-y-5 shadow-xs">
         <div>
-          <h3 className="text-base font-bold text-text-primary">Social Media Profiles</h3>
+          <h3 className="text-sm sm:text-base font-bold text-text-primary">Social Media Profiles</h3>
           <p className="text-xs text-text-muted">Direct profile URLs and visibility toggles.</p>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
           {socialLinks.map((social, idx) => {
             const socialId = social.id || `social-${idx}`;
             const isVisible = social.isVisible !== false;
             return (
               <div
                 key={socialId}
-                className="p-4 rounded-xl bg-black/20 dark:bg-black/40 border border-border-color flex flex-col gap-2"
+                className="p-3 sm:p-4 rounded-xl bg-bg-secondary border border-border-color flex flex-col gap-2"
               >
                 <div className="flex items-center justify-between">
                   <span className="text-xs font-bold text-text-primary">{social.platform || social.name || social.label || 'Link'}</span>
                   <button
                     onClick={() => handleToggleSocial(social.id || socialId)}
-                    className={`px-2 py-0.5 rounded-full text-[10px] font-bold transition-colors ${
-                      isVisible ? 'bg-emerald-500/20 text-emerald-500' : 'bg-white/10 text-text-muted'
+                    className={`min-h-[28px] px-2.5 py-0.5 rounded-full text-xs font-bold transition-colors active:scale-95 ${
+                      isVisible ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20' : 'bg-bg-card text-text-muted border border-border-color'
                     }`}
                   >
                     {isVisible ? 'Active' : 'Hidden'}
@@ -316,7 +310,7 @@ export const NavigationFooterTab: React.FC = () => {
                   type="text"
                   value={social.url || ''}
                   onChange={(e) => handleUpdateSocialUrl(social.id || socialId, e.target.value)}
-                  className="w-full bg-input-bg border border-border-color rounded-lg px-2.5 py-1.5 text-xs text-text-primary focus:border-rose-500 focus:outline-none font-mono"
+                  className="w-full min-h-[38px] bg-bg-card border border-border-color rounded-lg px-2.5 py-1.5 text-xs text-text-primary focus:border-rose-500 focus:outline-none font-mono"
                 />
               </div>
             );
@@ -325,15 +319,15 @@ export const NavigationFooterTab: React.FC = () => {
       </div>
 
       {/* SECTION 3: FOOTER SETTINGS */}
-      <div className="bg-bg-card border border-border-color rounded-2xl p-6 space-y-4">
+      <div className="bg-bg-card border border-border-color rounded-xl sm:rounded-2xl p-4 sm:p-6 space-y-3.5 sm:space-y-4 shadow-xs">
         <div>
-          <h3 className="text-base font-bold text-text-primary">Footer Copywriting</h3>
+          <h3 className="text-sm sm:text-base font-bold text-text-primary">Footer Copywriting</h3>
           <p className="text-xs text-text-muted">Copyright notices and closing statements.</p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
           <div>
-            <label className="block text-xs font-semibold text-text-primary mb-1">Copyright Notice</label>
+            <label className="block text-xs font-semibold text-text-secondary mb-1">Copyright Notice</label>
             <input
               type="text"
               value={footer.copyrightText || footer.copyright || ''}
@@ -341,22 +335,22 @@ export const NavigationFooterTab: React.FC = () => {
                 handleUpdateFooter('copyrightText', e.target.value);
                 handleUpdateFooter('copyright', e.target.value);
               }}
-              className="w-full bg-input-bg border border-border-color rounded-xl px-3 py-2 text-sm text-text-primary focus:border-rose-500 focus:outline-none"
+              className="w-full min-h-[42px] bg-bg-secondary border border-border-color rounded-xl px-3 py-2 text-sm text-text-primary focus:border-rose-500 focus:outline-none"
             />
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-text-primary mb-1">Footer Tagline</label>
+            <label className="block text-xs font-semibold text-text-secondary mb-1">Footer Tagline</label>
             <input
               type="text"
               value={footer.tagline || ''}
               onChange={(e) => handleUpdateFooter('tagline', e.target.value)}
-              className="w-full bg-input-bg border border-border-color rounded-xl px-3 py-2 text-sm text-text-primary focus:border-rose-500 focus:outline-none"
+              className="w-full min-h-[42px] bg-bg-secondary border border-border-color rounded-xl px-3 py-2 text-sm text-text-primary focus:border-rose-500 focus:outline-none"
             />
           </div>
 
           <div className="md:col-span-2">
-            <label className="block text-xs font-semibold text-text-primary mb-1">Bottom Subtext</label>
+            <label className="block text-xs font-semibold text-text-secondary mb-1">Bottom Subtext</label>
             <input
               type="text"
               value={footer.bottomSubtext || footer.customNote || ''}
@@ -364,7 +358,7 @@ export const NavigationFooterTab: React.FC = () => {
                 handleUpdateFooter('bottomSubtext', e.target.value);
                 handleUpdateFooter('customNote', e.target.value);
               }}
-              className="w-full bg-input-bg border border-border-color rounded-xl px-3 py-2 text-sm text-text-primary focus:border-rose-500 focus:outline-none"
+              className="w-full min-h-[42px] bg-bg-secondary border border-border-color rounded-xl px-3 py-2 text-sm text-text-primary focus:border-rose-500 focus:outline-none"
             />
           </div>
         </div>
@@ -372,46 +366,46 @@ export const NavigationFooterTab: React.FC = () => {
 
       {/* MODAL: Add Nav Link */}
       {isModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
-          <div className="admin-modal bg-bg-card border border-border-color rounded-2xl max-w-sm w-full p-6 space-y-4 shadow-2xl text-text-primary">
-            <h3 className="text-lg font-bold text-text-primary">Add Menu Link</h3>
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/60 backdrop-blur-xs">
+          <div className="admin-modal bg-bg-card border border-border-color rounded-xl sm:rounded-2xl max-w-sm w-full p-4 sm:p-6 space-y-3.5 sm:space-y-4 shadow-xl text-text-primary">
+            <h3 className="text-base sm:text-lg font-bold text-text-primary">Add Menu Link</h3>
 
-            <form onSubmit={handleAddNavItem} className="space-y-4">
+            <form onSubmit={handleAddNavItem} className="space-y-3.5 sm:space-y-4">
               <div>
-                <label className="block text-xs font-semibold text-text-primary mb-1">Menu Label</label>
+                <label className="block text-xs font-semibold text-text-secondary mb-1">Menu Label</label>
                 <input
                   type="text"
                   required
                   placeholder="e.g., Insights"
                   value={newNavLabel}
                   onChange={(e) => setNewNavLabel(e.target.value)}
-                  className="w-full bg-input-bg border border-border-color rounded-xl px-3 py-2 text-sm text-text-primary focus:border-rose-500 focus:outline-none"
+                  className="w-full min-h-[42px] bg-bg-secondary border border-border-color rounded-xl px-3 py-2 text-sm text-text-primary focus:border-rose-500 focus:outline-none"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-text-primary mb-1">Target Path / Anchor</label>
+                <label className="block text-xs font-semibold text-text-secondary mb-1">Target Path / Anchor</label>
                 <input
                   type="text"
                   required
                   placeholder="e.g., #insights or /insights"
                   value={newNavPath}
                   onChange={(e) => setNewNavPath(e.target.value)}
-                  className="w-full bg-input-bg border border-border-color rounded-xl px-3 py-2 text-sm text-text-primary focus:border-rose-500 focus:outline-none font-mono"
+                  className="w-full min-h-[42px] bg-bg-secondary border border-border-color rounded-xl px-3 py-2 text-sm text-text-primary focus:border-rose-500 focus:outline-none font-mono"
                 />
               </div>
 
-              <div className="flex items-center justify-end gap-3 pt-2">
+              <div className="flex items-center justify-end gap-2.5 pt-2 border-t border-border-color">
                 <button
                   type="button"
                   onClick={() => setIsModalOpen(false)}
-                  className="px-4 py-2 rounded-xl text-xs font-semibold bg-white/10 hover:bg-white/15 text-text-primary"
+                  className="min-h-[42px] px-4 py-2 rounded-xl text-xs font-semibold bg-bg-secondary hover:bg-bg-card-hover text-text-primary border border-border-color transition-colors active:scale-98"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 rounded-xl text-xs font-semibold bg-rose-600 hover:bg-rose-700 text-white shadow-md shadow-rose-600/30"
+                  className="min-h-[42px] px-5 py-2 rounded-xl text-xs font-semibold bg-rose-600 hover:bg-rose-700 text-white shadow-xs transition-all active:scale-98"
                 >
                   Add Link
                 </button>

@@ -525,6 +525,78 @@ export async function fetchAllLeadsFromFirestore(): Promise<any[]> {
       console.warn('[Firestore] Note fetching contactEnquiries collection:', e);
     }
 
+    // 3. Also fetch from chatbotLeads collection
+    try {
+      const chatbotRef = collection(db, 'chatbotLeads');
+      const snap = await getDocs(chatbotRef);
+      snap.forEach((docSnap) => {
+        if (!seenIds.has(docSnap.id)) {
+          seenIds.add(docSnap.id);
+          const d = docSnap.data();
+          results.push({
+            id: docSnap.id,
+            name: d.name || 'Anonymous Visitor',
+            email: d.email || '',
+            phone: d.phone || '',
+            businessName: d.businessName || '',
+            service: d.requiredService || d.service || 'AI Chatbot Inquiry',
+            message: d.projectDescription || d.conversationSummary || '',
+            status: d.status || 'new',
+            source: d.source || 'uni-ai-chatbot',
+            createdAt: d.createdAtIso || (d.createdAt?.toDate ? d.createdAt.toDate().toISOString() : (d.createdAt ? String(d.createdAt) : new Date().toISOString())),
+            notes: d.notes || '',
+            budgetRange: d.budgetRange || '',
+            attachmentUrl: null,
+            followUpAt: d.followUpAt?.toDate ? d.followUpAt.toDate().toISOString() : (d.followUpAt || null),
+            followUpStatus: d.followUpStatus || null,
+            nextAction: d.nextAction || '',
+            lastContactedAt: d.lastContactedAt?.toDate ? d.lastContactedAt.toDate().toISOString() : (d.lastContactedAt || null),
+            priority: d.priority || 'medium',
+            tags: Array.isArray(d.tags) ? d.tags : ['Chatbot'],
+            internalNotes: d.internalNotes || d.notes || ''
+          });
+        }
+      });
+    } catch (e) {
+      console.warn('[Firestore] Note fetching chatbotLeads collection:', e);
+    }
+
+    // 4. Also fetch from quoteRequests collection
+    try {
+      const quoteRef = collection(db, 'quoteRequests');
+      const snap = await getDocs(quoteRef);
+      snap.forEach((docSnap) => {
+        if (!seenIds.has(docSnap.id)) {
+          seenIds.add(docSnap.id);
+          const d = docSnap.data();
+          results.push({
+            id: docSnap.id,
+            name: d.name || '',
+            email: d.email || '',
+            phone: d.phone || '',
+            businessName: d.businessName || '',
+            service: d.packageName || d.requiredService || d.service || 'Quote Request',
+            message: d.projectDescription || '',
+            status: d.status || 'new',
+            source: d.source || 'website-pricing',
+            createdAt: d.createdAtIso || (d.createdAt?.toDate ? d.createdAt.toDate().toISOString() : (d.createdAt ? String(d.createdAt) : new Date().toISOString())),
+            notes: d.notes || '',
+            budgetRange: d.budgetRange || '',
+            attachmentUrl: null,
+            followUpAt: d.followUpAt?.toDate ? d.followUpAt.toDate().toISOString() : (d.followUpAt || null),
+            followUpStatus: d.followUpStatus || null,
+            nextAction: d.nextAction || '',
+            lastContactedAt: d.lastContactedAt?.toDate ? d.lastContactedAt.toDate().toISOString() : (d.lastContactedAt || null),
+            priority: d.priority || 'medium',
+            tags: Array.isArray(d.tags) ? d.tags : ['Pricing Quote'],
+            internalNotes: d.internalNotes || d.notes || ''
+          });
+        }
+      });
+    } catch (e) {
+      console.warn('[Firestore] Note fetching quoteRequests collection:', e);
+    }
+
     return results.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
   } catch (err) {
     console.warn('[Firestore] Error fetching all leads:', err);
@@ -541,12 +613,27 @@ export async function updateLeadStatusInFirestore(leadId: string, status: string
     try {
       const docRef = doc(db, 'leads', leadId);
       await updateDoc(docRef, updateData);
+      return { success: true, id: leadId };
     } catch (errLeads) {
       // Try contactEnquiries
-      const enquiryRef = doc(db, 'contactEnquiries', leadId);
-      await updateDoc(enquiryRef, updateData);
+      try {
+        const enquiryRef = doc(db, 'contactEnquiries', leadId);
+        await updateDoc(enquiryRef, updateData);
+        return { success: true, id: leadId };
+      } catch (errEnquiries) {
+        // Try chatbotLeads
+        try {
+          const chatRef = doc(db, 'chatbotLeads', leadId);
+          await updateDoc(chatRef, updateData);
+          return { success: true, id: leadId };
+        } catch (errChat) {
+          // Try quoteRequests
+          const quoteRef = doc(db, 'quoteRequests', leadId);
+          await updateDoc(quoteRef, updateData);
+          return { success: true, id: leadId };
+        }
+      }
     }
-    return { success: true, id: leadId };
   } catch (err) {
     console.error('[Firestore] Error updating lead:', err);
     return { success: false, error: 'Failed to update lead status' };
@@ -561,12 +648,25 @@ export async function updateLeadCrmDataInFirestore(leadId: string, updates: Reco
     try {
       const docRef = doc(db, 'leads', leadId);
       await updateDoc(docRef, cleanUpdates);
+      return { success: true, id: leadId };
     } catch (errLeads) {
       // Fallback to contactEnquiries
-      const enquiryRef = doc(db, 'contactEnquiries', leadId);
-      await updateDoc(enquiryRef, cleanUpdates);
+      try {
+        const enquiryRef = doc(db, 'contactEnquiries', leadId);
+        await updateDoc(enquiryRef, cleanUpdates);
+        return { success: true, id: leadId };
+      } catch (errEnquiries) {
+        try {
+          const chatRef = doc(db, 'chatbotLeads', leadId);
+          await updateDoc(chatRef, cleanUpdates);
+          return { success: true, id: leadId };
+        } catch (errChat) {
+          const quoteRef = doc(db, 'quoteRequests', leadId);
+          await updateDoc(quoteRef, cleanUpdates);
+          return { success: true, id: leadId };
+        }
+      }
     }
-    return { success: true, id: leadId };
   } catch (err) {
     console.error('[Firestore] Error updating CRM fields on lead:', err);
     return { success: false, error: 'Failed to update CRM data' };
@@ -579,11 +679,24 @@ export async function deleteLeadFromFirestore(leadId: string): Promise<ServiceRe
     try {
       const docRef = doc(db, 'leads', leadId);
       await deleteDoc(docRef);
+      return { success: true, id: leadId };
     } catch (errLeads) {
-      const enquiryRef = doc(db, 'contactEnquiries', leadId);
-      await deleteDoc(enquiryRef);
+      try {
+        const enquiryRef = doc(db, 'contactEnquiries', leadId);
+        await deleteDoc(enquiryRef);
+        return { success: true, id: leadId };
+      } catch (errEnquiries) {
+        try {
+          const chatRef = doc(db, 'chatbotLeads', leadId);
+          await deleteDoc(chatRef);
+          return { success: true, id: leadId };
+        } catch (errChat) {
+          const quoteRef = doc(db, 'quoteRequests', leadId);
+          await deleteDoc(quoteRef);
+          return { success: true, id: leadId };
+        }
+      }
     }
-    return { success: true, id: leadId };
   } catch (err) {
     console.error('[Firestore] Error deleting lead:', err);
     return { success: false, error: 'Failed to delete lead' };

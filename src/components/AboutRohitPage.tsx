@@ -195,7 +195,7 @@ export default function AboutRohitPage() {
               {/* Signature Style info */}
               <div className="border-t border-border-color pt-6 flex items-center justify-between">
                 <div>
-                  <span className="font-serif italic text-3xl text-text-primary block select-none mb-1">
+                  <span className="italic font-medium text-3xl text-text-primary block select-none mb-1 tracking-wide">
                     {PROFILE_INTRO.signature}
                   </span>
                   <span className="text-xs font-bold text-accent-primary uppercase tracking-wider">
@@ -261,7 +261,7 @@ export default function AboutRohitPage() {
             className="bg-bg-card/40 border border-border-color p-8 md:p-12 rounded-3xl relative overflow-hidden"
           >
             {/* Quotes accent */}
-            <div className="absolute top-4 right-8 text-accent-primary/5 font-serif text-9xl pointer-events-none select-none">
+            <div className="absolute top-4 right-8 text-accent-primary/5 font-extrabold text-9xl pointer-events-none select-none">
               ”
             </div>
 

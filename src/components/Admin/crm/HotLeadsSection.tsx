@@ -50,21 +50,21 @@ export const HotLeadsSection: React.FC<HotLeadsSectionProps> = ({
     .slice(0, 6);
 
   return (
-    <div className="bg-bg-card border border-border-color rounded-2xl p-5 sm:p-6 shadow-sm text-text-primary transition-colors duration-200">
+    <div className="bg-bg-card border border-border-color rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-xs text-text-primary transition-colors duration-200">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-border-color">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 pb-3.5 border-b border-border-color">
         <div className="space-y-1">
-          <div className="flex items-center gap-2.5 flex-wrap">
-            <h3 className="text-lg sm:text-xl font-bold text-text-primary flex items-center gap-2">
-              <Flame className="w-5 h-5 text-rose-500 fill-current" />
+          <div className="flex items-center gap-2 flex-wrap">
+            <h3 className="text-base sm:text-xl font-bold text-text-primary flex items-center gap-2">
+              <Flame className="w-4 sm:w-5 h-4 sm:h-5 text-rose-500 fill-current" />
               <span>Hot Leads</span>
             </h3>
 
-            <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-rose-500/15 text-rose-600 dark:text-rose-400 border border-rose-500/30">
+            <span className="px-2 py-0.5 rounded-full text-[11px] font-bold bg-rose-500/15 text-rose-600 dark:text-rose-400 border border-rose-500/30">
               {hotLeads.length} High Priority
             </span>
           </div>
-          <p className="text-xs text-text-muted">
+          <p className="text-[11px] sm:text-xs text-text-muted">
             Highest-intent leads based on verified budgets, advanced progress, or admin designation.
           </p>
         </div>
@@ -72,7 +72,7 @@ export const HotLeadsSection: React.FC<HotLeadsSectionProps> = ({
         {onViewAll && (
           <button
             onClick={onViewAll}
-            className="flex items-center gap-1.5 text-xs font-semibold text-rose-600 dark:text-rose-400 hover:text-rose-700 dark:hover:text-rose-300 transition-colors self-start sm:self-auto py-1"
+            className="flex items-center gap-1.5 text-xs font-semibold text-rose-600 dark:text-rose-400 hover:text-rose-700 dark:hover:text-rose-300 transition-colors self-start sm:self-auto py-1 min-h-[36px]"
           >
             <span>View All Leads</span>
             <ArrowRight className="w-3.5 h-3.5" />
@@ -81,9 +81,9 @@ export const HotLeadsSection: React.FC<HotLeadsSectionProps> = ({
       </div>
 
       {/* Leads Grid */}
-      <div className="mt-5 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div className="mt-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3.5 sm:gap-4">
         {hotLeads.length === 0 ? (
-          <div className="col-span-full py-10 text-center rounded-xl bg-bg-secondary border border-border-color p-6">
+          <div className="col-span-full py-8 text-center rounded-xl bg-bg-secondary border border-border-color p-5">
             <Sparkles className="w-8 h-8 text-neutral-400 mx-auto mb-2 opacity-70" />
             <h4 className="text-sm font-bold text-text-primary">No active hot leads</h4>
             <p className="text-xs text-text-muted mt-1 max-w-sm mx-auto">
@@ -100,11 +100,11 @@ export const HotLeadsSection: React.FC<HotLeadsSectionProps> = ({
               <div
                 key={lead.id}
                 onClick={() => onOpenLead(lead)}
-                className="p-5 rounded-2xl bg-bg-secondary hover:bg-bg-card-hover border border-border-color hover:border-rose-500/40 transition-all cursor-pointer group flex flex-col justify-between space-y-4 shadow-xs hover:shadow-md"
+                className="p-4 sm:p-5 rounded-xl sm:rounded-2xl bg-bg-secondary hover:bg-bg-card-hover border border-border-color hover:border-rose-500/40 transition-all cursor-pointer group flex flex-col justify-between space-y-3.5 shadow-xs hover:shadow-md active:scale-99"
               >
                 {/* Top Badge Strip */}
                 <div className="flex items-center justify-between gap-2">
-                  <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold ${
+                  <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold ${
                     isManual
                       ? 'bg-rose-500/20 text-rose-600 dark:text-rose-400 border border-rose-500/30'
                       : 'bg-amber-500/15 text-amber-600 dark:text-amber-400 border border-amber-500/30'
@@ -119,8 +119,8 @@ export const HotLeadsSection: React.FC<HotLeadsSectionProps> = ({
                 </div>
 
                 {/* Client & Service */}
-                <div className="space-y-1.5">
-                  <h4 className="text-base font-bold text-text-primary group-hover:text-rose-600 dark:group-hover:text-rose-400 transition-colors truncate">
+                <div className="space-y-1">
+                  <h4 className="text-sm sm:text-base font-bold text-text-primary group-hover:text-rose-600 dark:group-hover:text-rose-400 transition-colors truncate">
                     {lead.name}
                   </h4>
 
@@ -145,7 +145,7 @@ export const HotLeadsSection: React.FC<HotLeadsSectionProps> = ({
                 </div>
 
                 {/* Status & Next Follow-up info */}
-                <div className="pt-3 border-t border-border-color space-y-2 text-xs">
+                <div className="pt-2.5 border-t border-border-color space-y-2 text-xs">
                   <div className="flex items-center justify-between text-text-muted">
                     <span>Status: <strong className="text-text-primary capitalize">{lead.status}</strong></span>
                     <span className="capitalize">{lead.priority || 'Medium'} priority</span>
@@ -165,7 +165,7 @@ export const HotLeadsSection: React.FC<HotLeadsSectionProps> = ({
 
                 {/* Bottom Quick Actions */}
                 <div
-                  className="flex items-center justify-between gap-2 pt-2"
+                  className="flex items-center justify-between gap-2 pt-1 border-t border-border-color/50"
                   onClick={(e) => e.stopPropagation()}
                 >
                   <div className="flex items-center gap-1.5">
@@ -173,8 +173,9 @@ export const HotLeadsSection: React.FC<HotLeadsSectionProps> = ({
                       <>
                         <a
                           href={`tel:${cleanPhone}`}
-                          className="p-2 rounded-lg bg-bg-card hover:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border border-border-color transition-colors"
+                          className="w-9 h-9 rounded-xl bg-bg-card hover:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border border-border-color transition-colors flex items-center justify-center active:scale-95"
                           title="Call"
+                          aria-label="Call Client"
                         >
                           <Phone className="w-3.5 h-3.5" />
                         </a>
@@ -183,8 +184,9 @@ export const HotLeadsSection: React.FC<HotLeadsSectionProps> = ({
                           href={`https://wa.me/${waPhone}?text=${encodeURIComponent(`Hi ${lead.name}, regarding your project inquiry:`)}`}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="p-2 rounded-lg bg-bg-card hover:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border border-border-color transition-colors"
+                          className="w-9 h-9 rounded-xl bg-bg-card hover:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border border-border-color transition-colors flex items-center justify-center active:scale-95"
                           title="WhatsApp"
+                          aria-label="WhatsApp"
                         >
                           <MessageCircle className="w-3.5 h-3.5" />
                         </a>
@@ -193,8 +195,9 @@ export const HotLeadsSection: React.FC<HotLeadsSectionProps> = ({
 
                     <a
                       href={`mailto:${lead.email}?subject=${encodeURIComponent(`Project Inquiry: ${lead.service}`)}`}
-                      className="p-2 rounded-lg bg-bg-card hover:bg-rose-500/20 text-rose-600 dark:text-rose-400 border border-border-color transition-colors"
+                      className="w-9 h-9 rounded-xl bg-bg-card hover:bg-rose-500/20 text-rose-600 dark:text-rose-400 border border-border-color transition-colors flex items-center justify-center active:scale-95"
                       title="Email"
+                      aria-label="Email Client"
                     >
                       <Mail className="w-3.5 h-3.5" />
                     </a>
@@ -202,7 +205,7 @@ export const HotLeadsSection: React.FC<HotLeadsSectionProps> = ({
 
                   <button
                     onClick={() => onOpenLead(lead)}
-                    className="px-3 py-1.5 rounded-xl text-xs font-semibold bg-bg-card hover:bg-bg-card-hover text-text-primary border border-border-color transition-colors"
+                    className="min-h-[38px] px-3.5 py-1.5 rounded-xl text-xs font-semibold bg-bg-card hover:bg-bg-card-hover text-text-primary border border-border-color transition-colors active:scale-95"
                   >
                     Open Lead
                   </button>

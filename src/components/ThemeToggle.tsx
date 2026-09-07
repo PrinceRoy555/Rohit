@@ -24,7 +24,14 @@ export default function ThemeToggle({
   const handleToggle = propToggleTheme || contextTheme.toggleTheme;
   const isDark = resolvedTheme === 'dark';
 
-  const labelText = ariaLabel || (isDark ? 'Switch to light mode' : 'Switch to dark mode');
+  const labelText = ariaLabel || 'Toggle dark mode';
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      handleToggle();
+    }
+  };
 
   return (
     <div className={`my-body ${className}`.trim()}>
@@ -34,6 +41,7 @@ export default function ThemeToggle({
           type="checkbox"
           checked={isDark}
           onChange={handleToggle}
+          onKeyDown={handleKeyDown}
           aria-label={labelText}
         />
 
@@ -41,6 +49,7 @@ export default function ThemeToggle({
           htmlFor={inputId}
           title={labelText}
           aria-label={labelText}
+          onKeyDown={handleKeyDown}
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"

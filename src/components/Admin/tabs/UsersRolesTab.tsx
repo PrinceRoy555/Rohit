@@ -6,6 +6,7 @@ import {
   deleteAdminUser,
   fetchAuditLogs
 } from '../../../services/cmsApi';
+import { PageHeader } from '../layout/PageHeader';
 import {
   Shield,
   UserPlus,
@@ -84,83 +85,76 @@ export const UsersRolesTab: React.FC = () => {
   };
 
   return (
-    <div className="space-y-8 max-w-5xl mx-auto">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-white/10 pb-6">
-        <div>
-          <h2 className="text-xl sm:text-2xl font-bold text-white flex items-center gap-2.5">
-            <Shield className="w-6 h-6 text-rose-500" />
-            <span>Admin Users & Security Audit</span>
-          </h2>
-          <p className="text-sm text-neutral-400 mt-1">
-            Manage admin credentials, role permissions, and view immutable security audit logs.
-          </p>
-        </div>
-
-        <button
-          onClick={() => setIsAddUserModalOpen(true)}
-          className="px-4 py-2.5 rounded-xl text-xs sm:text-sm font-semibold bg-rose-600 hover:bg-rose-700 text-white shadow-lg shadow-rose-600/30 flex items-center gap-2 transition-all self-start sm:self-auto"
-        >
-          <UserPlus className="w-4 h-4" />
-          <span>Add Admin User</span>
-        </button>
-      </div>
+    <div className="space-y-6 max-w-5xl mx-auto">
+      <PageHeader
+        title="Admin Users & Security Audit"
+        description="Manage admin credentials, role permissions, and view immutable security audit logs."
+        actions={
+          <button
+            onClick={() => setIsAddUserModalOpen(true)}
+            className="h-9 px-3.5 rounded-lg text-xs font-semibold bg-accent-primary hover:bg-accent-secondary text-white flex items-center justify-center gap-1.5 shadow-xs transition-all cursor-pointer select-none"
+          >
+            <UserPlus className="w-4 h-4" />
+            <span>Add Admin User</span>
+          </button>
+        }
+      />
 
       {actionSuccess && (
-        <div className="p-4 rounded-xl bg-emerald-500/15 border border-emerald-500/30 text-emerald-300 text-sm flex items-center gap-3">
-          <CheckCircle2 className="w-5 h-5 text-emerald-400 flex-shrink-0" />
+        <div className="p-3.5 sm:p-4 rounded-xl bg-emerald-500/15 border border-emerald-500/30 text-emerald-600 dark:text-emerald-400 text-xs sm:text-sm flex items-center gap-2.5 sm:gap-3">
+          <CheckCircle2 className="w-4 sm:w-5 h-4 sm:h-5 text-emerald-500 flex-shrink-0" />
           <span>{actionSuccess}</span>
         </div>
       )}
 
       {/* Sub-nav */}
-      <div className="flex flex-wrap gap-2 p-1.5 bg-neutral-900/80 border border-white/10 rounded-2xl">
+      <div className="flex gap-1.5 p-1 sm:p-1.5 bg-bg-card border border-border-color rounded-xl sm:rounded-2xl shadow-xs">
         <button
           onClick={() => setActiveSubTab('users')}
-          className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs sm:text-sm font-semibold transition-all ${
+          className={`flex-1 min-h-[40px] flex items-center justify-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 rounded-lg sm:rounded-xl text-xs sm:text-sm font-semibold transition-all active:scale-98 ${
             activeSubTab === 'users'
-              ? 'bg-rose-600 text-white shadow-md shadow-rose-600/20'
-              : 'text-neutral-400 hover:text-white hover:bg-white/5'
+              ? 'bg-rose-600 text-white shadow-xs'
+              : 'text-text-muted hover:text-text-primary hover:bg-bg-secondary'
           }`}
         >
-          <Users className="w-4 h-4" />
+          <Users className="w-3.5 sm:w-4 h-3.5 sm:h-4" />
           <span>Team Accounts ({users.length})</span>
         </button>
         <button
           onClick={() => setActiveSubTab('audit')}
-          className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs sm:text-sm font-semibold transition-all ${
+          className={`flex-1 min-h-[40px] flex items-center justify-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 rounded-lg sm:rounded-xl text-xs sm:text-sm font-semibold transition-all active:scale-98 ${
             activeSubTab === 'audit'
-              ? 'bg-rose-600 text-white shadow-md shadow-rose-600/20'
-              : 'text-neutral-400 hover:text-white hover:bg-white/5'
+              ? 'bg-rose-600 text-white shadow-xs'
+              : 'text-text-muted hover:text-text-primary hover:bg-bg-secondary'
           }`}
         >
-          <History className="w-4 h-4" />
-          <span>Security Audit Trail ({auditLogs.length})</span>
+          <History className="w-3.5 sm:w-4 h-3.5 sm:h-4" />
+          <span>Audit Trail ({auditLogs.length})</span>
         </button>
       </div>
 
       {/* USERS TAB */}
       {activeSubTab === 'users' && (
-        <div className="space-y-4">
+        <div className="space-y-2.5 sm:space-y-3">
           {users.map((u) => (
             <div
               key={u.id}
-              className="p-5 rounded-2xl bg-neutral-900/80 border border-white/10 flex items-center justify-between gap-4"
+              className="p-3.5 sm:p-5 rounded-xl sm:rounded-2xl bg-bg-card border border-border-color flex items-center justify-between gap-3 sm:gap-4 shadow-xs"
             >
-              <div className="space-y-1">
-                <div className="flex items-center gap-2.5">
-                  <h4 className="text-sm font-bold text-white">{u.name}</h4>
-                  <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-rose-500/10 text-rose-300 border border-rose-500/20 uppercase">
+              <div className="space-y-1 min-w-0">
+                <div className="flex items-center gap-2 flex-wrap">
+                  <h4 className="text-xs sm:text-sm font-bold text-text-primary truncate">{u.name}</h4>
+                  <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-500/20 uppercase tracking-wider">
                     {u.role.replace('_', ' ')}
                   </span>
                 </div>
-                <div className="text-xs text-neutral-400 font-mono">{u.email}</div>
+                <div className="text-[11px] sm:text-xs text-text-muted font-mono truncate">{u.email}</div>
               </div>
 
               {u.role !== 'super_admin' && (
                 <button
                   onClick={() => handleDeleteUser(u.id, u.email)}
-                  className="p-2 rounded-lg bg-rose-500/10 hover:bg-rose-500/20 text-rose-400"
+                  className="min-h-[40px] min-w-[40px] p-2 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-500 transition-colors flex items-center justify-center flex-shrink-0 active:scale-95"
                   title="Delete user account"
                 >
                   <Trash2 className="w-4 h-4" />
@@ -173,31 +167,31 @@ export const UsersRolesTab: React.FC = () => {
 
       {/* AUDIT LOG TAB */}
       {activeSubTab === 'audit' && (
-        <div className="bg-neutral-900/80 border border-white/10 rounded-2xl p-4 sm:p-6 space-y-4">
-          <h3 className="text-sm font-bold text-white">System Activity & Authentication Logs</h3>
+        <div className="bg-bg-card border border-border-color rounded-xl sm:rounded-2xl p-3.5 sm:p-5 space-y-3 sm:space-y-4 shadow-xs">
+          <h3 className="text-xs sm:text-sm font-bold text-text-primary">System Activity & Authentication Logs</h3>
 
-          <div className="space-y-2 max-h-96 overflow-y-auto pr-2">
+          <div className="space-y-2 max-h-96 overflow-y-auto pr-1">
             {auditLogs.map((log) => (
               <div
                 key={log.id}
-                className="p-3 rounded-xl bg-black/40 border border-white/5 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs font-mono"
+                className="p-2.5 sm:p-3 rounded-lg sm:rounded-xl bg-bg-secondary border border-border-color flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 sm:gap-2 text-[11px] sm:text-xs font-mono"
               >
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 flex-wrap min-w-0">
                   <span
-                    className={`w-2 h-2 rounded-full ${
+                    className={`w-2 h-2 rounded-full flex-shrink-0 ${
                       log.status === 'success'
-                        ? 'bg-emerald-400'
+                        ? 'bg-emerald-500'
                         : log.status === 'warning'
-                        ? 'bg-amber-400'
-                        : 'bg-rose-400'
+                        ? 'bg-amber-500'
+                        : 'bg-rose-500'
                     }`}
                   />
-                  <span className="text-rose-300 font-bold">{log.action}</span>
-                  <span className="text-neutral-400">({log.userEmail})</span>
-                  <span className="text-neutral-300">{log.details}</span>
+                  <span className="text-rose-600 dark:text-rose-400 font-bold">{log.action}</span>
+                  <span className="text-text-muted truncate">({log.userEmail})</span>
+                  <span className="text-text-secondary truncate">{log.details}</span>
                 </div>
 
-                <div className="text-neutral-500 text-[11px] self-end sm:self-auto">
+                <div className="text-text-muted text-[10px] sm:text-[11px] self-start sm:self-auto flex-shrink-0">
                   {new Date(log.timestamp).toLocaleTimeString()} • IP: {log.ipAddress || '127.0.0.1'}
                 </div>
               </div>
@@ -208,53 +202,53 @@ export const UsersRolesTab: React.FC = () => {
 
       {/* MODAL: Add User */}
       {isAddUserModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
-          <div className="bg-neutral-900 border border-white/15 rounded-2xl max-w-md w-full p-6 space-y-4 shadow-2xl">
-            <h3 className="text-lg font-bold text-white">Add Team Administrator</h3>
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/60 backdrop-blur-xs">
+          <div className="bg-bg-card border border-border-color rounded-xl sm:rounded-2xl max-w-md w-full p-4 sm:p-6 space-y-3.5 sm:space-y-4 shadow-xl max-h-[90vh] overflow-y-auto">
+            <h3 className="text-base sm:text-lg font-bold text-text-primary">Add Team Administrator</h3>
 
-            <form onSubmit={handleCreateUser} className="space-y-4">
+            <form onSubmit={handleCreateUser} className="space-y-3.5 sm:space-y-4">
               <div>
-                <label className="block text-xs font-semibold text-neutral-300 mb-1">Full Name</label>
+                <label className="block text-xs font-semibold text-text-secondary mb-1">Full Name</label>
                 <input
                   type="text"
                   required
                   placeholder="e.g. Client Manager"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  className="w-full bg-black/40 border border-white/10 rounded-xl px-3 py-2 text-sm text-white focus:border-rose-500 focus:outline-none"
+                  className="w-full min-h-[42px] bg-bg-secondary border border-border-color rounded-xl px-3 py-2 text-sm text-text-primary focus:border-rose-500 focus:outline-none"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-neutral-300 mb-1">Admin Email</label>
+                <label className="block text-xs font-semibold text-text-secondary mb-1">Admin Email</label>
                 <input
                   type="email"
                   required
                   placeholder="admin@client.com"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full bg-black/40 border border-white/10 rounded-xl px-3 py-2 text-sm text-white focus:border-rose-500 focus:outline-none"
+                  className="w-full min-h-[42px] bg-bg-secondary border border-border-color rounded-xl px-3 py-2 text-sm text-text-primary focus:border-rose-500 focus:outline-none"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-neutral-300 mb-1">Password</label>
+                <label className="block text-xs font-semibold text-text-secondary mb-1">Password</label>
                 <input
                   type="password"
                   required
                   placeholder="••••••••••••"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full bg-black/40 border border-white/10 rounded-xl px-3 py-2 text-sm text-white focus:border-rose-500 focus:outline-none"
+                  className="w-full min-h-[42px] bg-bg-secondary border border-border-color rounded-xl px-3 py-2 text-sm text-text-primary focus:border-rose-500 focus:outline-none"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-neutral-300 mb-1">Role Permissions</label>
+                <label className="block text-xs font-semibold text-text-secondary mb-1">Role Permissions</label>
                 <select
                   value={role}
                   onChange={(e) => setRole(e.target.value as any)}
-                  className="w-full bg-black/40 border border-white/10 rounded-xl px-3 py-2 text-sm text-white focus:border-rose-500 focus:outline-none"
+                  className="w-full min-h-[42px] bg-bg-secondary border border-border-color rounded-xl px-3 py-2 text-sm text-text-primary focus:border-rose-500 focus:outline-none"
                 >
                   <option value="editor">Editor (Content & Media Only)</option>
                   <option value="admin">Admin (Full Customizer & Sections)</option>
@@ -262,17 +256,17 @@ export const UsersRolesTab: React.FC = () => {
                 </select>
               </div>
 
-              <div className="flex items-center justify-end gap-3 pt-2">
+              <div className="flex items-center justify-end gap-2.5 pt-2 border-t border-border-color">
                 <button
                   type="button"
                   onClick={() => setIsAddUserModalOpen(false)}
-                  className="px-4 py-2 rounded-xl text-xs font-semibold bg-white/10 hover:bg-white/15 text-white"
+                  className="min-h-[42px] px-4 py-2 rounded-xl text-xs font-semibold bg-bg-secondary hover:bg-bg-card text-text-secondary border border-border-color active:scale-98"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 rounded-xl text-xs font-semibold bg-rose-600 hover:bg-rose-700 text-white shadow-md shadow-rose-600/30"
+                  className="min-h-[42px] px-5 py-2 rounded-xl text-xs font-semibold bg-rose-600 hover:bg-rose-700 text-white shadow-xs active:scale-98"
                 >
                   Create Account
                 </button>

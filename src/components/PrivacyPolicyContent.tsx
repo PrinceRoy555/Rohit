@@ -397,7 +397,7 @@ export default function PrivacyPolicyContent() {
         <h2 className="font-bold text-text-primary text-sm">22. Acceptance</h2>
         <p>By accessing or using our Website and Services, you acknowledge that you have had an opportunity to review this Privacy Policy.</p>
         <p>If you do not agree with the applicable privacy practices described here, please discontinue use of the Website and contact us if you have questions or concerns.</p>
-        <div className="pt-2 text-[11px] text-text-muted font-mono">Last Updated: 10 August 2026</div>
+        <div className="pt-2 text-[11px] text-text-muted font-medium">Last Updated: 10 August 2026</div>
       </section>
     </div>
   );

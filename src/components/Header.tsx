@@ -190,13 +190,13 @@ export default function Header({ activeSection, theme: propTheme, toggleTheme: p
   return (
     <>
       <header
-        className={`site-header ${isScrolled ? 'py-3 shadow-md' : 'py-4'}`}
+        className={`site-header ${isScrolled ? 'py-2 sm:py-3 shadow-md' : 'py-2.5 sm:py-4'}`}
         id="app-header"
       >
         <div className="header-inner header-container">
           {/* Left: Rohit Brand Link */}
           <a
-            className="header-brand group cursor-pointer"
+            className="header-brand group cursor-pointer min-w-0 flex-shrink"
             href="/"
             onClick={handleHomeNavigation}
             id="logo-container"
@@ -207,7 +207,7 @@ export default function Header({ activeSection, theme: propTheme, toggleTheme: p
               alt={siteName}
               width="36"
               height="36"
-              className="header-avatar header-brand-image object-cover object-[50%_25%] group-hover:scale-110 transition-transform duration-300"
+              className="header-avatar header-brand-image object-cover object-[50%_25%] group-hover:scale-110 transition-transform duration-300 flex-shrink-0"
               referrerPolicy="no-referrer"
               onError={(e) => {
                 if (e.currentTarget.src !== window.location.origin + '/images/rohit-avatar.jpg') {
@@ -215,7 +215,7 @@ export default function Header({ activeSection, theme: propTheme, toggleTheme: p
                 }
               }}
             />
-            <span className="header-brand-text header-brand-name text-text-primary">
+            <span className="header-brand-text header-brand-name text-text-primary truncate">
               {siteName}<span className="brand-dot text-accent-primary">.</span>
             </span>
           </a>
@@ -251,43 +251,44 @@ export default function Header({ activeSection, theme: propTheme, toggleTheme: p
 
           {/* Right: Action Controls Group */}
           <div className="header-actions">
-            {/* WhatsApp Button */}
+            {/* WhatsApp Button - Visible on tablet/desktop (>= 640px) */}
             <a
               href={WHATSAPP_BUSINESS_URL}
               target="_blank"
               rel="noopener noreferrer"
-              className="whatsapp-button hidden sm:inline-flex items-center justify-center gap-2 h-[42px] min-h-[42px] px-4 rounded-full text-white font-bold text-xs sm:text-sm whitespace-nowrap active:scale-95 transition-all duration-200 shadow-md bg-accent-primary hover:bg-accent-secondary"
+              className="whatsapp-button hidden sm:inline-flex items-center justify-center gap-1.5 h-9 sm:h-[42px] px-3 sm:px-4 rounded-full text-white font-bold text-xs sm:text-sm whitespace-nowrap active:scale-95 transition-all duration-200 shadow-md bg-accent-primary hover:bg-accent-secondary flex-shrink-0"
               id="header-whatsapp-btn"
               aria-label="Contact Rohit Verma on WhatsApp Business"
             >
-              <MessageCircle className="w-4 h-4 text-white stroke-[2.25] flex-shrink-0" />
+              <MessageCircle className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-white stroke-[2.25] flex-shrink-0" />
               <span className="text-white font-bold">WhatsApp</span>
             </a>
 
-            {/* Animated Sun/Moon Theme Toggle */}
+            {/* Animated Sun/Moon Theme Toggle - Always visible, 44-46px touch target */}
             <ThemeToggle
               theme={theme}
               toggleTheme={toggleTheme}
               id="header-theme-toggle"
+              aria-label="Toggle dark mode"
             />
 
-            {/* View Resume Button */}
+            {/* View Resume Button - Visible on desktop (>= 1024px) */}
             <a
               href={resumeUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="resume-button hidden sm:inline-flex items-center justify-center gap-2 h-[42px] min-h-[42px] px-5 rounded-full text-white font-bold text-xs sm:text-sm whitespace-nowrap active:scale-95 transition-all duration-200 shadow-md bg-accent-primary hover:bg-accent-secondary"
+              className="resume-button hidden lg:inline-flex items-center justify-center gap-2 h-[42px] min-h-[42px] px-5 rounded-full text-white font-bold text-xs sm:text-sm whitespace-nowrap active:scale-95 transition-all duration-200 shadow-md bg-accent-primary hover:bg-accent-secondary flex-shrink-0"
               id="download-resume-btn"
               aria-label="Open Rohit Verma Resume PDF"
             >
               <FileText className="w-4 h-4 text-white stroke-[2.25] flex-shrink-0" aria-hidden="true" />
-              <span className="text-white font-bold">View Resume</span>
+              <span className="text-white font-bold">Resume</span>
             </a>
 
-            {/* Hamburger Menu Toggle (Mobile / Tablet) - 44x44px Touch Target */}
+            {/* Hamburger Menu Toggle (Mobile & Tablet < 1024px) - 44x44px Touch Target */}
             <button
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              className="lg:hidden w-11 h-11 min-w-[44px] min-h-[44px] rounded-full border border-border-color bg-bg-card text-accent-primary hover:bg-accent-primary hover:text-white flex items-center justify-center transition-all cursor-pointer shadow-xs active:scale-95"
+              className="lg:hidden w-11 h-11 min-w-[44px] min-h-[44px] rounded-xl border border-border-color bg-bg-card text-accent-primary hover:bg-accent-primary hover:text-white flex items-center justify-center transition-all cursor-pointer shadow-xs active:scale-95 flex-shrink-0"
               id="mobile-menu-toggle"
               aria-label="Toggle navigation menu"
               aria-expanded={isMobileMenuOpen}
@@ -302,86 +303,94 @@ export default function Header({ activeSection, theme: propTheme, toggleTheme: p
       <AnimatePresence>
         {isMobileMenuOpen && (
           <motion.div
-            initial={{ opacity: 0, y: -10 }}
+            initial={{ opacity: 0, y: -8 }}
             animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -10 }}
+            exit={{ opacity: 0, y: -8 }}
             transition={{ duration: 0.2 }}
-            className="fixed inset-0 top-[70px] sm:top-[76px] z-50 flex flex-col justify-between p-6 sm:p-8 lg:hidden overflow-y-auto bg-bg-primary text-text-primary shadow-2xl border-t border-border-color pb-[max(32px,env(safe-area-inset-bottom))] px-[max(20px,env(safe-area-inset-left))]"
-            style={{ minHeight: 'calc(100dvh - 70px)' }}
+            className="fixed inset-x-0 bottom-0 top-[54px] sm:top-[60px] z-[9999] flex flex-col justify-between p-5 sm:p-7 lg:hidden overflow-y-auto bg-bg-primary text-text-primary shadow-2xl border-t border-border-color pb-[max(28px,env(safe-area-inset-bottom))] px-[max(16px,env(safe-area-inset-left))]"
+            style={{ minHeight: 'calc(100dvh - 58px)' }}
             id="mobile-drawer"
             role="dialog"
             aria-modal="true"
             aria-label="Mobile Navigation Menu"
           >
-            <div className="flex flex-col gap-3">
-              {navLinks.map((link, idx) => {
-                const active = isLinkActive(link.id);
-                const isHome = link.id === 'home';
-                return (
-                  <motion.a
-                    initial={{ opacity: 0, x: -15 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: idx * 0.04 }}
-                    key={link.id}
-                    href={isHome ? '/' : `/${link.id}`}
-                    onClick={(e) => (isHome ? handleHomeNavigation(e) : scrollToSection(link.id, e))}
-                    className={`text-left text-xl font-bold py-3 px-4 rounded-2xl transition-all duration-200 flex items-center justify-between cursor-pointer ${
-                      active
-                        ? 'bg-accent-primary/15 text-accent-primary border-l-4 border-accent-primary font-extrabold'
-                        : 'text-text-secondary hover:text-text-primary hover:bg-bg-secondary/60'
-                    }`}
-                    id={`mobile-nav-link-${link.id}`}
-                    aria-current={active ? 'page' : undefined}
-                  >
-                    <span>{link.label}</span>
-                    {active && <span className="w-2 h-2 rounded-full bg-accent-primary pointer-events-none" />}
-                  </motion.a>
-                );
-              })}
+            <div className="flex flex-col gap-4">
+              {/* Quick Primary Actions: WhatsApp & Resume */}
+              <div className="grid grid-cols-2 gap-3" id="mobile-menu-quick-actions">
+                <a
+                  href={WHATSAPP_BUSINESS_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  aria-label="Contact Rohit Verma on WhatsApp Business"
+                  className="flex items-center justify-center gap-2 bg-accent-primary hover:bg-accent-secondary text-white font-bold py-3 px-3 rounded-2xl text-sm shadow-md active:scale-95 transition-all min-h-[46px] text-center cursor-pointer"
+                  id="mobile-menu-whatsapp-btn"
+                >
+                  <MessageCircle className="w-4 h-4 fill-current flex-shrink-0" />
+                  <span>WhatsApp</span>
+                </a>
+
+                <a
+                  href={resumeUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={() => {
+                    setTimeout(() => setIsMobileMenuOpen(false), 150);
+                  }}
+                  aria-label="Open Rohit Verma Resume PDF"
+                  className="flex items-center justify-center gap-2 border border-border-color bg-bg-card hover:bg-bg-secondary text-text-primary hover:text-accent-primary font-bold py-3 px-3 rounded-2xl text-sm shadow-xs active:scale-95 transition-all min-h-[46px] text-center cursor-pointer"
+                  id="mobile-menu-resume-btn"
+                >
+                  <FileText className="w-4 h-4 text-accent-primary flex-shrink-0" aria-hidden="true" />
+                  <span>Resume</span>
+                </a>
+              </div>
+
+              {/* Navigation Links */}
+              <div className="flex flex-col gap-1.5 pt-2 border-t border-border-color/60">
+                {navLinks.map((link, idx) => {
+                  const active = isLinkActive(link.id);
+                  const isHome = link.id === 'home';
+                  return (
+                    <motion.a
+                      initial={{ opacity: 0, x: -12 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: idx * 0.03 }}
+                      key={link.id}
+                      href={isHome ? '/' : `/${link.id}`}
+                      onClick={(e) => (isHome ? handleHomeNavigation(e) : scrollToSection(link.id, e))}
+                      className={`text-left text-lg font-bold py-2.5 px-4 rounded-xl transition-all duration-200 flex items-center justify-between cursor-pointer ${
+                        active
+                          ? 'bg-accent-primary/15 text-accent-primary border-l-4 border-accent-primary font-extrabold'
+                          : 'text-text-secondary hover:text-text-primary hover:bg-bg-secondary/60'
+                      }`}
+                      id={`mobile-nav-link-${link.id}`}
+                      aria-current={active ? 'page' : undefined}
+                    >
+                      <span>{link.label}</span>
+                      {active && <span className="w-2 h-2 rounded-full bg-accent-primary pointer-events-none" />}
+                    </motion.a>
+                  );
+                })}
+              </div>
             </div>
 
-            <div className="flex flex-col gap-3.5 pt-6 border-t border-border-color mt-6">
-              {/* Theme Toggle inside Mobile Drawer */}
-              <div className="flex items-center justify-between py-2 px-1">
-                <span className="text-sm font-semibold text-text-secondary">Theme Mode</span>
+            {/* Bottom: Theme Mode & Location Footer */}
+            <div className="flex flex-col gap-3 pt-4 border-t border-border-color mt-5">
+              <div className="flex items-center justify-between py-2 px-3 rounded-xl bg-bg-card/60 border border-border-color/70">
+                <div className="flex flex-col">
+                  <span className="text-sm font-bold text-text-primary">Theme Appearance</span>
+                  <span className="text-xs text-text-secondary capitalize">{theme === 'dark' ? 'Dark theme active' : 'Light theme active'}</span>
+                </div>
                 <ThemeToggle
                   theme={theme}
                   toggleTheme={toggleTheme}
                   id="mobile-theme-toggle"
+                  aria-label="Toggle dark mode"
                 />
               </div>
 
-              {/* WhatsApp Option inside Drawer */}
-              <a
-                href={WHATSAPP_BUSINESS_URL}
-                target="_blank"
-                rel="noopener noreferrer"
-                onClick={() => setIsMobileMenuOpen(false)}
-                aria-label="Contact Rohit Verma on WhatsApp Business"
-                className="flex items-center justify-center gap-2 text-white font-bold py-3.5 rounded-full text-sm active:scale-95 transition-all duration-200 bg-accent-primary hover:bg-accent-secondary shadow-md"
-                id="mobile-header-whatsapp-btn"
-              >
-                <MessageCircle className="w-4 h-4 fill-current" />
-                Chat on WhatsApp
-              </a>
-
-              {/* View Resume Option inside Drawer */}
-              <a
-                href={resumeUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                onClick={() => {
-                  setTimeout(() => setIsMobileMenuOpen(false), 150);
-                }}
-                className="flex items-center justify-center gap-2 text-white font-bold py-3.5 rounded-full text-sm active:scale-95 transition-all duration-200 bg-accent-primary hover:bg-accent-secondary shadow-md"
-                id="mobile-download-resume-btn"
-                aria-label="Open Rohit Verma Resume PDF"
-              >
-                <FileText className="w-4 h-4 text-white flex-shrink-0" aria-hidden="true" />
-                <span>View Resume</span>
-              </a>
-
-              <div className="text-center text-xs font-medium text-text-muted mt-2">
+              <div className="text-center text-xs font-medium text-text-muted mt-1">
                 Jaipur, Rajasthan, India • Rohit Verma Portfolio
               </div>
             </div>

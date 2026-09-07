@@ -132,14 +132,14 @@ export default function FloatingElements() {
         {/* AI Chatbot Launcher Button (Hidden when chat window is OPEN) */}
         {!isChatbotOpen && (
           <div className="relative flex items-center justify-end">
-            {/* Tooltip prompt "Need help with your project?" */}
+            {/* Tooltip prompt "Need help with your project?" - Hidden on small mobile to avoid blocking content */}
             <AnimatePresence>
               {showChatTooltip && (
                 <motion.div
                   initial={{ opacity: 0, scale: 0.85, x: -10 }}
                   animate={{ opacity: 1, scale: 1, x: 0 }}
                   exit={{ opacity: 0, scale: 0.85, x: -10 }}
-                  className="absolute right-14 bg-bg-card border border-accent-primary/40 text-text-primary text-xs font-semibold px-3.5 py-2 rounded-2xl shadow-xl flex items-center gap-2 max-w-[220px] whitespace-normal pointer-events-none z-20"
+                  className="hidden sm:flex absolute right-14 bg-bg-card border border-accent-primary/40 text-text-primary text-xs font-semibold px-3.5 py-2 rounded-2xl shadow-xl items-center gap-2 max-w-[220px] whitespace-normal pointer-events-none z-20"
                 >
                   <Sparkles className="w-3.5 h-3.5 text-accent-primary flex-shrink-0 animate-pulse" />
                   <span>Need help with your project?</span>
@@ -154,7 +154,7 @@ export default function FloatingElements() {
                   initial={{ opacity: 0, x: -10 }}
                   animate={{ opacity: 1, x: 0 }}
                   exit={{ opacity: 0, x: -10 }}
-                  className="absolute right-14 bg-bg-card border border-border-color px-3 py-1.5 rounded-xl text-xs text-text-primary font-bold whitespace-nowrap shadow-lg pointer-events-none z-10"
+                  className="hidden sm:block absolute right-14 bg-bg-card border border-border-color px-3 py-1.5 rounded-xl text-xs text-text-primary font-bold whitespace-nowrap shadow-lg pointer-events-none z-10"
                 >
                   Ask Uni AI
                 </motion.div>
@@ -165,11 +165,11 @@ export default function FloatingElements() {
               onClick={handleToggleChatbot}
               onMouseEnter={() => setHoveredButton('chatbot')}
               onMouseLeave={() => setHoveredButton(null)}
-              className="w-12 h-12 rounded-full bg-[#A50C18] hover:bg-[#8B0A14] border border-white/20 text-white flex items-center justify-center transition-all duration-200 shadow-xl hover:scale-105 active:scale-95 cursor-pointer outline-none focus-visible:ring-4 focus-visible:ring-[#A50C18] flex-shrink-0 relative"
+              className="w-11 h-11 sm:w-12 sm:h-12 rounded-full bg-[#A50C18] hover:bg-[#8B0A14] border border-white/20 text-white flex items-center justify-center transition-all duration-200 shadow-xl hover:scale-105 active:scale-95 cursor-pointer outline-none focus-visible:ring-4 focus-visible:ring-[#A50C18] flex-shrink-0 relative"
               aria-label="Ask Uni AI Creative Assistant"
               id="uni-ai-chatbot-btn"
             >
-              <Sparkles className="w-5.5 h-5.5 text-white fill-current" />
+              <Sparkles className="w-5 h-5 sm:w-5.5 sm:h-5.5 text-white fill-current" />
             </button>
           </div>
         )}
@@ -184,7 +184,7 @@ export default function FloatingElements() {
                     initial={{ opacity: 0, x: -10 }}
                     animate={{ opacity: 1, x: 0 }}
                     exit={{ opacity: 0, x: -10 }}
-                    className="absolute right-14 bg-bg-card border border-border-color px-3 py-1.5 rounded-xl text-xs text-text-primary font-semibold whitespace-nowrap shadow-lg pointer-events-none z-10"
+                    className="hidden sm:block absolute right-14 bg-bg-card border border-border-color px-3 py-1.5 rounded-xl text-xs text-text-primary font-semibold whitespace-nowrap shadow-lg pointer-events-none z-10"
                   >
                     Back to Top
                   </motion.div>
@@ -199,11 +199,11 @@ export default function FloatingElements() {
                 onClick={scrollToTop}
                 onMouseEnter={() => setHoveredButton('top')}
                 onMouseLeave={() => setHoveredButton(null)}
-                className="w-12 h-12 rounded-full bg-bg-card border border-border-color text-text-primary flex items-center justify-center shadow-xl hover:border-accent-primary hover:text-accent-primary hover:scale-105 active:scale-95 transition-all duration-200 cursor-pointer flex-shrink-0"
+                className="w-11 h-11 sm:w-12 sm:h-12 rounded-full bg-bg-card border border-border-color text-text-primary flex items-center justify-center shadow-xl hover:border-accent-primary hover:text-accent-primary hover:scale-105 active:scale-95 transition-all duration-200 cursor-pointer flex-shrink-0"
                 id="back-to-top-btn"
                 aria-label="Scroll back to top"
               >
-                <ArrowUp className="w-5 h-5" />
+                <ArrowUp className="w-4 h-4 sm:w-5 sm:h-5" />
               </motion.button>
             </div>
           )}

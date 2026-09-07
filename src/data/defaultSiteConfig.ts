@@ -90,7 +90,7 @@ export const DEFAULT_SITE_CONFIG: SiteConfig = {
     bio: 'Professional graphic designer, video editor, and creative director with over 5 years of experience delivering high-converting visual branding and cinematic digital content.',
     avatarImage: '/images/rohit-verma-portrait.jpg',
     logoText: 'Rohit Verma',
-    faviconUrl: '/favicon.ico',
+    faviconUrl: '/favicon.png',
     email: contactConfig.emailDisplay,
     phone: contactConfig.phoneDisplay,
     whatsappUrl: WHATSAPP_BUSINESS_URL,
@@ -114,8 +114,8 @@ export const DEFAULT_SITE_CONFIG: SiteConfig = {
     textPrimary: '#1A090A',
     textSecondary: 'rgba(26, 9, 10, 0.82)',
     borderColor: 'rgba(26, 9, 10, 0.12)',
-    fontHeading: 'Plus Jakarta Sans',
-    fontBody: 'Plus Jakarta Sans',
+    fontHeading: 'Manrope',
+    fontBody: 'Manrope',
     borderRadius: 'full',
     mode: 'system'
   },
@@ -355,8 +355,8 @@ export const BUILT_IN_TEMPLATES: SiteTemplate[] = [
         textPrimary: '#09090B',
         textSecondary: 'rgba(9, 9, 11, 0.80)',
         borderColor: 'rgba(9, 9, 11, 0.14)',
-        fontHeading: 'Plus Jakarta Sans',
-        fontBody: 'Plus Jakarta Sans',
+        fontHeading: 'Manrope',
+        fontBody: 'Manrope',
         borderRadius: 'sm',
         mode: 'light'
       }

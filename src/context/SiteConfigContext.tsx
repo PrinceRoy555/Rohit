@@ -78,12 +78,16 @@ function applyThemeToDom(theme: ThemeConfig) {
     root.style.setProperty('--chat-header-bg-end', theme.accentDark);
   }
 
-  if (theme.fontHeading) {
-    root.style.setProperty('--font-display', `"${theme.fontHeading}", "Inter", sans-serif`);
-  }
-  if (theme.fontBody) {
-    root.style.setProperty('--font-sans', `"${theme.fontBody}", ui-sans-serif, system-ui, sans-serif`);
-  }
+  const fallbackStack = 'system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif';
+  const headingFontName = (theme.fontHeading && theme.fontHeading !== 'Plus Jakarta Sans' && theme.fontHeading !== 'Inter') 
+    ? theme.fontHeading 
+    : 'Manrope';
+  const bodyFontName = (theme.fontBody && theme.fontBody !== 'Plus Jakarta Sans' && theme.fontBody !== 'Inter')
+    ? theme.fontBody
+    : 'Manrope';
+
+  root.style.setProperty('--font-display', `"${headingFontName}", "Manrope", ${fallbackStack}`);
+  root.style.setProperty('--font-sans', `"${bodyFontName}", "Manrope", ${fallbackStack}`);
 
   // Border radius map
   const radiusMap: Record<string, string> = {

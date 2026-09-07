@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useSiteConfig } from '../../../context/SiteConfigContext';
 import { ServiceItem, PricingTierItem } from '../../../types/cms';
+import { PageHeader } from '../layout/PageHeader';
 import {
   Wrench,
   CreditCard,
@@ -175,100 +176,93 @@ export const ServicesPricingTab: React.FC = () => {
   };
 
   return (
-    <div className="space-y-8 max-w-5xl mx-auto">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-white/10 pb-6">
-        <div>
-          <h2 className="text-xl sm:text-2xl font-bold text-white flex items-center gap-2.5">
-            <Wrench className="w-6 h-6 text-amber-500" />
-            <span>Services & Pricing Tiers</span>
-          </h2>
-          <p className="text-sm text-neutral-400 mt-1">
-            Configure client service offerings, feature breakdowns, and package pricing.
-          </p>
-        </div>
-
-        <button
-          onClick={handleSaveDraft}
-          disabled={isSaving}
-          className="px-5 py-2.5 rounded-xl text-sm font-semibold bg-rose-600 hover:bg-rose-700 text-white shadow-lg shadow-rose-600/30 flex items-center gap-2 transition-all self-start sm:self-auto"
-        >
-          {savedSuccess ? (
-            <>
-              <Check className="w-4 h-4 text-emerald-300" />
-              <span>Draft Saved!</span>
-            </>
-          ) : (
-            <>
-              <Save className="w-4 h-4" />
-              <span>{isSaving ? 'Saving...' : 'Save Draft'}</span>
-            </>
-          )}
-        </button>
-      </div>
+    <div className="space-y-6 max-w-5xl mx-auto">
+      <PageHeader
+        title="Services & Pricing Tiers"
+        description="Configure client service offerings, feature breakdowns, and package pricing."
+        actions={
+          <button
+            onClick={handleSaveDraft}
+            disabled={isSaving}
+            className="h-9 px-3.5 rounded-lg text-xs font-semibold bg-accent-primary hover:bg-accent-secondary text-white flex items-center justify-center gap-2 shadow-xs transition-all cursor-pointer select-none"
+          >
+            {savedSuccess ? (
+              <>
+                <Check className="w-3.5 h-3.5 text-emerald-300" />
+                <span>Draft Saved!</span>
+              </>
+            ) : (
+              <>
+                <Save className="w-3.5 h-3.5" />
+                <span>{isSaving ? 'Saving...' : 'Save Draft'}</span>
+              </>
+            )}
+          </button>
+        }
+      />
 
       {/* Sub-nav */}
-      <div className="flex flex-wrap gap-2 p-1.5 bg-neutral-900/80 border border-white/10 rounded-2xl">
+      <div className="flex overflow-x-auto no-scrollbar items-center gap-1.5 sm:gap-2 p-1.5 bg-bg-card border border-border-color rounded-xl sm:rounded-2xl">
         <button
           onClick={() => setActiveSubTab('services')}
-          className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs sm:text-sm font-semibold transition-all ${
+          className={`flex-shrink-0 whitespace-nowrap min-h-[38px] flex items-center gap-2 px-3.5 sm:px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all active:scale-98 ${
             activeSubTab === 'services'
-              ? 'bg-amber-600 text-white shadow-md shadow-amber-600/20'
-              : 'text-neutral-400 hover:text-white hover:bg-white/5'
+              ? 'bg-rose-600 text-white shadow-xs'
+              : 'text-text-muted hover:text-text-primary hover:bg-bg-secondary'
           }`}
         >
-          <Wrench className="w-4 h-4" />
+          <Wrench className="w-3.5 h-3.5" />
           <span>Creative Services ({services.length})</span>
         </button>
         <button
           onClick={() => setActiveSubTab('pricing')}
-          className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs sm:text-sm font-semibold transition-all ${
+          className={`flex-shrink-0 whitespace-nowrap min-h-[38px] flex items-center gap-2 px-3.5 sm:px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all active:scale-98 ${
             activeSubTab === 'pricing'
-              ? 'bg-amber-600 text-white shadow-md shadow-amber-600/20'
-              : 'text-neutral-400 hover:text-white hover:bg-white/5'
+              ? 'bg-rose-600 text-white shadow-xs'
+              : 'text-text-muted hover:text-text-primary hover:bg-bg-secondary'
           }`}
         >
-          <CreditCard className="w-4 h-4" />
+          <CreditCard className="w-3.5 h-3.5" />
           <span>Pricing Packages ({pricing.length})</span>
         </button>
       </div>
 
       {/* SERVICES SUB-TAB */}
       {activeSubTab === 'services' && (
-        <div className="space-y-6">
+        <div className="space-y-4 sm:space-y-6">
           <div className="flex items-center justify-between">
-            <h3 className="text-base font-bold text-white">Active Service Offerings</h3>
+            <h3 className="text-sm sm:text-base font-bold text-text-primary">Active Service Offerings</h3>
             <button
               onClick={handleOpenAddService}
-              className="px-4 py-2 rounded-xl text-xs font-semibold bg-amber-600 hover:bg-amber-700 text-white shadow-md shadow-amber-600/20 flex items-center gap-1.5"
+              className="min-h-[38px] px-3.5 sm:px-4 py-1.5 rounded-xl text-xs font-semibold bg-rose-600 hover:bg-rose-700 text-white shadow-xs flex items-center gap-1.5 active:scale-98"
             >
               <Plus className="w-4 h-4" />
               <span>Add Service</span>
             </button>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5 sm:gap-4">
             {services.map((s) => (
               <div
                 key={s.id}
-                className="p-5 rounded-2xl bg-neutral-900/80 border border-white/10 hover:border-white/20 transition-all flex flex-col justify-between"
+                className="p-4 sm:p-5 rounded-xl sm:rounded-2xl bg-bg-card border border-border-color hover:border-rose-500/30 transition-all flex flex-col justify-between shadow-xs"
               >
                 <div>
-                  <div className="flex items-center justify-between">
-                    <h4 className="text-base font-bold text-white">{s.title}</h4>
+                  <div className="flex items-center justify-between gap-2">
+                    <h4 className="text-sm sm:text-base font-bold text-text-primary">{s.title}</h4>
                     {s.priceStartingAt && (
-                      <span className="px-2.5 py-1 rounded-full text-xs font-bold bg-amber-500/10 text-amber-300 border border-amber-500/20">
+                      <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-500/20 flex-shrink-0">
                         {s.priceStartingAt}
                       </span>
                     )}
                   </div>
-                  <p className="text-xs text-neutral-400 mt-2">{s.description}</p>
+                  <p className="text-xs text-text-muted mt-1.5">{s.description}</p>
 
                   {s.features && (
                     <ul className="mt-3 space-y-1">
                       {s.features.map((f, idx) => (
-                        <li key={idx} className="text-xs text-neutral-300 flex items-center gap-1.5">
-                          <CheckCircle2 className="w-3.5 h-3.5 text-amber-400 flex-shrink-0" />
+                        <li key={idx} className="text-xs text-text-secondary flex items-center gap-1.5">
+                          <CheckCircle2 className="w-3.5 h-3.5 text-rose-500 flex-shrink-0" />
                           <span>{f}</span>
                         </li>
                       ))}
@@ -276,16 +270,20 @@ export const ServicesPricingTab: React.FC = () => {
                   )}
                 </div>
 
-                <div className="mt-4 pt-3 border-t border-white/5 flex items-center justify-end gap-2">
+                <div className="mt-4 pt-3 border-t border-border-color flex items-center justify-end gap-1.5">
                   <button
                     onClick={() => handleOpenEditService(s)}
-                    className="p-2 rounded-lg bg-white/5 hover:bg-white/10 text-neutral-300 hover:text-white"
+                    className="w-[38px] h-[38px] rounded-xl bg-bg-secondary hover:bg-bg-card-hover text-text-muted hover:text-text-primary border border-border-color flex items-center justify-center transition-colors active:scale-95"
+                    title="Edit Service"
+                    aria-label="Edit Service"
                   >
                     <Edit2 className="w-3.5 h-3.5" />
                   </button>
                   <button
                     onClick={() => handleDeleteService(s.id)}
-                    className="p-2 rounded-lg bg-rose-500/10 hover:bg-rose-500/20 text-rose-400"
+                    className="w-[38px] h-[38px] rounded-xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-600 dark:text-rose-400 border border-rose-500/20 flex items-center justify-center transition-colors active:scale-95"
+                    title="Delete Service"
+                    aria-label="Delete Service"
                   >
                     <Trash2 className="w-3.5 h-3.5" />
                   </button>
@@ -298,63 +296,67 @@ export const ServicesPricingTab: React.FC = () => {
 
       {/* PRICING SUB-TAB */}
       {activeSubTab === 'pricing' && (
-        <div className="space-y-6">
+        <div className="space-y-4 sm:space-y-6">
           <div className="flex items-center justify-between">
-            <h3 className="text-base font-bold text-white">Pricing & Retainer Packages</h3>
+            <h3 className="text-sm sm:text-base font-bold text-text-primary">Pricing & Retainer Packages</h3>
             <button
               onClick={handleOpenAddPricing}
-              className="px-4 py-2 rounded-xl text-xs font-semibold bg-amber-600 hover:bg-amber-700 text-white shadow-md shadow-amber-600/20 flex items-center gap-1.5"
+              className="min-h-[38px] px-3.5 sm:px-4 py-1.5 rounded-xl text-xs font-semibold bg-rose-600 hover:bg-rose-700 text-white shadow-xs flex items-center gap-1.5 active:scale-98"
             >
               <Plus className="w-4 h-4" />
               <span>Add Package</span>
             </button>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-3.5 sm:gap-4">
             {pricing.map((p) => (
               <div
                 key={p.id}
-                className={`p-5 rounded-2xl border transition-all flex flex-col justify-between relative ${
+                className={`p-4 sm:p-5 rounded-xl sm:rounded-2xl border transition-all flex flex-col justify-between relative shadow-xs ${
                   p.isPopular
-                    ? 'bg-neutral-900 border-amber-500/60 ring-1 ring-amber-500/40 shadow-xl'
-                    : 'bg-neutral-900/80 border-white/10'
+                    ? 'bg-bg-card border-rose-500 ring-1 ring-rose-500/30'
+                    : 'bg-bg-card border-border-color hover:border-rose-500/30'
                 }`}
               >
                 <div>
                   {p.isPopular && (
-                    <span className="inline-block px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-amber-500 text-black mb-3">
+                    <span className="inline-block px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-rose-600 text-white mb-2.5 shadow-xs">
                       MOST POPULAR
                     </span>
                   )}
-                  <h4 className="text-lg font-bold text-white">{p.name}</h4>
-                  <div className="mt-2 flex items-baseline gap-1">
-                    <span className="text-2xl font-black text-white">{p.price}</span>
-                    <span className="text-xs text-neutral-400">{p.period}</span>
+                  <h4 className="text-base sm:text-lg font-bold text-text-primary">{p.name}</h4>
+                  <div className="mt-1.5 flex items-baseline gap-1">
+                    <span className="text-xl sm:text-2xl font-black text-text-primary">{p.price}</span>
+                    <span className="text-xs text-text-muted">{p.period}</span>
                   </div>
-                  <p className="text-xs text-neutral-400 mt-2">{p.description}</p>
+                  <p className="text-xs text-text-muted mt-1.5">{p.description}</p>
 
-                  <ul className="mt-4 space-y-1.5 border-t border-white/5 pt-3">
+                  <ul className="mt-3.5 space-y-1.5 border-t border-border-color pt-3">
                     {(p.features || []).map((f, idx) => (
-                      <li key={idx} className="text-xs text-neutral-300 flex items-center gap-1.5">
-                        <CheckCircle2 className="w-3.5 h-3.5 text-amber-400 flex-shrink-0" />
+                      <li key={idx} className="text-xs text-text-secondary flex items-center gap-1.5">
+                        <CheckCircle2 className="w-3.5 h-3.5 text-rose-500 flex-shrink-0" />
                         <span>{f}</span>
                       </li>
                     ))}
                   </ul>
                 </div>
 
-                <div className="mt-5 pt-3 border-t border-white/5 flex items-center justify-between">
-                  <span className="text-xs text-neutral-400 font-medium">{p.ctaText || 'Get Started'}</span>
+                <div className="mt-4 pt-3 border-t border-border-color flex items-center justify-between">
+                  <span className="text-xs text-text-muted font-medium">{p.ctaText || 'Get Started'}</span>
                   <div className="flex items-center gap-1.5">
                     <button
                       onClick={() => handleOpenEditPricing(p)}
-                      className="p-2 rounded-lg bg-white/5 hover:bg-white/10 text-neutral-300 hover:text-white"
+                      className="w-[38px] h-[38px] rounded-xl bg-bg-secondary hover:bg-bg-card-hover text-text-muted hover:text-text-primary border border-border-color flex items-center justify-center transition-colors active:scale-95"
+                      title="Edit Package"
+                      aria-label="Edit Package"
                     >
                       <Edit2 className="w-3.5 h-3.5" />
                     </button>
                     <button
                       onClick={() => handleDeletePricing(p.id)}
-                      className="p-2 rounded-lg bg-rose-500/10 hover:bg-rose-500/20 text-rose-400"
+                      className="w-[38px] h-[38px] rounded-xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-600 dark:text-rose-400 border border-rose-500/20 flex items-center justify-center transition-colors active:scale-95"
+                      title="Delete Package"
+                      aria-label="Delete Package"
                     >
                       <Trash2 className="w-3.5 h-3.5" />
                     </button>
@@ -368,66 +370,66 @@ export const ServicesPricingTab: React.FC = () => {
 
       {/* MODAL: Service Edit */}
       {isEditingService && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
-          <div className="bg-neutral-900 border border-white/15 rounded-2xl max-w-md w-full p-6 space-y-4 shadow-2xl">
-            <h3 className="text-lg font-bold text-white">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/60 dark:bg-black/80 backdrop-blur-xs">
+          <div className="bg-bg-card border border-border-color rounded-xl sm:rounded-2xl max-w-md w-full p-4 sm:p-6 space-y-3.5 shadow-2xl text-text-primary max-h-[92vh] overflow-y-auto">
+            <h3 className="text-base sm:text-lg font-bold text-text-primary">
               {currentServiceId ? 'Edit Service' : 'Add Creative Service'}
             </h3>
 
-            <form onSubmit={handleSaveService} className="space-y-4">
+            <form onSubmit={handleSaveService} className="space-y-3">
               <div>
-                <label className="block text-xs font-semibold text-neutral-300 mb-1">Service Title</label>
+                <label className="block text-xs font-semibold text-text-secondary mb-1">Service Title</label>
                 <input
                   type="text"
                   required
                   value={serviceTitle}
                   onChange={(e) => setServiceTitle(e.target.value)}
-                  className="w-full bg-black/40 border border-white/10 rounded-xl px-3 py-2 text-sm text-white focus:border-amber-500 focus:outline-none"
+                  className="w-full min-h-[42px] bg-bg-secondary border border-border-color rounded-xl px-3 py-2 text-sm text-text-primary focus:border-rose-500 focus:outline-none"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-neutral-300 mb-1">Starting Price Tag</label>
+                <label className="block text-xs font-semibold text-text-secondary mb-1">Starting Price Tag</label>
                 <input
                   type="text"
                   placeholder="e.g. $499+ / project"
                   value={servicePrice}
                   onChange={(e) => setServicePrice(e.target.value)}
-                  className="w-full bg-black/40 border border-white/10 rounded-xl px-3 py-2 text-sm text-white focus:border-amber-500 focus:outline-none"
+                  className="w-full min-h-[42px] bg-bg-secondary border border-border-color rounded-xl px-3 py-2 text-sm text-text-primary focus:border-rose-500 focus:outline-none"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-neutral-300 mb-1">Description</label>
+                <label className="block text-xs font-semibold text-text-secondary mb-1">Description</label>
                 <textarea
                   rows={3}
                   value={serviceDesc}
                   onChange={(e) => setServiceDesc(e.target.value)}
-                  className="w-full bg-black/40 border border-white/10 rounded-xl px-3 py-2 text-sm text-white focus:border-amber-500 focus:outline-none resize-none"
+                  className="w-full bg-bg-secondary border border-border-color rounded-xl p-3 text-sm text-text-primary focus:border-rose-500 focus:outline-none resize-none"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-neutral-300 mb-1">Key Deliverables (comma separated)</label>
+                <label className="block text-xs font-semibold text-text-secondary mb-1">Key Deliverables (comma separated)</label>
                 <input
                   type="text"
                   value={serviceFeatures}
                   onChange={(e) => setServiceFeatures(e.target.value)}
-                  className="w-full bg-black/40 border border-white/10 rounded-xl px-3 py-2 text-sm text-white focus:border-amber-500 focus:outline-none"
+                  className="w-full min-h-[42px] bg-bg-secondary border border-border-color rounded-xl px-3 py-2 text-sm text-text-primary focus:border-rose-500 focus:outline-none"
                 />
               </div>
 
-              <div className="flex items-center justify-end gap-3 pt-2">
+              <div className="flex items-center justify-end gap-2.5 pt-2 border-t border-border-color">
                 <button
                   type="button"
                   onClick={() => setIsEditingService(false)}
-                  className="px-4 py-2 rounded-xl text-xs font-semibold bg-white/10 hover:bg-white/15 text-white"
+                  className="min-h-[42px] px-4 py-2 rounded-xl text-xs font-semibold bg-bg-secondary hover:bg-bg-card-hover text-text-primary border border-border-color transition-colors active:scale-98"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 rounded-xl text-xs font-semibold bg-amber-600 hover:bg-amber-700 text-white shadow-md shadow-amber-600/30"
+                  className="min-h-[42px] px-5 py-2 rounded-xl text-xs font-semibold bg-rose-600 hover:bg-rose-700 text-white shadow-xs transition-all active:scale-98"
                 >
                   Save Service
                 </button>
@@ -439,91 +441,91 @@ export const ServicesPricingTab: React.FC = () => {
 
       {/* MODAL: Pricing Edit */}
       {isEditingPricing && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
-          <div className="bg-neutral-900 border border-white/15 rounded-2xl max-w-md w-full p-6 space-y-4 shadow-2xl">
-            <h3 className="text-lg font-bold text-white">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/60 dark:bg-black/80 backdrop-blur-xs">
+          <div className="bg-bg-card border border-border-color rounded-xl sm:rounded-2xl max-w-md w-full p-4 sm:p-6 space-y-3.5 shadow-2xl text-text-primary max-h-[92vh] overflow-y-auto">
+            <h3 className="text-base sm:text-lg font-bold text-text-primary">
               {currentPricingId ? 'Edit Package' : 'Add Pricing Package'}
             </h3>
 
-            <form onSubmit={handleSavePricing} className="space-y-4">
+            <form onSubmit={handleSavePricing} className="space-y-3">
               <div className="grid grid-cols-2 gap-3">
                 <div className="col-span-2">
-                  <label className="block text-xs font-semibold text-neutral-300 mb-1">Package Name</label>
+                  <label className="block text-xs font-semibold text-text-secondary mb-1">Package Name</label>
                   <input
                     type="text"
                     required
                     value={tierName}
                     onChange={(e) => setTierName(e.target.value)}
-                    className="w-full bg-black/40 border border-white/10 rounded-xl px-3 py-2 text-sm text-white focus:border-amber-500 focus:outline-none"
+                    className="w-full min-h-[42px] bg-bg-secondary border border-border-color rounded-xl px-3 py-2 text-sm text-text-primary focus:border-rose-500 focus:outline-none"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-neutral-300 mb-1">Price</label>
+                  <label className="block text-xs font-semibold text-text-secondary mb-1">Price</label>
                   <input
                     type="text"
                     required
                     value={tierPrice}
                     onChange={(e) => setTierPrice(e.target.value)}
-                    className="w-full bg-black/40 border border-white/10 rounded-xl px-3 py-2 text-sm text-white focus:border-amber-500 focus:outline-none"
+                    className="w-full min-h-[42px] bg-bg-secondary border border-border-color rounded-xl px-3 py-2 text-sm text-text-primary focus:border-rose-500 focus:outline-none"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-neutral-300 mb-1">Billing Period</label>
+                  <label className="block text-xs font-semibold text-text-secondary mb-1">Billing Period</label>
                   <input
                     type="text"
                     value={tierPeriod}
                     onChange={(e) => setTierPeriod(e.target.value)}
-                    className="w-full bg-black/40 border border-white/10 rounded-xl px-3 py-2 text-sm text-white focus:border-amber-500 focus:outline-none"
+                    className="w-full min-h-[42px] bg-bg-secondary border border-border-color rounded-xl px-3 py-2 text-sm text-text-primary focus:border-rose-500 focus:outline-none"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-neutral-300 mb-1">Short Summary</label>
+                <label className="block text-xs font-semibold text-text-secondary mb-1">Short Summary</label>
                 <input
                   type="text"
                   value={tierDesc}
                   onChange={(e) => setTierDesc(e.target.value)}
-                  className="w-full bg-black/40 border border-white/10 rounded-xl px-3 py-2 text-sm text-white focus:border-amber-500 focus:outline-none"
+                  className="w-full min-h-[42px] bg-bg-secondary border border-border-color rounded-xl px-3 py-2 text-sm text-text-primary focus:border-rose-500 focus:outline-none"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-neutral-300 mb-1">Included Features (comma separated)</label>
+                <label className="block text-xs font-semibold text-text-secondary mb-1">Included Features (comma separated)</label>
                 <textarea
                   rows={3}
                   value={tierFeatures}
                   onChange={(e) => setTierFeatures(e.target.value)}
-                  className="w-full bg-black/40 border border-white/10 rounded-xl px-3 py-2 text-xs text-white focus:border-amber-500 focus:outline-none resize-none"
+                  className="w-full bg-bg-secondary border border-border-color rounded-xl p-3 text-xs text-text-primary focus:border-rose-500 focus:outline-none resize-none"
                 />
               </div>
 
-              <div className="flex items-center gap-3 pt-1">
+              <div className="flex items-center gap-2.5 pt-1">
                 <input
                   type="checkbox"
                   id="popularCheck"
                   checked={tierIsPopular}
                   onChange={(e) => setTierIsPopular(e.target.checked)}
-                  className="w-4 h-4 text-amber-600 rounded bg-black/40 border-white/20 focus:ring-amber-500"
+                  className="w-4 h-4 text-rose-600 rounded bg-bg-secondary border-border-color focus:ring-rose-500"
                 />
-                <label htmlFor="popularCheck" className="text-xs font-semibold text-white cursor-pointer">
-                  Mark as "Most Popular" Tier
+                <label htmlFor="popularCheck" className="text-xs font-semibold text-text-primary cursor-pointer">
+                  Mark as &quot;Most Popular&quot; Tier
                 </label>
               </div>
 
-              <div className="flex items-center justify-end gap-3 pt-2">
+              <div className="flex items-center justify-end gap-2.5 pt-2 border-t border-border-color">
                 <button
                   type="button"
                   onClick={() => setIsEditingPricing(false)}
-                  className="px-4 py-2 rounded-xl text-xs font-semibold bg-white/10 hover:bg-white/15 text-white"
+                  className="min-h-[42px] px-4 py-2 rounded-xl text-xs font-semibold bg-bg-secondary hover:bg-bg-card-hover text-text-primary border border-border-color transition-colors active:scale-98"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 rounded-xl text-xs font-semibold bg-amber-600 hover:bg-amber-700 text-white shadow-md shadow-amber-600/30"
+                  className="min-h-[42px] px-5 py-2 rounded-xl text-xs font-semibold bg-rose-600 hover:bg-rose-700 text-white shadow-xs transition-all active:scale-98"
                 >
                   Save Package
                 </button>

@@ -161,7 +161,7 @@ function SkillCard({ skill, index }: { skill: Skill; index: number; key?: string
       </div>
 
       {/* Tool Percentage & Name with High Contrast Theme Colors */}
-      <span className="text-xl sm:text-2xl font-black text-text-primary mb-0.5 sm:mb-1 tracking-tight">
+      <span className="text-xl sm:text-2xl font-bold text-text-primary mb-0.5 sm:mb-1 tracking-tight tabular-nums">
         {skill.percentage}%
       </span>
       <h3 className="text-xs sm:text-sm font-bold text-text-secondary group-hover:text-accent-primary transition-colors line-clamp-1">
