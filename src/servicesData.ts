@@ -74,7 +74,7 @@ export const SERVICES_LIST: DetailedService[] = [
     iconName: 'Palette',
     isFeatured: true,
     isPopular: true,
-    features: ['Custom Graphic Assets', 'Creative Composition', 'Brand-Compliant Artwork', 'Fast Turnaround'],
+    features: ['Custom Graphic Assets', 'Creative Composition', 'Brand-Compliant Artwork', 'High-Quality Execution'],
     details: {
       introduction: 'Comprehensive graphic design solutions crafted to elevate your business presence across print, digital, and promotional media.',
       included: [
@@ -90,7 +90,7 @@ export const SERVICES_LIST: DetailedService[] = [
       relatedProjects: ['Creative Portfolio', 'Hodu Academy Social Media Campaign'],
       faqs: [
         { question: 'What file formats do I receive?', answer: 'You will receive ready-to-use PNG/JPG exports alongside print-ready PDFs and editable source files.' },
-        { question: 'How many revisions are included?', answer: 'Each graphic project includes iterative revisions to ensure complete alignment with your vision.' }
+        { question: 'How many revisions are included?', answer: 'Standard projects include 2 rounds of revisions within the agreed scope to refine typography, color palettes, spacing, and layout.' }
       ]
     }
   },
@@ -119,7 +119,7 @@ export const SERVICES_LIST: DetailedService[] = [
       relatedProjects: ['Creative Portfolio'],
       faqs: [
         { question: 'Do you create a complete brand guidelines manual?', answer: 'Yes, we provide a detailed brand manual explaining font usage, color codes (HEX/RGB/CMYK), and spacing rules.' },
-        { question: 'Will I get full commercial ownership?', answer: 'Yes, full commercial intellectual property rights are transferred upon project completion.' }
+        { question: 'Will I get full commercial ownership?', answer: 'Yes, full commercial rights are transferred upon receipt of full final payment.' }
       ]
     }
   },
@@ -343,7 +343,7 @@ export const SERVICES_LIST: DetailedService[] = [
       deliverables: ['Optimized JPG / PNG Thumbnails under 2MB', 'Editable PSD Templates'],
       relatedProjects: ['Hodu Academy Social Media Campaign'],
       faqs: [
-        { question: 'Do you offer rush delivery for urgent video uploads?', answer: 'Yes, fast-track delivery is available for active YouTube creators.' }
+        { question: 'Do you offer expedited delivery for urgent video uploads?', answer: 'Expedited timelines can be arranged based on availability and project requirements.' }
       ]
     }
   },

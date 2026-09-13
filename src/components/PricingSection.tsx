@@ -19,47 +19,96 @@ interface PricingPackage {
 
 const defaultPackages: PricingPackage[] = [
   {
-    title: 'Starter',
-    price: '₹4,999',
-    description: 'Social Media Design Package perfect for growing personal brands and early-stage setups.',
+    title: 'Logo Design',
+    price: '₹2,999',
+    description: 'Best for businesses needing a clean, memorable, and high-impact custom logo.',
     features: [
-      '10 Custom Social Designs',
-      'Original Brand-Compliant Fonts',
-      'Direct Canva Template Access',
-      'Basic revisions included',
-      'Standard 7-day delivery'
+      '2 Unique Logo Concepts',
+      '2 Rounds of Revisions Included',
+      'Timeline Confirmed After Scope Review',
+      'High-Resolution Files (PNG, JPG, Vector/PDF)',
+      'Source Files Available Upon Request',
+      'Watermarked Preview Before Final Files',
+      '50% Advance to Begin; Balance Before Final Files'
     ],
     accentColor: '#D31322',
-    whatsappMessage: 'Hello Rohit, I am interested in your Starter Social Media Design Package starting at ₹4,999.'
+    whatsappMessage: 'Hi Rohit, I visited your portfolio and would like to discuss a Logo Design project (Starting at ₹2,999).'
   },
   {
-    title: 'Professional',
-    price: '₹12,999',
-    description: 'Branding and content package curated to scale business outreach and increase engagement.',
+    title: 'Brand Identity Starter',
+    price: '₹7,999',
+    description: 'Best for startups and growing businesses that need a cohesive and professional visual brand presence.',
     features: [
-      '20 Premium Social Designs',
-      '5 Edited Reels (High Pacing)',
-      'Brand Identity Refresh (Logo + Colors)',
-      'Priority revisions & Feedback',
-      'Express 4-day delivery'
+      '2 to 3 Custom Logo Concepts',
+      'Brand Color Palette & Typography Guidelines',
+      'Business Card & Letterhead Design',
+      'Social Media Profile & Cover Assets',
+      '2 Rounds of Revisions Included',
+      'Timeline Confirmed After Scope Review',
+      'Print-Ready and Digital File Formats',
+      'Complete Source Files Included (AI, PSD, or PDF)',
+      '50% Advance to Begin; Balance Before Final Files'
     ],
     isPopular: true,
     accentColor: '#D31322',
-    whatsappMessage: 'Hello Rohit, I am interested in your Professional Branding & Content Package starting at ₹12,999.'
+    whatsappMessage: 'Hi Rohit, I visited your portfolio and would like to discuss the Brand Identity Starter Package (Starting at ₹7,999).'
   },
   {
-    title: 'Premium',
-    price: 'Custom',
-    description: 'Complete creative solution and dedicated design partnership for high-velocity brands.',
+    title: 'Complete Brand Identity',
+    price: '₹12,999',
+    description: 'Best for brands looking for a comprehensive identity system, marketing collateral and digital assets.',
     features: [
-      'Full Brand Identity Strategy',
-      'Uncapped Social Media Creatives',
-      'Premium Video Editing (Reels/Shorts)',
-      'Cinematic Motion Graphics',
-      'Dedicated Slack/WhatsApp support'
+      'Complete Logo Suite (Primary, Secondary & Sub-marks)',
+      'Comprehensive Brand Style Guide Book',
+      'Stationery & Marketing Collateral (Flyer/Brochure/Banner)',
+      'Social Media Kit (Templates & Post Graphics)',
+      'Complete Source Files for All Approved Assets',
+      '2 Rounds of Revisions Per Asset Included',
+      'Timeline Confirmed After Scope Review',
+      'Dedicated WhatsApp & Email Project Support',
+      '50% Advance to Begin; Balance Before Final Files'
     ],
     accentColor: '#D31322',
-    whatsappMessage: 'Hello Rohit, I am interested in your Premium Complete Creative Solution. Let\'s discuss details and custom pricing.'
+    whatsappMessage: 'Hi Rohit, I visited your portfolio and would like to discuss the Complete Brand Identity Package (Starting at ₹12,999 / Custom Quote).'
+  }
+];
+
+const individualServices = [
+  {
+    name: 'Graphic Design',
+    startingRate: 'Starting at ₹499',
+    unit: 'per design',
+    description: 'Marketing banners, posters, flyers, print collateral, and custom visual assets.'
+  },
+  {
+    name: 'Social Media Creatives',
+    startingRate: 'Starting at ₹3,999',
+    unit: 'per package',
+    description: 'Branded social posts, carousels, story graphics, and promotional campaign visuals.'
+  },
+  {
+    name: 'Video Editing',
+    startingRate: 'Starting at ₹999',
+    unit: 'per short video',
+    description: 'Reels, YouTube Shorts, TikToks, pacing cuts, dynamic text overlays, and sound design.'
+  },
+  {
+    name: 'Motion Graphics',
+    startingRate: 'Starting at ₹1,999',
+    unit: 'per video',
+    description: 'Logo animations, kinetic typography, intro/outro sequences, and animated teasers.'
+  },
+  {
+    name: 'Website Design & Development',
+    startingRate: 'Starting at ₹14,999',
+    unit: '',
+    description: 'Responsive landing pages, personal portfolios, company websites, and web interfaces.'
+  },
+  {
+    name: 'Digital Marketing',
+    startingRate: 'Starting at ₹9,999',
+    unit: 'per month',
+    description: 'Visual campaign strategy, brand positioning, and social media creative assets.'
   }
 ];
 
@@ -197,9 +246,9 @@ export default function PricingSection() {
                   <span className="text-3xl sm:text-4xl font-bold text-text-primary tracking-tight tabular-nums">
                     {pkg.price}
                   </span>
-                  {pkg.price !== 'Custom' && (
-                    <span className="text-text-muted text-xs font-medium">/ package</span>
-                  )}
+                  <span className="text-text-muted text-xs font-medium">
+                    {pkg.title === 'Complete Brand Identity' ? 'starting rate / custom' : 'starting rate'}
+                  </span>
                 </div>
 
                 {/* Separator line */}
@@ -249,6 +298,109 @@ export default function PricingSection() {
               </div>
             </motion.div>
           ))}
+        </div>
+
+        {/* Individual Services & A La Carte Starting Rates */}
+        <div className="mt-14 pt-10 border-t border-border-color" id="individual-services-pricing">
+          <div className="text-center max-w-2xl mx-auto mb-8">
+            <span className="text-xs font-bold uppercase tracking-widest text-accent-primary bg-accent-primary/10 px-3 py-1 rounded-full inline-block mb-2">
+              Individual Services
+            </span>
+            <h3 className="text-xl sm:text-2xl font-extrabold text-text-primary tracking-tight">
+              A La Carte &amp; Service Starting Rates
+            </h3>
+            <p className="text-xs sm:text-sm text-text-secondary mt-1.5 leading-relaxed">
+              Prices shown are starting estimates. Final pricing depends on the project scope, complexity and required deliverables. A custom quotation will be provided after discussing the project requirements.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {individualServices.map((service, sIdx) => (
+              <div
+                key={sIdx}
+                className="bg-bg-card border border-border-color rounded-xl p-4 sm:p-5 flex flex-col justify-between hover:border-accent-primary/40 transition-all shadow-xs"
+              >
+                <div>
+                  <div className="flex items-baseline justify-between gap-2 mb-1.5">
+                    <h4 className="font-bold text-text-primary text-sm sm:text-base">
+                      {service.name}
+                    </h4>
+                  </div>
+                  <div className="flex items-baseline gap-1.5 mb-2">
+                    <span className="text-base sm:text-lg font-extrabold text-accent-primary">
+                      {service.startingRate}
+                    </span>
+                    {service.unit && (
+                      <span className="text-xs text-text-muted font-medium">
+                        {service.unit}
+                      </span>
+                    )}
+                  </div>
+                  <p className="text-xs text-text-secondary leading-relaxed mb-4">
+                    {service.description}
+                  </p>
+                </div>
+                <div className="pt-3 border-t border-border-color/60 flex items-center justify-between gap-2">
+                  <button
+                    onClick={() => setSelectedPkg({
+                      title: service.name,
+                      price: service.startingRate + (service.unit ? ` ${service.unit}` : ''),
+                      description: service.description,
+                      features: ['Custom Scope Discussion', 'Professional Execution', '2 Rounds of Revisions', 'Timeline Confirmed After Scope Review'],
+                      accentColor: '#D31322',
+                      whatsappMessage: `Hi Rohit, I would like to enquire about ${service.name} (${service.startingRate}).`
+                    })}
+                    className="text-xs font-semibold text-accent-primary hover:text-accent-secondary flex items-center gap-1 cursor-pointer transition-colors"
+                  >
+                    <span>Request Quote</span>
+                    <span>→</span>
+                  </button>
+                  <a
+                    href={`https://wa.me/919376569027?text=${encodeURIComponent(`Hi Rohit, I would like to enquire about ${service.name} (${service.startingRate}).`)}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-[11px] text-text-muted hover:text-text-primary transition-colors"
+                  >
+                    WhatsApp
+                  </a>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Pricing & Project Terms Clarity Note */}
+        <div className="mt-12 p-6 rounded-2xl bg-bg-card border border-border-color shadow-xs text-xs text-text-secondary">
+          <div className="flex items-center gap-2 mb-4 text-text-primary font-bold text-sm">
+            <CheckCircle2 className="w-4 h-4 text-accent-primary shrink-0" />
+            <span>Important Project &amp; Payment Terms</span>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-5 leading-relaxed">
+            <div className="space-y-1.5 bg-bg-primary/50 p-4 rounded-xl border border-border-color/70">
+              <strong className="text-text-primary block font-semibold text-xs">Payment Terms:</strong>
+              <p>
+                A 50% advance payment is required to begin the project. Once work has started, the advance payment is non-refundable. The remaining 50% payment must be completed before delivery of final or source files.
+              </p>
+            </div>
+            <div className="space-y-1.5 bg-bg-primary/50 p-4 rounded-xl border border-border-color/70">
+              <strong className="text-text-primary block font-semibold text-xs">Delivery Timelines &amp; Client Delays:</strong>
+              <p>
+                Project timelines are confirmed after reviewing the scope, complexity and required deliverables. If the client delays providing content, feedback or approval, the project timeline will be extended accordingly.
+              </p>
+            </div>
+            <div className="space-y-1.5 bg-bg-primary/50 p-4 rounded-xl border border-border-color/70">
+              <strong className="text-text-primary block font-semibold text-xs">Project Inactivity (30-Day Policy):</strong>
+              <p>
+                If the client does not provide the required content, feedback or approval for 30 consecutive days, the project may be placed on hold. Restarting the project will depend on availability and may require a revised timeline or quotation.
+              </p>
+            </div>
+            <div className="space-y-1.5 bg-bg-primary/50 p-4 rounded-xl border border-border-color/70">
+              <strong className="text-text-primary block font-semibold text-xs">Starting Estimates &amp; Revisions:</strong>
+              <p>
+                Prices shown are starting estimates. Final pricing depends on the project scope, complexity and required deliverables. A custom quotation will be provided after discussing the project requirements. Standard packages include 2 rounds of revisions.
+              </p>
+            </div>
+          </div>
         </div>
 
         {/* Direct Call & Email Enquiry Option */}

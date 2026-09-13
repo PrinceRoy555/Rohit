@@ -459,6 +459,7 @@ export default function App() {
             <BlogSection
               onSelectInsight={handleSelectInsight}
               onOpenAdmin={() => setIsAdminOpen(true)}
+              onViewAll={() => handleNavigate('blog')}
             />
           </AnimatedSection>
 
@@ -501,6 +502,7 @@ export default function App() {
             {currentRoute === 'blog' && (
               <div className="py-6">
                 <BlogSection
+                  isFullPage={true}
                   onSelectInsight={handleSelectInsight}
                   onOpenAdmin={() => setIsAdminOpen(true)}
                 />

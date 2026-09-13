@@ -250,9 +250,26 @@ export default function ContactSection() {
               <h2 className="text-3xl md:text-4xl font-extrabold text-text-primary tracking-tight mb-4">
                 Let’s Work Together
               </h2>
-              <p className="text-text-secondary text-sm md:text-base leading-relaxed mb-8 max-w-md">
-                Have an academy setup, brand refresh, or video campaign? Drop a detailed message with your brief, and let's craft stellar visuals.
+              <p className="text-text-secondary text-sm md:text-base leading-relaxed mb-6 max-w-md">
+                Have a branding project, logo design, video campaign, or website inquiry? Send your requirements and let’s discuss how we can bring your vision to life.
               </p>
+
+              {/* Freelance Availability Card */}
+              <div className="p-4 rounded-xl bg-accent-primary/5 border border-accent-primary/20 mb-8 max-w-md" id="contact-availability-card">
+                <div className="flex items-center gap-2 mb-1.5">
+                  <span className="relative flex h-2.5 w-2.5 shrink-0">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-500 opacity-75"></span>
+                    <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-600"></span>
+                  </span>
+                  <span className="text-xs font-bold text-accent-primary">Available for Freelance Projects</span>
+                </div>
+                <p className="text-xs text-text-secondary leading-relaxed">
+                  Currently accepting selected graphic design, branding, video editing and website projects in Jaipur and across India.
+                </p>
+                <div className="mt-2 text-[11px] text-text-muted font-medium">
+                  ⚡ Usually replies within 24 hours
+                </div>
+              </div>
 
               {/* Contact Specific Detail Rows */}
               <div className="space-y-4" id="contact-details-list">

@@ -19,6 +19,7 @@ import {
 } from 'lucide-react';
 import { Insight } from '../types';
 import { fetchInsights } from '../services/firebase/firestore';
+import { resolveInsightCover } from '../utils/insightImage';
 
 interface InsightDetailPageProps {
   insight: Insight;
@@ -226,18 +227,21 @@ export default function InsightDetailPage({
         </div>
 
         {/* Featured Cover Image */}
-        {insight.featuredImage && (
-          <div className="relative aspect-[16/9] w-full rounded-2xl overflow-hidden mb-12 border border-border-color shadow-lg">
-            <img
-              src={insight.featuredImage}
-              alt={insight.title}
-              loading="lazy"
-              decoding="async"
-              className="w-full h-full object-cover"
-              referrerPolicy="no-referrer"
-            />
-          </div>
-        )}
+        {(() => {
+          const coverImg = resolveInsightCover(insight);
+          return coverImg ? (
+            <div className="relative aspect-[16/9] w-full rounded-2xl overflow-hidden mb-12 border border-border-color shadow-lg">
+              <img
+                src={coverImg}
+                alt={insight.title}
+                loading="lazy"
+                decoding="async"
+                className="w-full h-full object-cover"
+                referrerPolicy="no-referrer"
+              />
+            </div>
+          ) : null;
+        })()}
 
         {/* Markdown Content Frame */}
         <div className="prose prose-invert max-w-none text-text-secondary text-base md:text-lg leading-relaxed space-y-6 mb-12" id="insight-content-body">
@@ -341,7 +345,7 @@ export default function InsightDetailPage({
                 >
                   <div className="relative aspect-[16/10] overflow-hidden">
                     <img
-                      src={rel.featuredImage}
+                      src={resolveInsightCover(rel) || ''}
                       alt={rel.title}
                       loading="lazy"
                       decoding="async"

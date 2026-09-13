@@ -920,19 +920,54 @@ let cachedInsights: Insight[] = [...INITIAL_INSIGHTS];
  * Fetch all insights. If includeUnpublished is true, returns drafts/reviews too.
  */
 export async function fetchInsights(includeUnpublished = false): Promise<Insight[]> {
+  // 1. In browser environment, check public API endpoint for instant CMS synchronization
+  if (typeof window !== 'undefined' && !includeUnpublished) {
+    try {
+      const res = await fetch('/api/public/insights');
+      if (res.ok) {
+        const json = await res.json();
+        if (json.success && Array.isArray(json.insights)) {
+          cachedInsights = json.insights;
+          return json.insights
+            .filter((i: Insight) => i.status === 'published')
+            .sort((a: Insight, b: Insight) => {
+              const timeA = new Date(a.publishDate || a.createdDate).getTime() || 0;
+              const timeB = new Date(b.publishDate || b.createdDate).getTime() || 0;
+              return timeB - timeA;
+            });
+        }
+      }
+    } catch {
+      // Fall through to Firestore or local cache
+    }
+  }
+
   if (!isFirebaseConfigured() || !db) {
     if (includeUnpublished) return cachedInsights;
-    return cachedInsights.filter(i => i.status === 'published');
+    return cachedInsights
+      .filter(i => i.status === 'published')
+      .sort((a, b) => {
+        const timeA = new Date(a.publishDate || a.createdDate).getTime() || 0;
+        const timeB = new Date(b.publishDate || b.createdDate).getTime() || 0;
+        return timeB - timeA;
+      });
   }
 
   try {
     const colRef = collection(db, 'insights');
-    const snap = await getDocs(colRef);
+    const q = includeUnpublished ? colRef : query(colRef, where('status', '==', 'published'));
+    const snap = await getDocs(q);
     if (snap.empty) {
       // Seed default insights so data is immediately available
       seedInitialInsights().catch(() => {});
       if (includeUnpublished) return cachedInsights;
-      return cachedInsights.filter(i => i.status === 'published');
+      return cachedInsights
+        .filter(i => i.status === 'published')
+        .sort((a, b) => {
+          const timeA = new Date(a.publishDate || a.createdDate).getTime() || 0;
+          const timeB = new Date(b.publishDate || b.createdDate).getTime() || 0;
+          return timeB - timeA;
+        });
     }
 
     const list: Insight[] = [];
@@ -970,11 +1005,21 @@ export async function fetchInsights(includeUnpublished = false): Promise<Insight
 
     return list
       .filter((item) => item.status === 'published')
-      .sort((a, b) => new Date(b.publishDate || b.createdDate).getTime() - new Date(a.publishDate || a.createdDate).getTime());
+      .sort((a, b) => {
+        const timeA = new Date(a.publishDate || a.createdDate).getTime() || 0;
+        const timeB = new Date(b.publishDate || b.createdDate).getTime() || 0;
+        return timeB - timeA;
+      });
   } catch (error) {
     console.warn('[Firestore] Error fetching insights, using fallback cache:', error);
     if (includeUnpublished) return cachedInsights;
-    return cachedInsights.filter(i => i.status === 'published');
+    return cachedInsights
+      .filter(i => i.status === 'published')
+      .sort((a, b) => {
+        const timeA = new Date(a.publishDate || a.createdDate).getTime() || 0;
+        const timeB = new Date(b.publishDate || b.createdDate).getTime() || 0;
+        return timeB - timeA;
+      });
   }
 }
 
@@ -987,6 +1032,21 @@ export async function fetchInsightBySlug(slug: string): Promise<Insight | null> 
   // Check local cache first
   const localMatch = cachedInsights.find(i => i.slug.toLowerCase() === cleanSlug || i.id === cleanSlug);
   if (localMatch) return localMatch;
+
+  // Try public API endpoint
+  if (typeof window !== 'undefined') {
+    try {
+      const res = await fetch(`/api/public/insights/${encodeURIComponent(cleanSlug)}`);
+      if (res.ok) {
+        const json = await res.json();
+        if (json.success && json.insight) {
+          return json.insight;
+        }
+      }
+    } catch {
+      // Continue to Firestore lookup
+    }
+  }
 
   if (!isFirebaseConfigured() || !db) {
     return null;

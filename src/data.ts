@@ -368,11 +368,11 @@ export const PROFILE_HERO: ProfileHero = {
 
 export const PROFILE_INTRO: ProfileIntro = {
   title: 'Meet Rohit Verma',
-  content1: 'Rohit Verma is a Graphic Designer, Video Editor and Social Media Specialist based in Jaipur, Rajasthan. With more than five years of professional experience, he has worked across graphic design, branding, video editing, social media management, creative strategy and client communication.',
-  content2: 'His work combines creativity with practical marketing strategies to help businesses improve their communication, establish strong identities and build a professional digital presence.',
+  content1: 'Rohit Verma is a Graphic Designer, Video Editor, Website Developer and Digital Marketing Professional based in Jaipur, Rajasthan. With 3+ years of professional experience, he works across graphic design, branding, video editing, social media creatives, and digital marketing.',
+  content2: 'His work combines creativity with practical visual communication strategies to help businesses improve their engagement, establish strong identities and build a professional digital presence. He is also the Founder of Unicivix Solutions.',
   image: '/src/assets/images/creative_workspace_1784367651312.jpg',
   signature: 'Rohit Verma',
-  designation: 'Founder – Unicivix Solutions'
+  designation: 'Graphic Designer & Founder'
 };
 
 export const SOCIAL_LINKS = [
@@ -410,28 +410,26 @@ export const SOCIAL_LINKS = [
 
 export const QUICK_CARDS: QuickCard[] = [
   { title: 'Location', value: 'Jaipur, Rajasthan, India', icon: 'MapPin' },
-  { title: 'Experience', value: '5+ Years', icon: 'Briefcase' },
-  { title: 'Current Role', value: 'Founder of Unicivix Solutions', icon: 'Award' },
-  { title: 'Professional Fields', value: 'Graphic Design, Video Editing and Social Media', icon: 'ShieldCheck' },
+  { title: 'Experience', value: '3+ Years', icon: 'Briefcase' },
+  { title: 'Current Role', value: 'Graphic Designer & Creative Professional', icon: 'Award' },
+  { title: 'Professional Fields', value: 'Graphic Design, Video Editing, Web & Marketing', icon: 'ShieldCheck' },
   { title: 'Training', value: 'Red Sketch Commercial Art Academy and Studio', icon: 'GraduationCap' },
-  { title: 'Specialisation', value: 'Graphic Design, Video Editing & Brand Identity', icon: 'Compass' }
+  { title: 'Specialisation', value: 'Graphic Design, Brand Identity & Video Editing', icon: 'Compass' }
 ];
 
 export const PROFILE_SUMMARY = {
   title: 'Professional Summary',
-  biography: `Rohit Verma is a Graphic Designer, Video Editor and Social Media Specialist based in Jaipur, Rajasthan. He has more than five years of experience in graphic design, branding, video editing, social media management and creative direction.
+  biography: `Rohit Verma is a Graphic Designer, Video Editor, Website Developer and Digital Marketing Professional based in Jaipur, Rajasthan. He has 3+ years of professional experience delivering creative design, branding, promotional video editing, and digital marketing assets for businesses in Jaipur, across India, and globally.
 
-He began his professional journey as a Freelance Graphic Designer, working with various clients and businesses for nine months. During this period, he gained practical experience in understanding client requirements, creating social media graphics, developing promotional designs and delivering visual communication solutions.
+He began his professional journey as a Freelance Graphic Designer, working with diverse clients and businesses for nine months. During this period, he gained hands-on experience in understanding client briefs, designing high-converting social media graphics, creating promotional materials, and establishing reliable delivery workflows.
 
-He later joined the Center for Business and Technology, commonly referred to as CBT, where he worked for one year and five months. At CBT, he worked across business development, client communication and creative design. This experience helped him develop a strong understanding of both creative production and brand growth.
+He later joined the Center for Business and Technology (CBT), where he contributed for one year and five months. At CBT, he worked across creative design, digital marketing, and client coordination, deepening his understanding of how visual communication directly powers customer engagement and business growth.
 
-After CBT, Rohit worked at Hodu Academy for one year. He contributed to graphic design, promotional campaigns, social media content, marketing creatives and visual storytelling for the organisation.
+Following his tenure at CBT, Rohit served at Hodu Academy for one year, leading graphic design, social media campaigns, promotional videos, and educational collateral.
 
-Rohit completed professional training in Graphic Designing and Video Editing from Red Sketch Commercial Art Academy and Studio. He has practical expertise in Adobe Photoshop, Adobe Illustrator, CorelDRAW, Adobe After Effects, branding, logo design, social media creatives, motion graphics and professional video editing.
+Rohit completed formal training in Graphic Designing and Video Editing at Red Sketch Commercial Art Academy and Studio. His toolkit includes Adobe Photoshop, Adobe Illustrator, CorelDRAW, Adobe Premiere Pro, Adobe After Effects, and Canva.
 
-Currently, Rohit is the Founder of Unicivix Solutions, a creative agency providing graphic design, brand identity design, video editing, social media management, and vibe coding solutions.
-
-His mission is to help businesses create strong brands, communicate effectively and grow their online presence through creative and result-driven digital solutions.`
+He is also the Founder of Unicivix Solutions, through which he collaborates on selective creative and digital projects.`
 };
 
 export const PROFILE_JOURNEY: JourneyEntry[] = [
@@ -604,24 +602,24 @@ export const WORK_PHILOSOPHIES: PhilosophyCard[] = [
 ];
 
 export const WHY_WORK_POINTS: string[] = [
-  'More than five years of creative and marketing experience',
-  'Combined understanding of design, marketing and business development',
+  '3+ years of professional creative and digital design experience',
+  'Graphic design as primary core specialty backed by video editing & web skills',
   'Experience working with clients, companies and educational organisations',
-  'Complete creative and digital service capabilities',
-  'Professional knowledge of industry-standard design software',
-  'Direct involvement in every project',
-  'Clear communication and timely project coordination',
-  'Result-oriented approach',
-  'Founder-led creative service experience'
+  'Clean, client-focused visual communication tailored to your goals',
+  'Professional knowledge of industry-standard creative software',
+  'Direct involvement in every phase of your project',
+  'Clear communication and reliable delivery timelines',
+  'Structured two-round revision process on every deliverable',
+  'Watermarked preview for peace of mind before final files'
 ];
 
 export const ACHIEVEMENT_CARDS: AchievementCard[] = [
-  { title: '5+ Years of Experience', subtitle: 'Creative & marketing industry', icon: 'Briefcase' },
-  { title: '3 Professional Work Phases', subtitle: 'Freelance, CBT, and Hodu Academy', icon: 'Layers' },
-  { title: '1 Creative Agency Founded', subtitle: 'Founder of Unicivix Solutions', icon: 'Award' },
-  { title: '8+ Digital Services', subtitle: 'Across multiple digital domains', icon: 'Cpu' },
-  { title: 'Multiple Creative Disciplines', subtitle: 'Design, video & digital marketing', icon: 'Palette' },
-  { title: 'Jaipur-Based Creative Professional', subtitle: 'Based in Rajasthan, India', icon: 'MapPin' }
+  { title: '3+ Years of Experience', subtitle: 'Creative & digital design industry', icon: 'Briefcase' },
+  { title: '100+ Creative Projects', subtitle: 'Delivered across branding & digital', icon: 'Layers' },
+  { title: '50+ Clients Served', subtitle: 'In Jaipur, India & globally', icon: 'Award' },
+  { title: 'Available for Projects', subtitle: 'Jaipur & across India', icon: 'Cpu' },
+  { title: 'Multiple Disciplines', subtitle: 'Design, video & digital marketing', icon: 'Palette' },
+  { title: 'Jaipur-Based Professional', subtitle: 'Based in Rajasthan, India', icon: 'MapPin' }
 ];
 
 export const WHATSAPP_BUSINESS_URL = "https://wa.me/message/E53AXF7SH5OMI1";
@@ -642,9 +640,17 @@ export const contactConfig = {
   resumeUrl: RESUME_PDF_URL
 };
 
+export const AVAILABILITY_INFO = {
+  title: 'Available for Freelance Projects',
+  description: 'Currently accepting selected graphic design, branding, video editing and website projects in Jaipur and across India.',
+  status: 'Accepting New Projects',
+  responseTime: 'Usually replies within 24 hours',
+  location: 'Jaipur, Rajasthan, India'
+};
+
 export const WHATSAPP_CONFIG = {
   phoneNumber: '919376569027',
-  defaultMessage: 'Hello Rohit, I visited your portfolio and would love to discuss a project!',
+  defaultMessage: 'Hi Rohit, I visited your portfolio and would like to discuss a project.',
   url: WHATSAPP_BUSINESS_URL
 };
 

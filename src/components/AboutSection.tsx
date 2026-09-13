@@ -73,15 +73,15 @@ export default function AboutSection({ onNavigate }: AboutSectionProps = {}) {
   const { activeConfig } = useSiteConfig();
   const branding = activeConfig?.branding;
 
-  const years = branding?.yearsExperience ? parseInt(branding.yearsExperience, 10) || 5 : 5;
-  const projects = branding?.projectsCompleted ? parseInt(branding.projectsCompleted, 10) || 150 : 150;
-  const clients = branding?.satisfiedClients ? parseInt(branding.satisfiedClients, 10) || 110 : 110;
+  const years = branding?.yearsExperience ? parseInt(branding.yearsExperience, 10) || 3 : 3;
+  const projects = branding?.projectsCompleted ? parseInt(branding.projectsCompleted, 10) || 100 : 100;
+  const clients = branding?.satisfiedClients ? parseInt(branding.satisfiedClients, 10) || 50 : 50;
 
   const achievements = [
     { label: 'Years of Experience', value: years, suffix: '+', icon: Briefcase, color: 'var(--accent-primary)' },
-    { label: 'Projects Completed', value: projects, suffix: '+', icon: Trophy, color: 'var(--accent-primary)' },
-    { label: 'Happy Clients', value: clients, suffix: '+', icon: Users, color: 'var(--accent-primary)' },
-    { label: 'Creative Tools', value: 50, suffix: '+', icon: Zap, color: 'var(--accent-primary)' },
+    { label: 'Creative Projects', value: projects, suffix: '+', icon: Trophy, color: 'var(--accent-primary)' },
+    { label: 'Clients Served', value: clients, suffix: '+', icon: Users, color: 'var(--accent-primary)' },
+    { label: 'Creative Tools', value: 8, suffix: '+', icon: Zap, color: 'var(--accent-primary)' },
   ];
 
   const handleNavigateToAbout = () => {
@@ -167,7 +167,7 @@ export default function AboutSection({ onNavigate }: AboutSectionProps = {}) {
               transition={{ duration: 0.5, delay: 0.2 }}
               className="text-text-secondary text-sm sm:text-base md:text-lg leading-relaxed mb-6 sm:mb-8 font-medium"
             >
-              Rohit Verma is a Jaipur-based Graphic Designer, Video Editor, Brand Strategist and Founder of Unicivix Solutions, with more than five years of experience in creative and digital services.
+              Rohit Verma is a Graphic Designer, Video Editor, Website Developer and Digital Marketing Professional based in Jaipur, Rajasthan. With 3+ years of professional experience, he helps businesses build memorable visual identities, engaging video content, and high-impact digital brands. He is also the Founder of Unicivix Solutions.
             </motion.p>
 
               {/* Achievement Counters */}

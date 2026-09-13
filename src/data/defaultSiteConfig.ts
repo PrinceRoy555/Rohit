@@ -24,56 +24,64 @@ export const INITIAL_SKILLS = [
 
 export const INITIAL_PRICING_TIERS = [
   {
-    id: 'tier-starter',
-    name: 'Starter Creative',
-    price: '₹9,999',
-    period: 'per project',
-    description: 'Perfect for startups and creators needing essential high-converting social creatives or basic video edits.',
+    id: 'tier-logo',
+    name: 'Logo Design',
+    price: '₹2,999',
+    period: 'starting at',
+    description: 'Best for businesses needing a clean, memorable, and high-impact custom logo.',
     features: [
-      '5 High-Impact Social Media Creatives',
-      '2 Short-Form Reels / YouTube Shorts (Up to 60s)',
-      'High-Resolution CMYK / RGB Export',
-      '2 Iteration Rounds Included',
-      '48-Hour Turnaround Time'
+      '2 Unique Logo Concepts',
+      '2 Rounds of Revisions Included',
+      'Timeline Confirmed After Scope Review',
+      'High-Resolution Files (PNG, JPG, Vector/PDF)',
+      'Source Files Available Upon Request',
+      'Watermarked Preview Before Final Files',
+      '50% Advance to Start; Balance Before Final Delivery'
     ],
     isPopular: false,
-    ctaText: 'Get Started',
+    ctaText: 'Start Logo Project',
     ctaLink: '#contact'
   },
   {
-    id: 'tier-pro',
-    name: 'Brand & Motion Pro',
-    price: '₹24,999',
-    period: 'per package',
-    description: 'Comprehensive brand identity, kinetic motion graphics, and full visual campaign suite for growing businesses.',
+    id: 'tier-brand-starter',
+    name: 'Brand Identity Starter',
+    price: '₹7,999',
+    period: 'starting at',
+    description: 'Best for startups and growing businesses that need a cohesive and professional visual brand presence.',
     features: [
-      'Full Brand Identity & Vector Logo Suite',
-      '15 Custom Social Media & Carousel Designs',
-      '5 Premium Kinetic Motion Video Reels',
-      'Complete Source Files (AI, PSD, AE, PR)',
-      'Priority 24/7 WhatsApp & Email Support',
-      'Unlimited Minor Revisions'
+      '2 to 3 Custom Logo Concepts',
+      'Brand Color Palette & Typography Guidelines',
+      'Business Card & Letterhead Design',
+      'Social Media Profile & Cover Assets',
+      '2 Rounds of Revisions Included',
+      'Timeline Confirmed After Scope Review',
+      'Print-Ready and Digital File Formats',
+      'Complete Source Files Included (AI, PSD, or PDF)',
+      '50% Advance to Start; Balance Before Final Delivery'
     ],
     isPopular: true,
-    ctaText: 'Claim Pro Package',
+    ctaText: 'Start Brand Project',
     ctaLink: '#contact'
   },
   {
-    id: 'tier-enterprise',
-    name: 'Agency Retainer',
-    price: '₹49,999',
-    period: 'per month',
-    description: 'Dedicated end-to-end creative direction, daily visual assets, long-form video production, and vibe coding.',
+    id: 'tier-complete-identity',
+    name: 'Complete Brand Identity',
+    price: '₹12,999',
+    period: 'starting at / custom quote',
+    description: 'Best for brands looking for a comprehensive identity system, marketing collateral and digital assets.',
     features: [
-      'Unlimited Graphic Design Requests',
-      'Up to 15 Full Video Edits + Motion Ads / Month',
-      'YouTube Thumbnail Strategy & A/B Variants',
-      'Custom UI/UX Prototypes & Web Vibe Coding',
-      'Dedicated Project Manager & Daily Syncs',
-      'Fast-Track Same-Day Rush Delivery'
+      'Complete Logo Suite (Primary, Secondary & Sub-marks)',
+      'Comprehensive Brand Style Guide Book',
+      'Stationery & Marketing Collateral (Flyer/Brochure/Banner)',
+      'Social Media Kit (Templates & Post Graphics)',
+      'Complete Source Files for All Approved Assets',
+      '2 Rounds of Revisions Per Asset Included',
+      'Timeline Confirmed After Scope Review',
+      'Dedicated WhatsApp & Email Project Support',
+      '50% Advance to Start; Balance Before Final Delivery'
     ],
     isPopular: false,
-    ctaText: 'Discuss Agency Retainer',
+    ctaText: 'Request Custom Quote',
     ctaLink: '#contact'
   }
 ];
@@ -86,8 +94,8 @@ export const DEFAULT_SITE_CONFIG: SiteConfig = {
   publishedBy: 'Rohit Verma',
   branding: {
     siteName: 'Rohit Verma',
-    tagline: 'Graphic Designer, Video Editor & Founder of Unicivix Solutions',
-    bio: 'Professional graphic designer, video editor, and creative director with over 5 years of experience delivering high-converting visual branding and cinematic digital content.',
+    tagline: 'Graphic Designer, Video Editor & Digital Creator',
+    bio: 'Professional Graphic Designer, Video Editor, Website Developer and Digital Marketing Professional based in Jaipur, India. Dedicated to helping businesses build memorable visual brands with clarity and craft.',
     avatarImage: '/images/rohit-verma-portrait.jpg',
     logoText: 'Rohit Verma',
     faviconUrl: '/favicon.png',
@@ -96,9 +104,9 @@ export const DEFAULT_SITE_CONFIG: SiteConfig = {
     whatsappUrl: WHATSAPP_BUSINESS_URL,
     location: 'Jaipur, Rajasthan, India',
     availableForWork: true,
-    yearsExperience: '5+ Years',
-    projectsCompleted: '120+',
-    satisfiedClients: '85+',
+    yearsExperience: '3+ Years',
+    projectsCompleted: '100+',
+    satisfiedClients: '50+',
     resumeUrl: RESUME_PDF_URL,
     socials: SOCIAL_LINKS
   },
@@ -147,7 +155,7 @@ export const DEFAULT_SITE_CONFIG: SiteConfig = {
   },
   footer: {
     tagline: 'Designing high-impact visuals, cinematic video edits, and modern branding campaigns that accelerate business growth.',
-    copyright: `© ${new Date().getFullYear()} Rohit Verma & Unicivix Solutions. All rights reserved.`,
+    copyright: `© ${new Date().getFullYear()} Rohit Verma. All rights reserved.`,
     showSocials: true,
     showQuickLinks: true,
     customNote: 'Crafted with precision, creative strategy, and cutting-edge digital aesthetics in Jaipur, India.'
@@ -162,10 +170,10 @@ export const DEFAULT_SITE_CONFIG: SiteConfig = {
       headlinePrefix: 'Creative Excellence in',
       headlineHighlight: 'Graphic Design & Video Editing',
       headlineSuffix: 'for Growing Brands',
-      ctaPrimaryText: 'Explore Portfolio',
-      ctaPrimaryLink: '#portfolio',
-      ctaSecondaryText: 'Start a Project',
-      ctaSecondaryLink: '#contact'
+      ctaPrimaryText: 'Start a Project',
+      ctaPrimaryLink: '#contact',
+      ctaSecondaryText: 'Explore Portfolio',
+      ctaSecondaryLink: '#portfolio'
     },
     portfolio: {
       id: 'portfolio',

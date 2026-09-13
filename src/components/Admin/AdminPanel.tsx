@@ -109,8 +109,8 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose, onLogout }) => 
   const [isUnauthorizedUser, setIsUnauthorizedUser] = useState<boolean>(false);
   const [unauthorizedEmail, setUnauthorizedEmail] = useState<string>('');
 
-  // Login form state (Pre-filled with primary admin email for smooth access)
-  const [loginEmail, setLoginEmail] = useState('workall724038@gmail.com');
+  // Login form state (Empty by default for secure manual entry)
+  const [loginEmail, setLoginEmail] = useState('');
   const [loginPassword, setLoginPassword] = useState('');
   const [showLoginPassword, setShowLoginPassword] = useState(false);
   const [loginError, setLoginError] = useState<string | null>(null);
@@ -237,13 +237,13 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose, onLogout }) => 
         if (roleRes.authorized) {
           setIsUnauthorizedUser(false);
           setIsAuthenticated(true);
-          setAdminEmail(user.email || 'workall724038@gmail.com');
+          setAdminEmail(user.email || '');
           setAdminRole(roleRes.role);
 
           try {
             await syncAdminFirestoreProfile(user);
             const idToken = await user.getIdToken();
-            await syncFirebaseAdminSession(user.email || 'workall724038@gmail.com', idToken, user.uid);
+            await syncFirebaseAdminSession(user.email || '', idToken, user.uid);
             await refreshConfig();
           } catch (e) {
             console.warn('[AdminPanel] Session sync warning:', e);
@@ -974,7 +974,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose, onLogout }) => 
                   <input
                     type="email"
                     required
-                    placeholder="admin@rohitverma.design"
+                    placeholder=""
                     value={loginEmail}
                     onChange={(e) => setLoginEmail(e.target.value)}
                     className="w-full bg-black/40 border border-white/10 rounded-xl px-3.5 py-2.5 text-sm text-white focus:border-rose-500 focus:outline-none transition-colors"

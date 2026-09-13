@@ -42,6 +42,7 @@ import {
   AuditLogEntry
 } from '../../services/adminApi';
 import ReactMarkdown from 'react-markdown';
+import { getCategoryFallbackCover } from '../../utils/insightImage';
 
 interface AdminInsightsDashboardProps {
   onClose: () => void;
@@ -72,8 +73,8 @@ export default function AdminInsightsDashboard({ onClose, onPreviewInsight }: Ad
   // Authentication states
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
   const [isVerifyingSession, setIsVerifyingSession] = useState<boolean>(true);
-  const [adminEmail, setAdminEmail] = useState<string>('workall724038@gmail.com');
-  const [loginEmailInput, setLoginEmailInput] = useState<string>('workall724038@gmail.com');
+  const [adminEmail, setAdminEmail] = useState<string>('');
+  const [loginEmailInput, setLoginEmailInput] = useState<string>('');
   const [loginPasswordInput, setLoginPasswordInput] = useState<string>('');
   const [showPassword, setShowPassword] = useState<boolean>(false);
   const [authError, setAuthError] = useState<string>('');
@@ -334,6 +335,9 @@ export default function AdminInsightsDashboard({ onClose, onPreviewInsight }: Ad
       if (res.success && res.insight) {
         setFeedbackMsg({ type: 'success', text: `Insight "${res.insight.title}" saved successfully!` });
         await loadAllData();
+        if (typeof window !== 'undefined') {
+          window.dispatchEvent(new CustomEvent('insights-updated'));
+        }
         setTimeout(() => {
           setActiveTab('insights');
           setEditingInsight(null);
@@ -358,6 +362,9 @@ export default function AdminInsightsDashboard({ onClose, onPreviewInsight }: Ad
       const res = await setAdminInsightStatus(item.id, newStatus);
       if (res.success) {
         await loadAllData();
+        if (typeof window !== 'undefined') {
+          window.dispatchEvent(new CustomEvent('insights-updated'));
+        }
       } else if (res.error === 'SESSION_EXPIRED') {
         setIsAuthenticated(false);
         setAuthError('Session expired. Please log in again.');
@@ -374,6 +381,9 @@ export default function AdminInsightsDashboard({ onClose, onPreviewInsight }: Ad
       if (res.success) {
         setDeleteConfirmId(null);
         await loadAllData();
+        if (typeof window !== 'undefined') {
+          window.dispatchEvent(new CustomEvent('insights-updated'));
+        }
       } else if (res.error === 'SESSION_EXPIRED') {
         setIsAuthenticated(false);
         setAuthError('Session expired. Please log in again.');
@@ -517,7 +527,7 @@ export default function AdminInsightsDashboard({ onClose, onPreviewInsight }: Ad
                 type="email"
                 value={loginEmailInput}
                 onChange={(e) => setLoginEmailInput(e.target.value)}
-                placeholder="workall724038@gmail.com"
+                placeholder=""
                 className="w-full bg-bg-primary border border-border-color rounded-xl px-4 py-3 text-text-primary text-sm focus:outline-none focus:border-accent-primary transition-colors"
                 required
                 disabled={lockoutSeconds > 0 || isLoggingIn}
@@ -1126,20 +1136,28 @@ export default function AdminInsightsDashboard({ onClose, onPreviewInsight }: Ad
 
                   {/* Featured Image Selector */}
                   <div className="bg-bg-primary border border-border-color rounded-2xl p-4 space-y-3">
-                    <h3 className="text-xs font-extrabold uppercase tracking-wider text-text-primary flex items-center justify-between">
-                      <span>Featured Image</span>
-                    </h3>
+                    <div className="flex items-center justify-between">
+                      <h3 className="text-xs font-extrabold uppercase tracking-wider text-text-primary">
+                        Featured Image
+                      </h3>
+                      <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-bg-card border border-border-color text-text-secondary">
+                        {editingInsight.featuredImage ? 'Manual Custom Override' : 'Auto Category Default'}
+                      </span>
+                    </div>
 
-                    {editingInsight.featuredImage && (
-                      <div className="relative aspect-[16/9] w-full rounded-xl overflow-hidden border border-border-color">
-                        <img
-                          src={editingInsight.featuredImage}
-                          alt="Cover Preview"
-                          className="w-full h-full object-cover"
-                          referrerPolicy="no-referrer"
-                        />
-                      </div>
-                    )}
+                    <div className="relative aspect-[16/9] w-full rounded-xl overflow-hidden border border-border-color bg-bg-card">
+                      <img
+                        src={editingInsight.featuredImage || getCategoryFallbackCover({ category: editingInsight.category, title: editingInsight.title, shortDescription: editingInsight.shortDescription })}
+                        alt="Cover Preview"
+                        className="w-full h-full object-cover"
+                        referrerPolicy="no-referrer"
+                      />
+                      {!editingInsight.featuredImage && (
+                        <div className="absolute bottom-2 left-2 bg-black/75 backdrop-blur-sm text-white text-[10px] font-bold px-2 py-0.5 rounded-md border border-white/10">
+                          Auto: {editingInsight.category || 'Graphic Design'} Cover
+                        </div>
+                      )}
+                    </div>
 
                     <div>
                       <label className="block text-[10px] uppercase font-bold text-text-secondary mb-1">Image URL</label>

@@ -445,73 +445,22 @@ export default function AboutRohitPage() {
         </div>
       </section>
 
-      {/* 8. UNICIVIX SOLUTIONS SECTION */}
-      <section className="py-24 bg-bg-secondary/50 border-t border-b border-border-color relative overflow-hidden" id="unicivix-agency">
-        {/* Ambient lights */}
-        <div className="absolute top-1/2 left-0 -translate-y-1/2 w-[500px] h-[300px] bg-accent-primary/5 rounded-full blur-[130px] pointer-events-none" />
-
-        <div className="max-w-7xl mx-auto px-6 relative z-10">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-center">
-            {/* Left Content */}
-            <div className="lg:col-span-7">
-              <span className="text-accent-primary font-bold text-xs uppercase tracking-widest mb-3 block">
-                {UNICIVIX_DATA.title}
-              </span>
-              <h2 className="text-3xl md:text-5xl font-extrabold text-text-primary tracking-tight leading-tight mb-6">
-                {UNICIVIX_DATA.heading}
-              </h2>
-              <p className="text-text-secondary text-base leading-relaxed mb-6 whitespace-pre-line">
-                {UNICIVIX_DATA.description}
-              </p>
-
-              {/* Mission Statement Box */}
-              <div className="bg-bg-card border-l-4 border-l-accent-primary border-border-color p-5 rounded-r-2xl mb-8">
-                <span className="text-xs font-bold text-accent-primary uppercase tracking-widest block mb-1">
-                  Our Mission
-                </span>
-                <p className="text-text-secondary text-sm italic font-semibold">
-                  “{UNICIVIX_DATA.mission}”
-                </p>
-              </div>
-
-              <div className="flex flex-wrap gap-4">
-                <button
-                  onClick={handleScrollToContact}
-                  className="bg-accent-primary hover:bg-accent-secondary text-white font-bold px-7 py-3.5 rounded-full shadow-lg transition-transform active:scale-95 cursor-pointer"
-                >
-                  Start a Project
-                </button>
-                <a
-                  href="https://unicivix.com"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="bg-transparent border border-border-color hover:border-accent-primary text-text-primary hover:text-accent-primary font-bold px-7 py-3.5 rounded-full flex items-center gap-2 transition-all"
-                >
-                  Explore Unicivix Solutions
-                  <ExternalLink className="w-4 h-4" />
-                </a>
-              </div>
-            </div>
-
-            {/* Right Side services list */}
-            <div className="lg:col-span-5">
-              <div className="bg-bg-card border border-border-color rounded-3xl p-6 md:p-8 shadow-xl">
-                <h4 className="text-sm font-extrabold text-text-primary uppercase tracking-wider mb-6 pb-2 border-b border-border-color">
-                  Agency Services Matrix
-                </h4>
-                <div className="grid grid-cols-1 gap-3">
-                  {UNICIVIX_DATA.services.map((srv, sIdx) => (
-                    <div key={sIdx} className="flex items-center gap-3 bg-bg-secondary/40 hover:bg-bg-primary p-3.5 rounded-xl border border-border-color transition-all group">
-                      <div className="w-6 h-6 rounded-full bg-accent-primary/10 text-accent-primary flex items-center justify-center flex-shrink-0 group-hover:bg-accent-primary group-hover:text-white transition-all">
-                        <Check className="w-3.5 h-3.5" />
-                      </div>
-                      <span className="text-text-secondary text-sm font-semibold group-hover:text-text-primary transition-colors">
-                        {srv}
-                      </span>
-                    </div>
-                  ))}
-                </div>
-              </div>
+      {/* 8. FOUNDER BACKGROUND (SECONDARY MENTION) */}
+      <section className="py-16 bg-bg-secondary/40 border-t border-b border-border-color relative overflow-hidden" id="founder-background">
+        <div className="max-w-4xl mx-auto px-6">
+          <div className="bg-bg-card border border-border-color rounded-2xl p-6 sm:p-8 shadow-sm">
+            <span className="text-accent-primary font-bold text-xs uppercase tracking-widest mb-2 block">
+              Entrepreneurial Experience
+            </span>
+            <h3 className="text-xl sm:text-2xl font-bold text-text-primary mb-3">
+              Founder of Unicivix Solutions
+            </h3>
+            <p className="text-text-secondary text-sm leading-relaxed mb-4">
+              In addition to independent freelance client work, Rohit Verma founded Unicivix Solutions to provide creative design, brand identity systems, and digital media production for businesses and startups.
+            </p>
+            <div className="p-4 bg-bg-secondary/60 rounded-xl border border-border-color text-xs text-text-secondary">
+              <strong className="text-text-primary block mb-1">Guiding Approach:</strong>
+              “To deliver clear, purposeful, and brand-first visual communication that creates measurable value for every client.”
             </div>
           </div>
         </div>

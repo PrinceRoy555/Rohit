@@ -1643,77 +1643,23 @@ a.btn-primary:hover {
 /* Scoped Hover effect applied strictly to the individual card under cursor */
 @media (hover: hover) and (pointer: fine) {
   .service-card:hover {
-    background: #B70D1B !important;
-    background-color: #B70D1B !important;
-    border-color: #B70D1B !important;
-    color: #FFFFFF !important;
+    border-color: rgba(211, 19, 34, 0.45) !important;
     transform: translateY(-4px);
-    box-shadow: 0 14px 30px rgba(183, 13, 27, 0.20) !important;
+    box-shadow: 0 12px 28px -6px rgba(211, 19, 34, 0.12), 0 4px 12px rgba(0, 0, 0, 0.05) !important;
   }
 
   .service-card:hover .service-title {
-    color: #FFFFFF !important;
-  }
-
-  .service-card:hover .service-description {
-    color: #FFFFFF !important;
-  }
-
-  .service-card:hover .service-feature-text {
-    color: #FFFFFF !important;
-  }
-
-  .service-card:hover .service-feature-bullet {
-    background-color: #FFFFFF !important;
+    color: var(--accent-primary) !important;
   }
 
   .service-card:hover .service-icon {
-    background: #FFFFFF !important;
-    background-color: #FFFFFF !important;
-    border-color: #FFFFFF !important;
-    color: #B70D1B !important;
-  }
-
-  .service-card:hover .service-icon svg {
-    color: #B70D1B !important;
-    stroke: #B70D1B !important;
-  }
-
-  .service-card:hover .popular-service-badge,
-  .service-card:hover .service-category-badge {
-    background: rgba(255, 255, 255, 0.14) !important;
-    background-color: rgba(255, 255, 255, 0.14) !important;
-    border-color: rgba(255, 255, 255, 0.55) !important;
-    color: #FFFFFF !important;
-  }
-
-  .service-card:hover .popular-service-badge svg,
-  .service-card:hover .service-category-badge svg {
-    color: #FFFFFF !important;
-    stroke: #FFFFFF !important;
-  }
-
-  .service-card:hover .service-quote-btn {
-    background: #FFFFFF !important;
-    background-color: #FFFFFF !important;
-    border-color: #FFFFFF !important;
-    color: #B70D1B !important;
-    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.15) !important;
-  }
-
-  .service-card:hover .service-quote-btn svg {
-    color: #B70D1B !important;
-    stroke: #B70D1B !important;
-  }
-
-  .service-card:hover .learn-more,
-  .service-card:hover .learn-more svg {
-    color: #FFFFFF !important;
-    stroke: currentColor !important;
+    background-color: rgba(211, 19, 34, 0.15) !important;
+    border-color: rgba(211, 19, 34, 0.35) !important;
+    transform: scale(1.04);
   }
 
   .service-card:hover .service-card-divider {
-    border-color: rgba(255, 255, 255, 0.25) !important;
+    border-color: rgba(211, 19, 34, 0.20) !important;
   }
 }
 

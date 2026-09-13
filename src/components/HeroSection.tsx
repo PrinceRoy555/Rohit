@@ -14,9 +14,9 @@ export default function HeroSection() {
   const professionalTitles = GLOBAL_ROLES;
   const greeting = 'Hello,';
   const name = branding?.siteName || 'Rohit Verma';
-  const description = branding?.bio || 'I combine branding, motion mechanics, visual storytelling, and advanced AI systems to develop engaging digital content, social media creatives, and premium web layouts that help businesses stand out and connect with their audience.';
-  const primaryCtaText = hero?.ctaPrimaryText || 'Explore Portfolio';
-  const secondaryCtaText = hero?.ctaSecondaryText || 'Start a Project';
+  const description = branding?.bio || 'Professional Graphic Designer, Video Editor, Website Developer and Digital Marketing Professional based in Jaipur, India. Dedicated to helping businesses build memorable visual brands with clarity and craft.';
+  const primaryCtaText = hero?.ctaPrimaryText || 'Start a Project';
+  const secondaryCtaText = hero?.ctaSecondaryText || 'Explore Portfolio';
   const portrait = branding?.avatarImage || portraitImg;
 
   const [titleIdx, setTitleIdx] = useState(0);
@@ -72,18 +72,18 @@ export default function HeroSection() {
   };
 
   const handlePrimaryCta = () => {
-    if (hero?.ctaPrimaryLink === '#contact') {
-      scrollToContact();
-    } else {
+    if (hero?.ctaPrimaryLink === '#portfolio') {
       scrollToPortfolio();
+    } else {
+      scrollToContact();
     }
   };
 
   const handleSecondaryCta = () => {
-    if (hero?.ctaSecondaryLink === '#portfolio') {
-      scrollToPortfolio();
-    } else {
+    if (hero?.ctaSecondaryLink === '#contact') {
       scrollToContact();
+    } else {
+      scrollToPortfolio();
     }
   };
 
@@ -166,10 +166,26 @@ export default function HeroSection() {
       <div className="max-w-7xl 2xl:max-w-[1400px] mx-auto px-5 sm:px-8 lg:px-12 w-full box-border relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-8 sm:gap-10 lg:gap-12 xl:gap-16 items-center">
         {/* Left Side Content */}
         <div className="lg:col-span-7 flex flex-col items-start w-full max-w-full" id="hero-left-content">
-          <motion.span
+          {/* Availability Status Badge */}
+          <motion.div
             initial={{ opacity: 0, y: 15 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
+            className="inline-flex items-center gap-2.5 px-3.5 py-1.5 rounded-full bg-accent-primary/10 border border-accent-primary/20 mb-3 text-xs text-text-primary"
+            id="hero-availability-status"
+          >
+            <span className="relative flex h-2.5 w-2.5 shrink-0">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-500 opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-600"></span>
+            </span>
+            <span className="font-bold text-accent-primary">Available for Freelance Projects</span>
+            <span className="hidden sm:inline text-text-muted">• Jaipur &amp; Across India</span>
+          </motion.div>
+
+          <motion.span
+            initial={{ opacity: 0, y: 15 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.05 }}
             className="text-accent-primary font-semibold text-xs sm:text-base lg:text-lg uppercase tracking-wider mb-1.5 sm:mb-2.5"
             id="hero-greeting"
           >
@@ -354,7 +370,7 @@ export default function HeroSection() {
               </div>
             ))}
 
-            {/* 4. Sleek 150+ Creative Projects Metric Badge (z-index: 4) */}
+            {/* 4. Sleek 100+ Creative Projects Metric Badge (z-index: 4) */}
             <div className="absolute right-[2%] bottom-[2%] sm:bottom-[3%] z-[4] pointer-events-none">
               <div
                 className="bg-bg-card/95 backdrop-blur-sm text-text-primary px-3.5 py-2.5 rounded-xl shadow-md border border-border-color flex items-center gap-3 whitespace-nowrap"
@@ -362,8 +378,8 @@ export default function HeroSection() {
               >
                 <div className="w-2 h-8 rounded-full bg-accent-primary shrink-0" />
                 <div>
-                  <div className="text-base sm:text-lg font-extrabold text-text-primary leading-none">150+</div>
-                  <div className="text-[10px] sm:text-[11px] uppercase font-semibold text-text-muted leading-tight mt-0.5">Projects Delivered</div>
+                  <div className="text-base sm:text-lg font-extrabold text-text-primary leading-none">100+</div>
+                  <div className="text-[10px] sm:text-[11px] uppercase font-semibold text-text-muted leading-tight mt-0.5">Creative Projects</div>
                 </div>
               </div>
             </div>
