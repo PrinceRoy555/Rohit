@@ -51,6 +51,7 @@ export const InquiriesDataTable: React.FC<InquiriesDataTableProps> = ({
   const [statusFilter, setStatusFilter] = useState<'all' | 'new' | 'contacted' | 'closed'>(
     initialFilterStatus
   );
+  const [sourceFilter, setSourceFilter] = useState<'all' | 'leads' | 'contactEnquiries' | 'chatbotLeads' | 'quoteRequests'>('all');
   const [priorityFilter, setPriorityFilter] = useState<'all' | 'high' | 'medium' | 'low'>('all');
   const [onlyHot, setOnlyHot] = useState(false);
   const [sortField, setSortField] = useState<'createdAt' | 'name' | 'score'>('createdAt');
@@ -63,6 +64,9 @@ export const InquiriesDataTable: React.FC<InquiriesDataTableProps> = ({
     return inquiries.filter((inq) => {
       // Status filter
       if (statusFilter !== 'all' && inq.status !== statusFilter) return false;
+
+      // Source Collection filter
+      if (sourceFilter !== 'all' && (inq.sourceCollection || 'leads') !== sourceFilter) return false;
 
       // Priority filter
       if (priorityFilter !== 'all' && (inq.priority || 'medium') !== priorityFilter)
@@ -87,7 +91,7 @@ export const InquiriesDataTable: React.FC<InquiriesDataTableProps> = ({
 
       return true;
     });
-  }, [inquiries, statusFilter, priorityFilter, onlyHot, searchQuery]);
+  }, [inquiries, statusFilter, sourceFilter, priorityFilter, onlyHot, searchQuery]);
 
   // Sort inquiries
   const sorted = useMemo(() => {
@@ -185,6 +189,23 @@ export const InquiriesDataTable: React.FC<InquiriesDataTableProps> = ({
             <Flame className={`w-3.5 h-3.5 ${onlyHot ? 'fill-current' : ''}`} />
             <span>Hot Only</span>
           </button>
+
+          {/* Source Collection Filter */}
+          <select
+            id="filter-source-collection-select"
+            value={sourceFilter}
+            onChange={(e) => {
+              setSourceFilter(e.target.value as any);
+              setCurrentPage(1);
+            }}
+            className="flex-shrink-0 h-9 px-2.5 rounded-lg text-xs font-semibold bg-bg-secondary hover:bg-bg-card-hover text-text-primary border border-border-color focus:border-accent-primary focus:outline-none cursor-pointer"
+          >
+            <option value="all">All Sources ({inquiries.length})</option>
+            <option value="leads">leads</option>
+            <option value="contactEnquiries">contactEnquiries</option>
+            <option value="chatbotLeads">chatbotLeads</option>
+            <option value="quoteRequests">quoteRequests</option>
+          </select>
         </div>
 
         {/* Search input and Export action */}
@@ -317,9 +338,13 @@ export const InquiriesDataTable: React.FC<InquiriesDataTableProps> = ({
                                 <Flame className="w-3.5 h-3.5 text-rose-600 dark:text-rose-400 fill-current shrink-0" />
                               )}
                             </div>
-                            <div className="text-[11px] text-text-muted truncate">
-                              {inq.businessName ? `${inq.businessName} • ` : ''}
-                              {inq.email}
+                            <div className="text-[11px] text-text-muted truncate flex items-center gap-1.5 mt-0.5">
+                              <span className="truncate">{inq.businessName ? `${inq.businessName} • ` : ''}{inq.email}</span>
+                              {inq.sourceCollection && (
+                                <span className="px-1.5 py-0.2 text-[9px] font-mono rounded bg-bg-secondary text-text-muted border border-border-color shrink-0">
+                                  {inq.sourceCollection}
+                                </span>
+                              )}
                             </div>
                           </div>
                         </div>

@@ -16,7 +16,7 @@ import FloatingElements from './components/FloatingElements';
 import AIChatbot from './components/AIChatbot';
 import Preloader from './components/Preloader';
 import CustomCursor from './components/custom-cursor';
-import { updateDocumentMetadata } from './seoConfig';
+import { updateDocumentMetadata, updateArticleMetadata } from './seoConfig';
 import { Insight } from './types';
 import { fetchInsightBySlug } from './services/firebase/firestore';
 import { useTheme } from './context/ThemeContext';
@@ -191,6 +191,7 @@ export default function App() {
         'privacy-policy': 'privacy',
         'terms': 'terms',
         'terms-and-conditions': 'terms',
+        'admin': 'admin',
         '404': '404'
       };
 
@@ -255,10 +256,14 @@ export default function App() {
 
   // Dynamic SEO, Canonical & Structured Data updates per route
   useEffect(() => {
-    if (currentRoute !== 'insight-detail') {
+    if (isAdminOpen) {
+      updateDocumentMetadata('admin');
+    } else if (currentRoute === 'insight-detail' && activeInsight) {
+      updateArticleMetadata(activeInsight);
+    } else {
       updateDocumentMetadata(currentRoute);
     }
-  }, [currentRoute]);
+  }, [currentRoute, isAdminOpen, activeInsight]);
 
   // Disable browser automatic scroll restoration override
   useEffect(() => {

@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { WHATSAPP_BUSINESS_URL, contactConfig } from '../data';
-import portraitImg from '../assets/images/rohit-verma-portrait.jpg';
+import { WHATSAPP_BUSINESS_URL, contactConfig, ROHIT_PROFILE_IMAGE_URL, getAuthoritativeProfileImage } from '../data';
+import { useSiteConfig } from '../context/SiteConfigContext';
 import { 
   MapPin, 
   Briefcase, 
@@ -57,6 +57,9 @@ function getIconComponent(iconName: string) {
 }
 
 export default function AboutRohitPage() {
+  const { activeConfig } = useSiteConfig();
+  const portrait = getAuthoritativeProfileImage(activeConfig?.branding?.avatarImage);
+
   const handleScrollToContact = () => {
     const contactSection = document.getElementById('contact');
     if (contactSection) {
@@ -126,15 +129,17 @@ export default function AboutRohitPage() {
                 className="profile-card group"
               >
                 <img
-                  src={portraitImg}
-                  alt="Portrait of Rohit Verma, Graphic Designer, Video Editor and Founder of Unicivix Solutions."
+                  src={portrait}
+                  alt="Rohit Verma – Graphic Designer and Video Editor in Jaipur"
+                  width="440"
+                  height="462"
                   loading="lazy"
                   decoding="async"
                   className="profile-card-image"
                   referrerPolicy="no-referrer"
                   onError={(e) => {
-                    if (e.currentTarget.src !== window.location.origin + '/images/rohit-verma-portrait.jpg') {
-                      e.currentTarget.src = '/images/rohit-verma-portrait.jpg';
+                    if (e.currentTarget.src !== ROHIT_PROFILE_IMAGE_URL) {
+                      e.currentTarget.src = ROHIT_PROFILE_IMAGE_URL;
                     }
                   }}
                 />

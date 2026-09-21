@@ -5,7 +5,7 @@ export const INITIAL_INSIGHTS: Insight[] = [
     id: 'insight-1',
     title: 'How Generative AI Is Transforming Graphic Design & Video Pipelines',
     slug: 'ai-transforming-graphic-design-video-pipelines',
-    shortDescription: 'Explore how modern generative AI tools assist creators in rapid concept drafting, asset synthesis, neural upscaling, and doubling client deliverable velocity without losing artistic soul.',
+    shortDescription: 'Explore practical generative AI workflows for graphic design and video editing, including concept drafting, asset synthesis, neural upscaling, and creative production pipelines.',
     category: 'AI & Automation',
     featuredImage: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=1200&q=80',
     tags: ['AI Tools', 'Graphic Design', 'Motion Graphics', 'Workflow Optimization'],
@@ -13,7 +13,7 @@ export const INITIAL_INSIGHTS: Insight[] = [
     publishDate: 'Aug 24, 2026',
     readingTime: '5 min read',
     seoTitle: 'How AI Is Transforming Graphic Design & Video Pipelines | Rohit Verma',
-    seoDescription: 'Discover how generative AI systems and vibe coding workflows allow creative designers to ideate faster, enhance assets, and elevate visual storytelling.',
+    seoDescription: 'Explore practical AI workflows for graphic design and video editing using tools such as Photoshop, After Effects and Premiere Pro.',
     status: 'published',
     isAiGenerated: true,
     viewsCount: 342,
@@ -37,7 +37,7 @@ Traditionally, setting up a moodboard or custom style guide took days of searchi
 ### 2. Smart Upscaling and Detail Enhancement
 Working with lower-resolution client files is a constant pain point. Neural upscalers and smart vector reconstruction tools enable designers to restore micro-textures, sharpen vector contours, and upscale imagery for premium large-format printing without pixelation.
 
-> *"AI does not replace human taste; it amplifies your creative bandwidth so you spend 90% of your time on storytelling and strategy rather than repetitive masking."*
+> *"AI does not replace human taste; it amplifies your creative bandwidth so you spend more time on storytelling and strategy rather than repetitive masking."*
 
 ---
 
@@ -47,27 +47,27 @@ Video editors can now leverage AI speech transcription to create animated kineti
 ---
 
 ### Key Takeaway for Modern Creatives
-The true differentiator in the age of AI remains human taste, strategic composition, and storytelling craft. By embracing generative pipelines, we do not surrender our artistry; we elevate our creative velocity and deliver higher-value design systems to our clients.`
+The true differentiator in the age of AI remains human taste, strategic composition, and storytelling craft. By embracing generative pipelines, we do not surrender our artistry; we elevate our workflow and deliver thoughtful design systems to our clients.`
   },
   {
     id: 'insight-2',
     title: 'The Visual Psychology of High-CTR YouTube Thumbnails and Social Creatives',
     slug: 'visual-psychology-high-ctr-thumbnails-social-creatives',
-    shortDescription: 'Uncover the visual science behind click-through rates: eye-tracking focal points, 60-30-10 color harmony, expressive facial contrast, and kinetic typography.',
+    shortDescription: 'Explore the visual design principles of effective YouTube thumbnails: eye-tracking focal points, 60-30-10 color harmony, facial framing, and readable typography.',
     category: 'Graphic Design',
     featuredImage: 'https://images.unsplash.com/photo-1550745165-9bc0b252726f?auto=format&fit=crop&w=1200&q=80',
-    tags: ['Thumbnail Design', 'CTR Optimization', 'Color Psychology', 'Social Media'],
+    tags: ['Thumbnail Design', 'Visual Hierarchy', 'Color Psychology', 'Social Media'],
     author: 'Rohit Verma',
     publishDate: 'Aug 18, 2026',
     readingTime: '4 min read',
-    seoTitle: 'Visual Psychology of High-CTR Thumbnails | Rohit Verma',
-    seoDescription: 'Learn the principles of scroll-stopping thumbnail design, visual hierarchy, and contrast rules that drive clicks and audience engagement.',
+    seoTitle: 'Visual Psychology of YouTube Thumbnails & Social Creatives | Rohit Verma',
+    seoDescription: 'Learn the principles of thumbnail composition, visual hierarchy, and contrast techniques for YouTube and social media creatives.',
     status: 'published',
     isAiGenerated: false,
     viewsCount: 512,
     createdDate: '2026-08-18T14:30:00Z',
     updatedDate: '2026-08-18T14:30:00Z',
-    content: `In a world of infinite digital feeds, the average user's attention span is less than 1.5 seconds. This means your thumbnail or social creative must stop the scroll immediately. Achieving high click-through rates (CTR) is not about luck—it is a blend of visual psychology, tonal contrast, and structural hierarchy.
+    content: `In a world of infinite digital feeds, the average user's attention span is less than 1.5 seconds. This means your thumbnail or social creative must stand out immediately. Creating compelling thumbnails is a blend of visual design principles, tonal contrast, and clear structural hierarchy.
 
 ---
 
@@ -96,27 +96,27 @@ Mobile users view thumbnails at small dimensions. Ensure your text uses bold, co
 Hook Formula: [Unexpected Question] + [Visual Contrast] + [Clear Benefit]
 \`\`\`
 
-By systematically testing and applying these visual anchors, creators consistently see a 30%–80% lift in organic video impressions and social interaction.`
+By systematically testing and applying these visual anchors, creators improve organic video visibility and audience engagement.`
   },
   {
     id: 'insight-3',
-    title: 'Why Kinetic Motion Graphics Drive 3x Higher Conversion for Modern Brands',
+    title: 'Why Kinetic Motion Graphics Elevate Brand Engagement for Modern Companies',
     slug: 'kinetic-motion-graphics-3x-higher-conversion',
-    shortDescription: 'Discover why animation, seamless micro-interactions, and rhythm-matched sound design elevate viewer retention and dramatically boost advertising ROI.',
+    shortDescription: 'Discover how animation, seamless micro-interactions, and rhythm-matched sound design elevate viewer retention and communicate brand messaging effectively.',
     category: 'Motion Graphics',
     featuredImage: 'https://images.unsplash.com/photo-1574717024653-61fd2cf4d44d?auto=format&fit=crop&w=1200&q=80',
-    tags: ['Motion Graphics', 'Video Editing', 'Brand Strategy', 'Conversion Rate'],
+    tags: ['Motion Graphics', 'Video Editing', 'Brand Strategy', 'Visual Communication'],
     author: 'Rohit Verma',
     publishDate: 'Aug 10, 2026',
     readingTime: '6 min read',
-    seoTitle: 'Why Motion Graphics Drive 3x Higher Brand Conversion | Rohit Verma',
+    seoTitle: 'Why Motion Graphics Elevate Brand Engagement | Rohit Verma',
     seoDescription: 'Explore the retention power of kinetic motion graphics, easing curves, and audio synchronization in commercial campaigns.',
     status: 'published',
     isAiGenerated: true,
     viewsCount: 289,
     createdDate: '2026-08-10T09:15:00Z',
     updatedDate: '2026-08-10T09:15:00Z',
-    content: `Static graphics communicate a message, but kinetic motion graphics bring that message into the viewer's subconscious. As video platforms dominate digital advertising, brands incorporating motion graphics consistently outperform static image ads by 300% in conversion metrics.
+    content: `Static graphics communicate a message, but kinetic motion graphics bring that message into the viewer's subconscious. As video platforms dominate digital media, brands incorporating motion graphics often achieve stronger audience engagement compared to static image graphics.
 
 ---
 

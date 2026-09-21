@@ -177,28 +177,28 @@ export const PROJECTS_DATA: Project[] = [
   },
   {
     id: 'p6',
-    title: 'Digital Marketing & Conversion Ads',
+    title: 'Digital Marketing & Social Ads',
     category: 'Marketing Design',
     image: 'https://picsum.photos/seed/marketing-ads/800/600',
-    description: 'High-converting display ad banners, promotional story ads, and sales landing graphics optimized for targeted marketing funnels.',
+    description: 'Display ad banners, promotional story ads, and sales landing graphics designed for targeted digital campaigns.',
     tools: ['Adobe Photoshop', 'Canva', 'Adobe Firefly'],
     client: 'Growth Media Group',
     date: '2025',
     link: 'https://www.behance.net/gallery/254351431/Rohit-Verma-Creative-Portfolio-2026',
-    details: 'Crafted structured marketing visual assets with high-contrast call-to-actions, psychological focal points, and A/B tested creative variants.'
+    details: 'Crafted structured marketing visual assets with clear visual hierarchy, intentional focal points, and cohesive brand variants.'
   },
   {
     id: 'p7',
-    title: 'High-CTR YouTube Thumbnails',
+    title: 'Custom YouTube Thumbnails',
     category: 'Thumbnail Design',
     image: '/images/youtube-thumbnail-portfolio.png',
     fallbackImage: 'https://lh3.googleusercontent.com/d/1voCLZkaqF_ROVJ-eK9kO9H_5DXn5F1NH=w1600',
-    description: 'Custom YouTube thumbnails featuring expressive cutouts, vivid lighting rim-effects, bold hooks, and optimized visual hierarchy.',
+    description: 'Custom YouTube thumbnails featuring expressive cutouts, lighting effects, bold hooks, and optimized visual hierarchy.',
     tools: ['Adobe Photoshop', 'Adobe Firefly'],
     client: 'EduTech Creator Hub',
     date: '2025',
     link: 'https://www.behance.net/gallery/254359065/Thumbnail-Design',
-    details: 'Designed scroll-stopping thumbnails with color psychology, facial expressions, and dynamic typography resulting in higher click-through rates across video channels.'
+    details: 'Designed engaging thumbnails with color psychology, facial framing, and dynamic typography crafted for readability across video channels.'
   },
   {
     id: 'p8',
@@ -206,7 +206,7 @@ export const PROJECTS_DATA: Project[] = [
     category: 'Video Editing',
     image: '/images/commercial-promotional-video.jpg',
     fallbackImage: 'https://images.unsplash.com/photo-1574717024653-61fd2cf4d44d?auto=format&fit=crop&w=1200&q=80',
-    description: 'A dynamic, high-pacing promotion video featuring engaging typography overlays, visual graphics, sound design, and custom audio mixing to maximize user conversion.',
+    description: 'A dynamic, high-pacing promotional video featuring engaging typography overlays, visual graphics, sound design, and custom audio mixing.',
     tools: ['Adobe Premiere Pro', 'Adobe After Effects', 'Audition'],
     client: 'Hodu Academy, Jaipur',
     date: 'December 2024',
@@ -331,7 +331,7 @@ Designs featuring real people, clear expressions, and direct gazes create a sens
   {
     id: 'b3',
     title: 'Why Motion Graphics Improve Brand Communication',
-    excerpt: 'Learn why animation, micro-interactions, and kinetic typography enhance retention, explain complex ideas faster, and lift advertising conversions.',
+    excerpt: 'Learn why animation, micro-interactions, and kinetic typography enhance retention, explain complex ideas clearly, and strengthen brand communication.',
     content: `Static images tell a story, but motion graphics bring that story to life. As attention moves increasingly toward short-form video on channels like Instagram Reels and YouTube Shorts, brands that fail to incorporate motion are getting left behind.
 
 Let's dissect why motion graphics are an absolute necessity for modern brand communication:
@@ -345,8 +345,8 @@ The human brain is naturally wired to detect motion. A moving graphic is far mor
 ### 3. Cinematic Aesthetic and Premium Vibe
 Well-crafted vector animations, fluid easing, and custom sound designs immediately convey professional quality. It shows that a brand pays attention to details and is willing to invest in premium experiences, instantly boosting perceived value.
 
-### 4. Direct Impact on Ad Conversion
-Data across marketing campaigns shows that animated advertisements consistently outperform static banners in Click-Through Rates (CTR). A kinetic call-to-action or animated product mockup can drive more clicks and inquiries for the same advertising spend.
+### 4. Direct Impact on Audience Engagement
+Well-crafted motion graphics and animated advertisements capture viewer attention effectively compared to static banners. A kinetic call-to-action or animated product mockup helps clarify the offer and encourage viewer response.
 
 ### Summary
 Motion is no longer a luxury decoration—it is an essential storytelling asset. Integrating motion graphics into your digital marketing mix ensures your voice is heard, understood, and remembered in a crowded marketplace.`,
@@ -359,11 +359,44 @@ Motion is no longer a luxury decoration—it is an essential storytelling asset.
   }
 ];
 
+/**
+ * Confirmed official portrait/profile photograph of Rohit Verma.
+ * Hosted on ImageKit CDN with high availability and optimized delivery.
+ */
+export const ROHIT_PROFILE_IMAGE_URL = "https://ik.imagekit.io/auhuory9w/website%20work/Hero%20section%20Photo/Image/ChatGPT%20Image%20Sep%2010,%202026,%2011_18_40%20PM.png";
+export const ROHIT_PORTRAIT_IMAGE_URL = ROHIT_PROFILE_IMAGE_URL;
+
+/**
+ * Resolves the authoritative portrait/profile photograph of Rohit Verma across the platform.
+ * 1. Uses the valid CMS profile image when configured (and not an obsolete local path).
+ * 2. Otherwise uses the confirmed ImageKit URL as the default fallback.
+ */
+export function getAuthoritativeProfileImage(configuredImage?: string | null): string {
+  if (!configuredImage || typeof configuredImage !== 'string') {
+    return ROHIT_PROFILE_IMAGE_URL;
+  }
+  const trimmed = configuredImage.trim();
+  if (
+    !trimmed ||
+    trimmed === '/images/rohit-verma-portrait.jpg' ||
+    trimmed === '/images/rohit-avatar.jpg' ||
+    trimmed === '/images/rohit-avatar.webp' ||
+    trimmed === '/images/rohit-hero.webp' ||
+    trimmed === '/images/rohit-verma-portrait.png' ||
+    trimmed === '/images/rohit-verma-portrait.webp' ||
+    trimmed.includes('rohit-verma-portrait.jpg') ||
+    trimmed.includes('rohit-avatar.jpg')
+  ) {
+    return ROHIT_PROFILE_IMAGE_URL;
+  }
+  return trimmed;
+}
+
 export const PROFILE_HERO: ProfileHero = {
   label: 'About Me',
   title: 'Designer, Marketer and Creative Entrepreneur',
   subtitle: 'Discover the professional journey, creative expertise and entrepreneurial vision of Rohit Verma.',
-  image: '/images/rohit-verma-portrait.jpg'
+  image: ROHIT_PROFILE_IMAGE_URL
 };
 
 export const PROFILE_INTRO: ProfileIntro = {

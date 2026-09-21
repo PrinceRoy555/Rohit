@@ -8,6 +8,7 @@ import {
   SOCIAL_LINKS,
   WHATSAPP_BUSINESS_URL,
   RESUME_PDF_URL,
+  ROHIT_PROFILE_IMAGE_URL,
   contactConfig
 } from '../data';
 
@@ -96,9 +97,9 @@ export const DEFAULT_SITE_CONFIG: SiteConfig = {
     siteName: 'Rohit Verma',
     tagline: 'Graphic Designer, Video Editor & Digital Creator',
     bio: 'Professional Graphic Designer, Video Editor, Website Developer and Digital Marketing Professional based in Jaipur, India. Dedicated to helping businesses build memorable visual brands with clarity and craft.',
-    avatarImage: '/images/rohit-verma-portrait.jpg',
+    avatarImage: ROHIT_PROFILE_IMAGE_URL,
     logoText: 'Rohit Verma',
-    faviconUrl: '/favicon.png',
+    faviconUrl: '/favicon.svg',
     email: contactConfig.emailDisplay,
     phone: contactConfig.phoneDisplay,
     whatsappUrl: WHATSAPP_BUSINESS_URL,
@@ -107,6 +108,8 @@ export const DEFAULT_SITE_CONFIG: SiteConfig = {
     yearsExperience: '3+ Years',
     projectsCompleted: '100+',
     satisfiedClients: '50+',
+    creativeToolsCount: '15+',
+    countriesServed: '12+',
     resumeUrl: RESUME_PDF_URL,
     socials: SOCIAL_LINKS
   },
@@ -164,12 +167,14 @@ export const DEFAULT_SITE_CONFIG: SiteConfig = {
     hero: {
       id: 'hero',
       title: 'Hero Section',
-      subtitle: 'Main introduction banner on homepage',
+      subtitle: 'Professional Graphic Designer, Video Editor, Website Developer and Digital Marketing Professional based in Jaipur, India. Dedicated to helping businesses build memorable visual brands with clarity and craft.',
       isVisible: true,
       order: 1,
-      headlinePrefix: 'Creative Excellence in',
-      headlineHighlight: 'Graphic Design & Video Editing',
-      headlineSuffix: 'for Growing Brands',
+      headlinePrefix: 'CREATIVE EXCELLENCE IN',
+      headlineHighlight: 'Rohit Verma',
+      headlineSuffix: '',
+      role: 'Graphic Designer & Video Editor',
+      location: 'Jaipur, India',
       ctaPrimaryText: 'Start a Project',
       ctaPrimaryLink: '#contact',
       ctaSecondaryText: 'Explore Portfolio',

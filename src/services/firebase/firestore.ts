@@ -25,6 +25,8 @@ import {
 } from '../../lib/validation';
 import { Insight, InsightAutomationSettings } from '../../types';
 import { INITIAL_INSIGHTS, DEFAULT_AUTOMATION_SETTINGS } from '../../insightsData';
+import { NewsletterSubscriberRecord, FirestoreHealthRecord } from '../../types/cms';
+export type { NewsletterSubscriberRecord, FirestoreHealthRecord };
 
 
 export interface ServiceResponse<T = unknown> {
@@ -460,6 +462,8 @@ export async function fetchAllLeadsFromFirestore(): Promise<any[]> {
         seenIds.add(docSnap.id);
         results.push({
           id: docSnap.id,
+          sourceCollection: 'leads',
+          sourceDocumentId: docSnap.id,
           name: d.name || '',
           email: d.email || '',
           phone: d.phone || '',
@@ -497,6 +501,8 @@ export async function fetchAllLeadsFromFirestore(): Promise<any[]> {
           const d = docSnap.data();
           results.push({
             id: docSnap.id,
+            sourceCollection: 'contactEnquiries',
+            sourceDocumentId: docSnap.id,
             name: d.name || '',
             email: d.email || '',
             phone: d.phone || '',
@@ -535,6 +541,8 @@ export async function fetchAllLeadsFromFirestore(): Promise<any[]> {
           const d = docSnap.data();
           results.push({
             id: docSnap.id,
+            sourceCollection: 'chatbotLeads',
+            sourceDocumentId: docSnap.id,
             name: d.name || 'Anonymous Visitor',
             email: d.email || '',
             phone: d.phone || '',
@@ -571,6 +579,8 @@ export async function fetchAllLeadsFromFirestore(): Promise<any[]> {
           const d = docSnap.data();
           results.push({
             id: docSnap.id,
+            sourceCollection: 'quoteRequests',
+            sourceDocumentId: docSnap.id,
             name: d.name || '',
             email: d.email || '',
             phone: d.phone || '',
@@ -604,33 +614,45 @@ export async function fetchAllLeadsFromFirestore(): Promise<any[]> {
   }
 }
 
-export async function updateLeadStatusInFirestore(leadId: string, status: string, notes?: string): Promise<ServiceResponse> {
+export async function updateLeadStatusInFirestore(leadId: string, status: string, notes?: string, sourceCollection?: string, sourceDocumentId?: string): Promise<ServiceResponse> {
   if (!isFirebaseConfigured() || !db) return { success: false, error: 'Database unconfigured' };
   try {
     const updateData: Record<string, unknown> = { status };
     if (notes !== undefined) updateData.notes = notes;
+    const targetDocId = sourceDocumentId || leadId;
+
+    // If sourceCollection is specified, update directly
+    if (sourceCollection && ['leads', 'contactEnquiries', 'chatbotLeads', 'quoteRequests'].includes(sourceCollection)) {
+      try {
+        const directDocRef = doc(db, sourceCollection, targetDocId);
+        await updateDoc(directDocRef, updateData);
+        return { success: true, id: targetDocId };
+      } catch (errDirect) {
+        console.warn(`[Firestore] Could not update direct lead in ${sourceCollection}, trying fallbacks:`, errDirect);
+      }
+    }
 
     try {
-      const docRef = doc(db, 'leads', leadId);
+      const docRef = doc(db, 'leads', targetDocId);
       await updateDoc(docRef, updateData);
-      return { success: true, id: leadId };
+      return { success: true, id: targetDocId };
     } catch (errLeads) {
       // Try contactEnquiries
       try {
-        const enquiryRef = doc(db, 'contactEnquiries', leadId);
+        const enquiryRef = doc(db, 'contactEnquiries', targetDocId);
         await updateDoc(enquiryRef, updateData);
-        return { success: true, id: leadId };
+        return { success: true, id: targetDocId };
       } catch (errEnquiries) {
         // Try chatbotLeads
         try {
-          const chatRef = doc(db, 'chatbotLeads', leadId);
+          const chatRef = doc(db, 'chatbotLeads', targetDocId);
           await updateDoc(chatRef, updateData);
-          return { success: true, id: leadId };
+          return { success: true, id: targetDocId };
         } catch (errChat) {
           // Try quoteRequests
-          const quoteRef = doc(db, 'quoteRequests', leadId);
+          const quoteRef = doc(db, 'quoteRequests', targetDocId);
           await updateDoc(quoteRef, updateData);
-          return { success: true, id: leadId };
+          return { success: true, id: targetDocId };
         }
       }
     }
@@ -640,30 +662,42 @@ export async function updateLeadStatusInFirestore(leadId: string, status: string
   }
 }
 
-export async function updateLeadCrmDataInFirestore(leadId: string, updates: Record<string, unknown>): Promise<ServiceResponse> {
+export async function updateLeadCrmDataInFirestore(leadId: string, updates: Record<string, unknown>, sourceCollection?: string, sourceDocumentId?: string): Promise<ServiceResponse> {
   if (!isFirebaseConfigured() || !db) return { success: false, error: 'Database unconfigured' };
   try {
     const cleanUpdates = removeUndefinedValues(updates);
+    const targetDocId = sourceDocumentId || leadId;
+
+    // If sourceCollection is specified, update directly
+    if (sourceCollection && ['leads', 'contactEnquiries', 'chatbotLeads', 'quoteRequests'].includes(sourceCollection)) {
+      try {
+        const directDocRef = doc(db, sourceCollection, targetDocId);
+        await updateDoc(directDocRef, cleanUpdates);
+        return { success: true, id: targetDocId };
+      } catch (errDirect) {
+        console.warn(`[Firestore] Could not update CRM data in ${sourceCollection}, trying fallbacks:`, errDirect);
+      }
+    }
 
     try {
-      const docRef = doc(db, 'leads', leadId);
+      const docRef = doc(db, 'leads', targetDocId);
       await updateDoc(docRef, cleanUpdates);
-      return { success: true, id: leadId };
+      return { success: true, id: targetDocId };
     } catch (errLeads) {
       // Fallback to contactEnquiries
       try {
-        const enquiryRef = doc(db, 'contactEnquiries', leadId);
+        const enquiryRef = doc(db, 'contactEnquiries', targetDocId);
         await updateDoc(enquiryRef, cleanUpdates);
-        return { success: true, id: leadId };
+        return { success: true, id: targetDocId };
       } catch (errEnquiries) {
         try {
-          const chatRef = doc(db, 'chatbotLeads', leadId);
+          const chatRef = doc(db, 'chatbotLeads', targetDocId);
           await updateDoc(chatRef, cleanUpdates);
-          return { success: true, id: leadId };
+          return { success: true, id: targetDocId };
         } catch (errChat) {
-          const quoteRef = doc(db, 'quoteRequests', leadId);
+          const quoteRef = doc(db, 'quoteRequests', targetDocId);
           await updateDoc(quoteRef, cleanUpdates);
-          return { success: true, id: leadId };
+          return { success: true, id: targetDocId };
         }
       }
     }
@@ -673,27 +707,38 @@ export async function updateLeadCrmDataInFirestore(leadId: string, updates: Reco
   }
 }
 
-export async function deleteLeadFromFirestore(leadId: string): Promise<ServiceResponse> {
+export async function deleteLeadFromFirestore(leadId: string, sourceCollection?: string, sourceDocumentId?: string): Promise<ServiceResponse> {
   if (!isFirebaseConfigured() || !db) return { success: false, error: 'Database unconfigured' };
   try {
+    const targetDocId = sourceDocumentId || leadId;
+    if (sourceCollection && ['leads', 'contactEnquiries', 'chatbotLeads', 'quoteRequests'].includes(sourceCollection)) {
+      try {
+        const directDocRef = doc(db, sourceCollection, targetDocId);
+        await deleteDoc(directDocRef);
+        return { success: true, id: targetDocId };
+      } catch (errDirect) {
+        console.warn(`[Firestore] Could not delete direct lead from ${sourceCollection}, trying fallbacks:`, errDirect);
+      }
+    }
+
     try {
-      const docRef = doc(db, 'leads', leadId);
+      const docRef = doc(db, 'leads', targetDocId);
       await deleteDoc(docRef);
-      return { success: true, id: leadId };
+      return { success: true, id: targetDocId };
     } catch (errLeads) {
       try {
-        const enquiryRef = doc(db, 'contactEnquiries', leadId);
+        const enquiryRef = doc(db, 'contactEnquiries', targetDocId);
         await deleteDoc(enquiryRef);
-        return { success: true, id: leadId };
+        return { success: true, id: targetDocId };
       } catch (errEnquiries) {
         try {
-          const chatRef = doc(db, 'chatbotLeads', leadId);
+          const chatRef = doc(db, 'chatbotLeads', targetDocId);
           await deleteDoc(chatRef);
-          return { success: true, id: leadId };
+          return { success: true, id: targetDocId };
         } catch (errChat) {
-          const quoteRef = doc(db, 'quoteRequests', leadId);
+          const quoteRef = doc(db, 'quoteRequests', targetDocId);
           await deleteDoc(quoteRef);
-          return { success: true, id: leadId };
+          return { success: true, id: targetDocId };
         }
       }
     }
@@ -701,6 +746,116 @@ export async function deleteLeadFromFirestore(leadId: string): Promise<ServiceRe
     console.error('[Firestore] Error deleting lead:', err);
     return { success: false, error: 'Failed to delete lead' };
   }
+}
+
+/**
+ * ========================================================
+ * NEWSLETTER SUBSCRIBERS FIRESTORE SERVICES
+ * ========================================================
+ */
+export async function fetchNewsletterSubscribersFromFirestore(): Promise<NewsletterSubscriberRecord[]> {
+  if (!isFirebaseConfigured() || !db) return [];
+  try {
+    const colRef = collection(db, 'newsletterSubscribers');
+    const snap = await getDocs(colRef);
+    const subscribers: NewsletterSubscriberRecord[] = [];
+    snap.forEach((docSnap) => {
+      const d = docSnap.data();
+      subscribers.push({
+        id: docSnap.id,
+        email: d.email || d.emailNormalised || '',
+        status: d.status || 'active',
+        source: d.source || 'website-newsletter',
+        subscribedAt: d.subscribedAt?.toDate ? d.subscribedAt.toDate().toISOString() : (d.subscribedAt || new Date().toISOString())
+      });
+    });
+    return subscribers.sort((a, b) => new Date(b.subscribedAt).getTime() - new Date(a.subscribedAt).getTime());
+  } catch (err) {
+    console.warn('[Firestore] Error fetching newsletter subscribers:', err);
+    return [];
+  }
+}
+
+export async function updateNewsletterSubscriberInFirestore(docId: string, updates: { status?: string }): Promise<ServiceResponse> {
+  if (!isFirebaseConfigured() || !db) return { success: false, error: 'Database unconfigured' };
+  try {
+    const docRef = doc(db, 'newsletterSubscribers', docId);
+    await updateDoc(docRef, updates);
+    return { success: true, id: docId };
+  } catch (err) {
+    console.error('[Firestore] Error updating newsletter subscriber:', err);
+    return { success: false, error: 'Failed to update subscriber' };
+  }
+}
+
+export async function deleteNewsletterSubscriberFromFirestore(docId: string): Promise<ServiceResponse> {
+  if (!isFirebaseConfigured() || !db) return { success: false, error: 'Database unconfigured' };
+  try {
+    const docRef = doc(db, 'newsletterSubscribers', docId);
+    await deleteDoc(docRef);
+    return { success: true, id: docId };
+  } catch (err) {
+    console.error('[Firestore] Error deleting newsletter subscriber:', err);
+    return { success: false, error: 'Failed to delete subscriber' };
+  }
+}
+
+/**
+ * ========================================================
+ * FIRESTORE DATA SOURCES & COLLECTIONS HEALTH CHECK
+ * ========================================================
+ */
+export async function checkFirestoreCollectionsHealth(): Promise<FirestoreHealthRecord[]> {
+  const collectionsToCheck = [
+    'leads',
+    'contactEnquiries',
+    'chatbotLeads',
+    'quoteRequests',
+    'newsletterSubscribers',
+    'siteConfig',
+    'siteRevisions',
+    'insights'
+  ];
+
+  if (!isFirebaseConfigured() || !db) {
+    return collectionsToCheck.map((col) => ({
+      collection: col,
+      count: 0,
+      status: 'error',
+      lastChecked: new Date().toISOString(),
+      error: 'Firebase Firestore is not initialized or configured'
+    }));
+  }
+
+  const results: FirestoreHealthRecord[] = [];
+
+  for (const colName of collectionsToCheck) {
+    const startTime = performance.now();
+    try {
+      const snap = await getDocs(collection(db, colName));
+      const duration = Math.round(performance.now() - startTime);
+      results.push({
+        collection: colName,
+        count: snap.size,
+        status: snap.size > 0 ? 'healthy' : 'empty',
+        latencyMs: duration,
+        lastChecked: new Date().toISOString(),
+        sampleId: snap.docs[0]?.id || undefined
+      });
+    } catch (err: any) {
+      const duration = Math.round(performance.now() - startTime);
+      results.push({
+        collection: colName,
+        count: 0,
+        status: 'error',
+        latencyMs: duration,
+        lastChecked: new Date().toISOString(),
+        error: err.message || 'Permission denied or collection unreachable'
+      });
+    }
+  }
+
+  return results;
 }
 
 /**

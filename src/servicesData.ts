@@ -160,7 +160,7 @@ export const SERVICES_LIST: DetailedService[] = [
     iconName: 'Share2',
     isFeatured: true,
     isPopular: true,
-    features: ['High-CTR Carousels', 'Curated Grid Templates', 'Story & Reel Graphics', 'Visual Hooks'],
+    features: ['Multi-Slide Carousels', 'Curated Grid Templates', 'Story & Reel Graphics', 'Visual Hooks'],
     details: {
       introduction: 'Engaging social media visual designs tailored to build organic audience growth, elevate engagement, and stop the scroll.',
       included: [
@@ -210,15 +210,15 @@ export const SERVICES_LIST: DetailedService[] = [
   {
     id: 's-gd-6',
     title: 'Marketing Designer',
-    description: 'High-converting advertising banners, landing page hero graphics, email newsletter layouts, and campaign collateral.',
+    description: 'Advertising banners, landing page hero graphics, email newsletter layouts, and campaign collateral.',
     category: 'Graphic Design',
     categories: ['Graphic Design'],
     iconName: 'Megaphone',
     isFeatured: false,
     isPopular: true,
-    features: ['Performance Ad Creatives', 'Display Banner Suites', 'Campaign Graphics', 'Conversion-Focused Layout'],
+    features: ['Performance Ad Creatives', 'Display Banner Suites', 'Campaign Graphics', 'Clear Visual Layout'],
     details: {
-      introduction: 'Strategic marketing visuals designed to maximize click-through rates (CTR) and user conversion across paid advertising channels.',
+      introduction: 'Strategic marketing visuals designed for visual clarity, messaging hierarchy, and brand consistency across paid advertising channels.',
       included: [
         'Multi-size Google & Meta ad banners',
         'Promotional discount badges & graphics',
@@ -322,15 +322,15 @@ export const SERVICES_LIST: DetailedService[] = [
   {
     id: 's-gd-10',
     title: 'Thumbnail Designer',
-    description: 'High-CTR YouTube thumbnails, course preview graphics, and video cards optimized for peak click-through performance.',
+    description: 'Custom YouTube thumbnails, course preview graphics, and video cards designed for visual appeal and readability.',
     category: 'Graphic Design',
     categories: ['Graphic Design'],
     iconName: 'Image',
     isFeatured: false,
     isPopular: true,
-    features: ['High-CTR Composition', 'Expressive Facial Cutouts', 'Bold Readable Typography', 'Vibrant Color Pop'],
+    features: ['Focal Point Composition', 'Expressive Facial Cutouts', 'Bold Readable Typography', 'Vibrant Color Balance'],
     details: {
-      introduction: 'Psychologically engineered thumbnails designed to stand out on crowded feeds and maximize video click-through rates.',
+      introduction: 'Custom thumbnails designed to stand out on crowded feeds with clear visual focus and legible typography.',
       included: [
         'Facial cutout enhancement & glow effects',
         'Bold, high-contrast headline typography',

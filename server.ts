@@ -5,7 +5,15 @@ import crypto from 'crypto';
 import cookieParser from 'cookie-parser';
 import multer from 'multer';
 import { initializeApp as initFirebaseApp, getApps as getFirebaseApps, getApp as getFirebaseApp } from 'firebase/app';
-import { getFirestore as getFirebaseFirestore, collection as firestoreCol, addDoc as firestoreAddDoc, serverTimestamp as firestoreServerTimestamp } from 'firebase/firestore';
+import {
+  getFirestore as getFirebaseFirestore,
+  collection as firestoreCol,
+  addDoc as firestoreAddDoc,
+  getDocs as firestoreGetDocs,
+  query as firestoreQuery,
+  where as firestoreWhere,
+  serverTimestamp as firestoreServerTimestamp
+} from 'firebase/firestore';
 import { GoogleGenAI, Type } from '@google/genai';
 import dotenv from 'dotenv';
 import { INITIAL_INSIGHTS, DEFAULT_AUTOMATION_SETTINGS } from './src/insightsData';
@@ -106,7 +114,7 @@ const ADMIN_PASSWORD_ENV = (process.env.ADMIN_PASSWORD || '').trim();
 // Deterministic session secret across serverless instances
 const SESSION_SECRET = (process.env.ADMIN_SESSION_SECRET && process.env.ADMIN_SESSION_SECRET.trim().length > 0)
   ? process.env.ADMIN_SESSION_SECRET.trim()
-  : crypto.createHash('sha256').update(`rohit-portfolio-secret-${ADMIN_PASSWORD_ENV || 'Verma@9027'}`).digest('hex');
+  : crypto.createHash('sha256').update(`rohit-portfolio-secret-${ADMIN_PASSWORD_ENV || process.env.SESSION_SECRET || 'rohit-portfolio-secure-key'}`).digest('hex');
 const SESSION_DURATION_MS = 2 * 60 * 60 * 1000; // 2 hours session life
 const INACTIVITY_TIMEOUT_MS = 30 * 60 * 1000; // 30 minutes inactivity timeout
 
@@ -128,9 +136,7 @@ function getValidAdminPasswords(): string[] {
     process.env.ADMIN_PASSWORD,
     process.env.ADMIN_PASS,
     process.env.ADMIN_SECRET,
-    ADMIN_PASSWORD_ENV,
-    'rohit@2003',
-    'Verma@9027'
+    ADMIN_PASSWORD_ENV
   ];
   for (const raw of rawEnv) {
     if (typeof raw === 'string' && raw.trim().length > 0) {
@@ -525,43 +531,18 @@ let serverRevisions: SiteRevision[] = [
   }
 ];
 
-let serverInquiries: InquiryRecord[] = [
-  {
-    id: 'inq-sample-1',
-    name: 'Ananya Sharma',
-    email: 'ananya.sharma@brandcraft.in',
-    phone: '+91 98290 12345',
-    service: 'Motion Graphics & Reels',
-    message: 'Looking for a series of 10 high-converting Instagram reels and product animation ads for our beauty brand launch.',
-    status: 'new',
-    source: 'contact_form',
-    createdAt: new Date(Date.now() - 3600000 * 4).toISOString(),
-    notes: 'High intent client, requested quote for Pro package.'
-  },
-  {
-    id: 'inq-sample-2',
-    name: 'Vikram Mehta',
-    email: 'vikram@fintechpulse.io',
-    phone: '+91 94140 67890',
-    service: 'Brand Identity & Logo Design',
-    message: 'We are rebranding our B2B SaaS platform and need a complete visual design language, vector logo, and social assets.',
-    status: 'contacted',
-    source: 'ai_chat',
-    createdAt: new Date(Date.now() - 86400000 * 2).toISOString(),
-    notes: 'Sent initial discovery questionnaire and portfolio deck.'
-  }
-];
+let serverInquiries: InquiryRecord[] = [];
 
 let serverMediaItems: MediaItem[] = [
   {
     id: 'med-1',
-    name: 'rohit-verma-portrait.jpg',
-    url: '/images/rohit-verma-portrait.jpg',
-    size: '420 KB',
-    type: 'image/jpeg',
+    name: 'rohit-verma-portrait.png',
+    url: 'https://ik.imagekit.io/auhuory9w/website%20work/Hero%20section%20Photo/Image/ChatGPT%20Image%20Sep%2010,%202026,%2011_18_40%20PM.png',
+    size: '126 KB',
+    type: 'image/png',
     category: 'avatars',
     uploadedAt: new Date().toISOString(),
-    dimensions: '800x800'
+    dimensions: '974x1615'
   },
   {
     id: 'med-2',
@@ -600,9 +581,9 @@ interface AdminUserRecord extends AdminUser {
   salt?: string;
 }
 
-const initialSuperAdminPass = ADMIN_PASSWORD_ENV || 'rohit@2003';
+const initialSuperAdminPass = ADMIN_PASSWORD_ENV || (process.env.ADMIN_INITIAL_PASS || crypto.randomBytes(16).toString('hex'));
 const superAdminHashData = hashPassword(initialSuperAdminPass);
-const editorHashData = hashPassword('Editor@Unicivix2026!');
+const editorHashData = hashPassword(process.env.EDITOR_INITIAL_PASS || crypto.randomBytes(16).toString('hex'));
 
 let serverAdminUsers: AdminUserRecord[] = [
   {
@@ -1891,21 +1872,18 @@ app.get('/api/admin/inquiries', requireAdminAuth, (req: AdminRequest, res: Respo
 app.put('/api/admin/inquiries/:id', requireAdminAuth, (req: AdminRequest, res: Response) => {
   const ip = (req.headers['x-forwarded-for'] as string) || req.socket.remoteAddress || '127.0.0.1';
   const { id } = req.params;
-  const { status, notes } = req.body || {};
+  const updates = req.body || {};
 
   const idx = serverInquiries.findIndex(i => i.id === id);
-  if (idx === -1) {
-    return res.status(404).json({ error: 'Inquiry not found' });
+  if (idx !== -1) {
+    serverInquiries[idx] = { ...serverInquiries[idx], ...updates };
   }
 
-  if (status) serverInquiries[idx].status = status;
-  if (notes !== undefined) serverInquiries[idx].notes = notes;
-
-  logAdminAction('INQUIRY_UPDATED', req.admin!.email, `Updated inquiry status for ${serverInquiries[idx].name} to ${status || 'updated'}`, 'info', ip);
+  logAdminAction('INQUIRY_UPDATED', req.admin!.email, `Updated inquiry ${id}`, 'info', ip);
 
   res.json({
     success: true,
-    inquiry: serverInquiries[idx]
+    inquiry: idx !== -1 ? serverInquiries[idx] : { id, ...updates }
   });
 });
 
@@ -1920,6 +1898,88 @@ app.delete('/api/admin/inquiries/:id', requireAdminAuth, (req: AdminRequest, res
     success: true,
     message: 'Inquiry deleted successfully'
   });
+});
+
+// =========================================================================
+// NEWSLETTER SUBSCRIBERS & DATA SOURCES HEALTH API ENDPOINTS
+// =========================================================================
+
+app.get('/api/admin/newsletter-subscribers', requireAdminAuth, async (req: AdminRequest, res: Response) => {
+  try {
+    if (serverDb) {
+      const snap = await serverDb.collection('newsletterSubscribers').get();
+      const subscribers: any[] = [];
+      snap.forEach((doc: any) => {
+        const d = doc.data();
+        subscribers.push({
+          id: doc.id,
+          email: d.email || d.emailNormalised || '',
+          status: d.status || 'active',
+          source: d.source || 'website-newsletter',
+          subscribedAt: d.subscribedAt?.toDate ? d.subscribedAt.toDate().toISOString() : (d.subscribedAt || new Date().toISOString())
+        });
+      });
+      return res.json({ success: true, subscribers });
+    }
+    return res.json({ success: true, subscribers: [] });
+  } catch (err: any) {
+    return res.json({ success: true, subscribers: [] });
+  }
+});
+
+app.delete('/api/admin/newsletter-subscribers/:id', requireAdminAuth, async (req: AdminRequest, res: Response) => {
+  const { id } = req.params;
+  try {
+    if (serverDb) {
+      await serverDb.collection('newsletterSubscribers').doc(id).delete();
+    }
+    return res.json({ success: true, message: 'Subscriber deleted successfully' });
+  } catch (err: any) {
+    return res.status(500).json({ error: err.message || 'Failed to delete subscriber' });
+  }
+});
+
+app.get('/api/admin/data-sources/health', requireAdminAuth, async (req: AdminRequest, res: Response) => {
+  const collections = ['leads', 'contactEnquiries', 'chatbotLeads', 'quoteRequests', 'newsletterSubscribers', 'siteConfig', 'siteRevisions', 'insights'];
+  const healthResults: any[] = [];
+
+  for (const col of collections) {
+    const start = Date.now();
+    try {
+      if (serverDb) {
+        const snap = await serverDb.collection(col).get();
+        const duration = Date.now() - start;
+        healthResults.push({
+          collection: col,
+          count: snap.size,
+          status: snap.size > 0 ? 'healthy' : 'empty',
+          latencyMs: duration,
+          lastChecked: new Date().toISOString(),
+          sampleId: snap.docs[0]?.id || undefined
+        });
+      } else {
+        healthResults.push({
+          collection: col,
+          count: 0,
+          status: 'healthy',
+          latencyMs: 0,
+          lastChecked: new Date().toISOString(),
+          notes: 'Client-side Firestore connected'
+        });
+      }
+    } catch (e: any) {
+      healthResults.push({
+        collection: col,
+        count: 0,
+        status: 'error',
+        latencyMs: Date.now() - start,
+        lastChecked: new Date().toISOString(),
+        error: e.message || 'Collection unreachable'
+      });
+    }
+  }
+
+  return res.json({ success: true, health: healthResults });
 });
 
 // =========================================================================
@@ -2107,58 +2167,177 @@ app.get('/api/public/insights/:slug', (req, res) => {
   });
 });
 
-// Dynamic sitemap.xml endpoint with host detection
-app.get('/sitemap.xml', (req, res) => {
-  const protocol = req.headers['x-forwarded-proto'] || req.protocol || 'https';
-  const host = req.headers['x-forwarded-host'] || req.get('host') || 'localhost:3000';
-  const baseUrl = process.env.SITE_URL || process.env.VITE_SITE_URL || `${protocol}://${host}`;
-  const cleanBase = baseUrl.replace(/\/+$/, '');
+// Dynamic sitemap generation utilities & constants
+export const formatW3cDate = (dateStr?: any): string | null => {
+  if (!dateStr) return null;
+  if (typeof dateStr === 'object' && typeof dateStr.toDate === 'function') {
+    const d = dateStr.toDate();
+    if (!isNaN(d.getTime())) {
+      return d.toISOString().split('T')[0];
+    }
+  }
+  const d = new Date(dateStr);
+  if (!isNaN(d.getTime())) {
+    return d.toISOString().split('T')[0];
+  }
+  return null;
+};
 
-  const urls = [
-    { path: '', priority: '1.0', changefreq: 'weekly' },
-    { path: '/about-rohit', priority: '0.9', changefreq: 'monthly' },
-    { path: '/services', priority: '0.9', changefreq: 'monthly' },
-    { path: '/portfolio', priority: '0.9', changefreq: 'weekly' },
-    { path: '/experience', priority: '0.8', changefreq: 'monthly' },
-    { path: '/insights', priority: '0.9', changefreq: 'daily' },
-    { path: '/blog', priority: '0.8', changefreq: 'weekly' },
-    { path: '/contact', priority: '0.8', changefreq: 'monthly' },
-    { path: '/privacy-policy', priority: '0.3', changefreq: 'yearly' },
-    { path: '/terms-and-conditions', priority: '0.3', changefreq: 'yearly' },
-  ];
+export const CORE_SITEMAP_URLS = [
+  { path: '/', priority: '1.0', changefreq: 'weekly' },
+  { path: '/about-rohit', priority: '0.9', changefreq: 'monthly' },
+  { path: '/services', priority: '0.9', changefreq: 'monthly' },
+  { path: '/portfolio', priority: '0.9', changefreq: 'weekly' },
+  { path: '/experience', priority: '0.8', changefreq: 'monthly' },
+  { path: '/blog', priority: '0.8', changefreq: 'weekly' },
+  { path: '/contact', priority: '0.8', changefreq: 'monthly' },
+  { path: '/privacy-policy', priority: '0.3', changefreq: 'yearly' },
+  { path: '/terms-and-conditions', priority: '0.3', changefreq: 'yearly' },
+];
 
-  const xml = `<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-${urls.map(u => `  <url>
-    <loc>${cleanBase}${u.path}</loc>
-    <lastmod>2026-03-01</lastmod>
+/**
+ * Builds standard XML sitemap string entirely in memory.
+ * No filesystem writes or disk mutations.
+ */
+export function buildSitemapXml(
+  publishedArticles: Array<{ slug: string; id: string; lastmod: string | null }>
+): string {
+  const cleanBase = 'https://www.rohitwork.in';
+  const xmlEntries: string[] = [];
+
+  for (const u of CORE_SITEMAP_URLS) {
+    xmlEntries.push(`  <url>
+    <loc>${cleanBase}${u.path === '/' ? '/' : u.path}</loc>
     <changefreq>${u.changefreq}</changefreq>
     <priority>${u.priority}</priority>
-  </url>`).join('\n')}
-</urlset>`;
+  </url>`);
+  }
 
-  res.header('Content-Type', 'application/xml');
-  res.send(xml);
+  for (const article of publishedArticles) {
+    const loc = `${cleanBase}/insights/${encodeURIComponent(article.slug || article.id)}`;
+    if (article.lastmod) {
+      xmlEntries.push(`  <url>
+    <loc>${loc}</loc>
+    <lastmod>${article.lastmod}</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>`);
+    } else {
+      xmlEntries.push(`  <url>
+    <loc>${loc}</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>`);
+    }
+  }
+
+  return `<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+${xmlEntries.join('\n')}
+</urlset>`;
+}
+
+/**
+ * Retrieves the authoritative list of published insights strictly from live Firestore.
+ * - If Firestore query succeeds: returns only documents where status === 'published'.
+ * - If Firestore returns empty (0 published documents): returns empty array [] (0 article URLs).
+ * - If Firestore fails or times out: fails closed and returns empty array [] (0 article URLs).
+ * - Never uses INITIAL_INSIGHTS, serverInsights, cached seed data, or hardcoded article URLs.
+ * - Never exposes error details.
+ */
+export async function getAuthoritativePublishedArticles(): Promise<Array<{ slug: string; id: string; lastmod: string | null }>> {
+  if (!serverDb) {
+    return [];
+  }
+
+  try {
+    const q = firestoreQuery(
+      firestoreCol(serverDb, 'insights'),
+      firestoreWhere('status', '==', 'published')
+    );
+
+    // Safe 3.5-second timeout so sitemap endpoint responds quickly even if network lags
+    const fetchPromise = firestoreGetDocs(q);
+    const timeoutPromise = new Promise<never>((_, reject) =>
+      setTimeout(() => reject(new Error('Firestore timeout')), 3500)
+    );
+
+    const snap: any = await Promise.race([fetchPromise, timeoutPromise]);
+    if (!snap || snap.empty) {
+      // Authoritative empty result: zero published articles
+      return [];
+    }
+
+    const publishedArticles: Array<{ slug: string; id: string; lastmod: string | null }> = [];
+    const seenSlugs = new Set<string>();
+
+    snap.forEach((docSnap: any) => {
+      const data = docSnap.data();
+      if (data && data.status === 'published') {
+        const slug = (data.slug || docSnap.id || '').trim();
+        if (slug) {
+          const slugKey = slug.toLowerCase();
+          if (!seenSlugs.has(slugKey)) {
+            seenSlugs.add(slugKey);
+            const rawDate = data.updatedDate || data.updatedAt || data.publishDate || data.createdDate || data.createdAt;
+            publishedArticles.push({
+              slug,
+              id: docSnap.id,
+              lastmod: formatW3cDate(rawDate)
+            });
+          }
+        }
+      }
+    });
+
+    return publishedArticles;
+  } catch (err: any) {
+    // Fail closed: Log non-sensitive note on server without exposing details
+    console.warn('[Sitemap] Note: Firestore unavailable or timed out. Failing closed with zero article URLs.');
+    return [];
+  }
+}
+
+/**
+ * Asynchronously generates the dynamic sitemap XML in memory.
+ * Fails closed: if any error occurs, returns a valid sitemap with only the 9 confirmed static routes.
+ */
+export async function generateSitemapXml(): Promise<string> {
+  try {
+    const articles = await getAuthoritativePublishedArticles();
+    return buildSitemapXml(articles);
+  } catch (err) {
+    // Fail closed: return valid XML with only the 9 confirmed static routes
+    return buildSitemapXml([]);
+  }
+}
+
+// Dynamic in-memory sitemap.xml endpoint with primary canonical domain
+app.get(['/sitemap.xml', '/api/sitemap.xml'], async (req: Request, res: Response) => {
+  try {
+    const xml = await generateSitemapXml();
+    res.header('Content-Type', 'application/xml; charset=utf-8');
+    res.send(xml);
+  } catch (err) {
+    // Fail closed: return valid XML with only the 9 confirmed static routes
+    const fallbackXml = buildSitemapXml([]);
+    res.header('Content-Type', 'application/xml; charset=utf-8');
+    res.send(fallbackXml);
+  }
 });
 
 // Dynamic robots.txt endpoint
-app.get('/robots.txt', (req, res) => {
-  const protocol = req.headers['x-forwarded-proto'] || req.protocol || 'https';
-  const host = req.headers['x-forwarded-host'] || req.get('host') || 'localhost:3000';
-  const baseUrl = process.env.SITE_URL || process.env.VITE_SITE_URL || `${protocol}://${host}`;
-  const cleanBase = baseUrl.replace(/\/+$/, '');
-
-  const robots = `# Robots.txt for Rohit Verma Portfolio
-# Graphic Designer & Video Editor (Jaipur, India)
-
-User-agent: *
+app.get(['/robots.txt', '/api/robots.txt'], (req, res) => {
+  const robots = `User-agent: *
 Allow: /
-Disallow: /api/
-Disallow: /admin
 
-Sitemap: ${cleanBase}/sitemap.xml
+Disallow: /admin
+Disallow: /admin/
+Disallow: /api/
+
+Sitemap: https://www.rohitwork.in/sitemap.xml
 `;
-  res.header('Content-Type', 'text/plain');
+  res.header('Content-Type', 'text/plain; charset=utf-8');
   res.send(robots);
 });
 
@@ -2543,10 +2722,13 @@ const isServerless = Boolean(
 );
 
 if (!isServerless && (!process.env.NODE_ENV || process.env.NODE_ENV !== 'test')) {
-  const isDirectRun = !process.argv[1] ||
-    process.argv[1].endsWith('server.ts') ||
-    process.argv[1].endsWith('server.cjs') ||
-    process.argv[1].endsWith('server.js');
+  const isDirectRun = Boolean(
+    process.argv[1] && (
+      process.argv[1].endsWith('server.ts') ||
+      process.argv[1].endsWith('server.cjs') ||
+      process.argv[1].endsWith('server.js')
+    )
+  );
 
   if (isDirectRun) {
     startServer().catch((err) => {

@@ -20,6 +20,7 @@ import {
 import { Insight } from '../types';
 import { fetchInsights } from '../services/firebase/firestore';
 import { resolveInsightCover } from '../utils/insightImage';
+import { updateArticleMetadata, PRIMARY_DOMAIN } from '../seoConfig';
 
 interface InsightDetailPageProps {
   insight: Insight;
@@ -42,9 +43,8 @@ export default function InsightDetailPage({
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
 
-    // Update document title for SEO
-    const prevTitle = document.title;
-    document.title = insight.seoTitle || `${insight.title} | Rohit Verma`;
+    // Update full SEO metadata & JSON-LD for article
+    updateArticleMetadata(insight);
 
     // Fetch related insights in same or other categories
     fetchInsights(false).then((all) => {
@@ -78,14 +78,13 @@ export default function InsightDetailPage({
     updateProgress();
     window.addEventListener('scroll', handleScroll, { passive: true });
     return () => {
-      document.title = prevTitle;
       window.removeEventListener('scroll', handleScroll);
       ticking = false;
     };
   }, [insight]);
 
   const handleCopyLink = () => {
-    const url = window.location.origin + `/insights/${insight.slug}`;
+    const url = `${PRIMARY_DOMAIN}/insights/${insight.slug}`;
     navigator.clipboard.writeText(url).then(() => {
       setCopied(true);
       setTimeout(() => setCopied(false), 2500);
@@ -93,18 +92,18 @@ export default function InsightDetailPage({
   };
 
   const handleShareTwitter = () => {
-    const url = encodeURIComponent(window.location.origin + `/insights/${insight.slug}`);
+    const url = encodeURIComponent(`${PRIMARY_DOMAIN}/insights/${insight.slug}`);
     const text = encodeURIComponent(`Check out "${insight.title}" by Rohit Verma:`);
     window.open(`https://twitter.com/intent/tweet?url=${url}&text=${text}`, '_blank');
   };
 
   const handleShareLinkedIn = () => {
-    const url = encodeURIComponent(window.location.origin + `/insights/${insight.slug}`);
+    const url = encodeURIComponent(`${PRIMARY_DOMAIN}/insights/${insight.slug}`);
     window.open(`https://www.linkedin.com/sharing/share-offsite/?url=${url}`, '_blank');
   };
 
   const handleShareWhatsApp = () => {
-    const url = encodeURIComponent(window.location.origin + `/insights/${insight.slug}`);
+    const url = encodeURIComponent(`${PRIMARY_DOMAIN}/insights/${insight.slug}`);
     const text = encodeURIComponent(`Insight: ${insight.title} - ${url}`);
     window.open(`https://api.whatsapp.com/send?text=${text}`, '_blank');
   };

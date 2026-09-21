@@ -2,19 +2,24 @@ import React, { useState } from 'react';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'motion/react';
 import { Instagram, Linkedin, Github, MessageSquare, ArrowRight, CheckCircle2, X, Phone, Mail, Lock, FileText } from 'lucide-react';
-import { WHATSAPP_BUSINESS_URL, contactConfig } from '../data';
+import { WHATSAPP_BUSINESS_URL, contactConfig, ROHIT_PROFILE_IMAGE_URL, getAuthoritativeProfileImage } from '../data';
 import { useBodyScrollLock } from '../lib/scrollLock';
 import WhatsAppIcon from './WhatsAppIcon';
 import { subscribeToNewsletter } from '../services/firebase/firestore';
 import PrivacyPolicyContent from './PrivacyPolicyContent';
 import TermsAndConditionsContent from './TermsAndConditionsContent';
-import avatarImg from '../assets/images/rohit-verma-portrait.jpg';
+import { useSiteConfig } from '../context/SiteConfigContext';
 
 interface FooterProps {
   onNavigate?: (routeId: string) => void;
 }
 
 export default function Footer({ onNavigate }: FooterProps = {}) {
+  const { activeConfig } = useSiteConfig();
+  const branding = activeConfig?.branding;
+  const footerConfig = activeConfig?.footer;
+  const avatar = getAuthoritativeProfileImage(branding?.avatarImage);
+
   const [email, setEmail] = useState('');
   const [subscribedMessage, setSubscribedMessage] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -93,29 +98,29 @@ export default function Footer({ onNavigate }: FooterProps = {}) {
         {/* Column 1: Brand & Bio */}
         <div className="lg:col-span-4" id="footer-col-1">
           <a href="/" className="flex items-center gap-3 mb-6 cursor-pointer" onClick={handleHomeNav}>
-            <div className="w-9 h-9 rounded-full overflow-hidden border border-accent-primary">
+            <div className="w-9 h-9 rounded-full overflow-hidden border border-accent-primary bg-bg-secondary flex-shrink-0">
               <img
-                src={avatarImg}
-                alt="Rohit Verma"
+                src={avatar}
+                alt="Rohit Verma – Graphic Designer and Video Editor in Jaipur"
                 width="36"
                 height="36"
                 loading="lazy"
                 decoding="async"
-                className="w-full h-full object-cover object-[50%_25%]"
+                className="w-full h-full object-cover object-[center_top]"
                 referrerPolicy="no-referrer"
                 onError={(e) => {
-                  if (e.currentTarget.src !== window.location.origin + '/images/rohit-avatar.jpg') {
-                    e.currentTarget.src = '/images/rohit-avatar.jpg';
+                  if (e.currentTarget.src !== ROHIT_PROFILE_IMAGE_URL) {
+                    e.currentTarget.src = ROHIT_PROFILE_IMAGE_URL;
                   }
                 }}
               />
             </div>
             <span className="text-xl font-bold text-text-primary tracking-wide">
-              Rohit<span className="text-accent-primary">.</span>
+              {branding?.siteName || 'Rohit'}<span className="text-accent-primary">.</span>
             </span>
           </a>
           <p className="text-sm leading-relaxed mb-4 max-w-sm">
-            Creating purposeful branding layouts, high-retention short reels, cinematic kinetic motions, and immersive web graphics that set organizations apart online.
+            {footerConfig?.tagline || 'Creating purposeful branding layouts, high-retention short reels, cinematic kinetic motions, and immersive web graphics that set organizations apart online.'}
           </p>
 
           <div className="flex flex-col gap-2 text-text-primary text-sm font-semibold mb-6" id="footer-contact-info">
@@ -123,22 +128,22 @@ export default function Footer({ onNavigate }: FooterProps = {}) {
               <Phone className="w-4 h-4 text-accent-primary flex-shrink-0" />
               <span>Phone:</span>
               <a
-                href={contactConfig.phoneHref}
-                aria-label={`Call Rohit Verma at ${contactConfig.phoneDisplay}`}
+                href={branding?.phone ? `tel:${branding.phone.replace(/[^0-9+]/g, '')}` : contactConfig.phoneHref}
+                aria-label={`Call at ${branding?.phone || contactConfig.phoneDisplay}`}
                 className="hover:text-accent-primary transition-colors underline decoration-accent-primary/40 underline-offset-4"
               >
-                {contactConfig.phoneDisplay}
+                {branding?.phone || contactConfig.phoneDisplay}
               </a>
             </div>
             <div className="flex items-center gap-2">
               <Mail className="w-4 h-4 text-accent-primary flex-shrink-0" />
               <span>Email:</span>
               <a
-                href={contactConfig.emailHref}
-                aria-label={`Email Rohit Verma at ${contactConfig.emailDisplay}`}
+                href={branding?.email ? `mailto:${branding.email}` : contactConfig.emailHref}
+                aria-label={`Email at ${branding?.email || contactConfig.emailDisplay}`}
                 className="hover:text-accent-primary transition-colors underline decoration-accent-primary/40 underline-offset-4 contact-email"
               >
-                {contactConfig.emailDisplay}
+                {branding?.email || contactConfig.emailDisplay}
               </a>
             </div>
           </div>
@@ -303,7 +308,7 @@ export default function Footer({ onNavigate }: FooterProps = {}) {
       {/* Bottom Footer Section */}
       <div className="max-w-7xl mx-auto px-6 pt-8 border-t border-border-color flex flex-col sm:flex-row items-center justify-between gap-4 text-xs">
         <div id="footer-copyright" className="text-text-secondary text-center sm:text-left">
-          Copyright © 2026 Rohit Verma. All rights reserved.
+          {footerConfig?.copyright || footerConfig?.copyrightText || `Copyright © ${new Date().getFullYear()} ${branding?.siteName || 'Rohit Verma'}. All rights reserved.`}
         </div>
         <div className="flex flex-wrap items-center justify-center sm:justify-end gap-3 sm:gap-6" id="footer-policy-links">
           <button

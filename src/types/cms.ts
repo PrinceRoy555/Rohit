@@ -31,6 +31,8 @@ export interface BrandingConfig {
   yearsExperience: string;
   projectsCompleted: string;
   satisfiedClients: string;
+  creativeToolsCount?: string;
+  countriesServed?: string;
   resumeUrl: string;
   socials: SocialLinkItem[];
 }
@@ -115,6 +117,9 @@ export interface SectionsConfig {
     headlinePrefix: string;
     headlineHighlight: string;
     headlineSuffix: string;
+    role?: string;
+    location?: string;
+    rotatingRoles?: string[];
     ctaPrimaryText: string;
     ctaPrimaryLink: string;
     ctaSecondaryText: string;
@@ -252,6 +257,26 @@ export interface InquiryRecord {
   isHotLead?: boolean;
   tags?: string[];
   internalNotes?: string;
+  sourceCollection?: 'leads' | 'contactEnquiries' | 'chatbotLeads' | 'quoteRequests' | string;
+  sourceDocumentId?: string;
+}
+
+export interface NewsletterSubscriberRecord {
+  id: string;
+  email: string;
+  status: string;
+  source?: string;
+  subscribedAt: string;
+}
+
+export interface FirestoreHealthRecord {
+  collection: string;
+  count: number;
+  status: 'healthy' | 'warning' | 'empty' | 'error';
+  latencyMs?: number;
+  lastChecked: string;
+  sampleId?: string;
+  error?: string;
 }
 
 export type AdminRole = 'super_admin' | 'admin' | 'editor';

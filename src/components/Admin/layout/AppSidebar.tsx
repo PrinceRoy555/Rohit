@@ -29,7 +29,9 @@ import {
   ShieldCheck,
   CheckCircle2,
   AlertCircle,
-  ExternalLink
+  ExternalLink,
+  Mail,
+  Database
 } from 'lucide-react';
 import { useSidebar } from './SidebarContext';
 import { InquiryRecord } from '../../../types/cms';
@@ -156,6 +158,12 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({
           badgeColor: 'bg-rose-600 text-white',
           viewOptions: { view: 'hot_leads' },
         },
+        {
+          id: 'newsletter',
+          label: 'Newsletter Subscribers',
+          icon: Mail,
+          category: 'CRM & Inquiries',
+        },
       ],
     },
     {
@@ -247,6 +255,12 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({
           id: 'security',
           label: 'Users & Security',
           icon: Shield,
+          category: 'Settings & System',
+        },
+        {
+          id: 'datasources',
+          label: 'Firestore Collections',
+          icon: Database,
           category: 'Settings & System',
         },
       ],

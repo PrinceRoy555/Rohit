@@ -1,7 +1,19 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'motion/react';
-import { ArrowLeft, ArrowRight, ChevronLeft, ChevronRight, X, ExternalLink, Calendar, User, Briefcase, Eye, Image as ImageIcon, Layers } from 'lucide-react';
+import {
+  ArrowLeft,
+  ArrowRight,
+  ChevronLeft,
+  ChevronRight,
+  X,
+  ExternalLink,
+  Calendar,
+  User,
+  Eye,
+  Image as ImageIcon,
+  Layers
+} from 'lucide-react';
 import { PROJECTS_DATA, PORTFOLIO_CATEGORIES } from '../data';
 import { useSiteConfig } from '../context/SiteConfigContext';
 import { useBodyScrollLock } from '../lib/scrollLock';
@@ -50,10 +62,8 @@ function ProjectImage({ project, className = '', imgClassName = '', isModal = fa
 
   const handleError = () => {
     if (sourceIndex < fallbackSources.length - 1) {
-      // Try next source in chain
       setSourceIndex((prev) => prev + 1);
     } else {
-      // All sources failed
       setHasError(true);
     }
   };
@@ -80,7 +90,6 @@ function ProjectImage({ project, className = '', imgClassName = '', isModal = fa
 
   return (
     <div className={`relative w-full overflow-hidden bg-bg-secondary/40 ${isModal ? 'aspect-[16/9]' : 'aspect-[4/3]'} ${className}`}>
-      {/* Loading Skeleton */}
       {!isLoaded && (
         <div className="absolute inset-0 bg-bg-secondary animate-pulse flex items-center justify-center z-0">
           <ImageIcon className="w-6 h-6 text-text-muted/30 animate-pulse" />
@@ -167,12 +176,27 @@ export default function PortfolioSection() {
   const [isHovered, setIsHovered] = useState(false);
 
   // Filter projects based on active category
-  const filteredProjects = allProjects.filter((project) => {
-    if (activeCategory === 'All') return true;
-    return project.category.toLowerCase() === activeCategory.toLowerCase();
-  });
+  const filteredProjects = useMemo(() => {
+    if (activeCategory === 'All') return allProjects;
+    const aCat = activeCategory.toLowerCase();
+    return allProjects.filter((project) => {
+      const pCat = project.category.toLowerCase();
+      if (aCat === 'graphic design') {
+        const graphicSub = [
+          'graphic design',
+          'social media design',
+          'packaging',
+          'print design',
+          'marketing design',
+          'thumbnail design'
+        ];
+        return graphicSub.includes(pCat);
+      }
+      return pCat === aCat;
+    });
+  }, [allProjects, activeCategory]);
 
-  // Reset index & scroll active tab into view when filter changes
+  // Reset index & scroll active tab into view when category changes
   useEffect(() => {
     setCurrentIndex(0);
     const activeBtn = tabButtonsRef.current[activeCategory];
@@ -180,6 +204,23 @@ export default function PortfolioSection() {
       activeBtn.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
     }
   }, [activeCategory]);
+
+  // Keyboard navigation for categories & modal escape
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (selectedProject) {
+        if (e.key === 'Escape') {
+          e.preventDefault();
+          setSelectedProject(null);
+        }
+      } else {
+        if (e.key === 'ArrowLeft') handlePrev();
+        if (e.key === 'ArrowRight') handleNext();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [selectedProject, filteredProjects]);
 
   const handleTabKeyDown = (e: React.KeyboardEvent, index: number) => {
     const catList = PORTFOLIO_CATEGORIES.map((c) => c.name);
@@ -206,30 +247,22 @@ export default function PortfolioSection() {
 
   // Autoplay functionality
   useEffect(() => {
-    if (isHovered || filteredProjects.length <= 1) return;
+    if (isHovered || filteredProjects.length <= 1 || selectedProject) return;
     const interval = setInterval(() => {
       setCurrentIndex((prevIndex) => (prevIndex + 1) % filteredProjects.length);
     }, 4500);
     return () => clearInterval(interval);
-  }, [isHovered, filteredProjects.length]);
+  }, [isHovered, filteredProjects.length, selectedProject]);
 
   const handlePrev = () => {
+    if (filteredProjects.length === 0) return;
     setCurrentIndex((prev) => (prev === 0 ? filteredProjects.length - 1 : prev - 1));
   };
 
   const handleNext = () => {
+    if (filteredProjects.length === 0) return;
     setCurrentIndex((prev) => (prev + 1) % filteredProjects.length);
   };
-
-  // Keyboard accessibility for carousel
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'ArrowLeft') handlePrev();
-      if (e.key === 'ArrowRight') handleNext();
-    };
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [filteredProjects]);
 
   return (
     <section id="portfolio" className="py-24 bg-bg-primary relative overflow-hidden transition-colors duration-300">
@@ -240,7 +273,7 @@ export default function PortfolioSection() {
       <div className="max-w-7xl mx-auto px-6 relative z-10">
         
         {/* Section Header */}
-        <div className="flex flex-col md:flex-row md:items-end justify-between mb-10 gap-6" id="portfolio-header">
+        <div className="flex flex-col md:flex-row md:items-end justify-between mb-8 gap-6" id="portfolio-header">
           <div className="max-w-xl">
             <motion.span
               initial={{ opacity: 0, y: 15 }}
@@ -360,14 +393,22 @@ export default function PortfolioSection() {
           id="portfolio-slider-outer"
         >
           {filteredProjects.length === 0 ? (
-            <div className="text-center py-20 text-text-secondary/50" id="no-projects-fallback">
-              No items found in this category.
+            <div className="text-center py-20 px-6 bg-bg-card border border-border-color rounded-2xl my-6" id="no-projects-fallback">
+              <h3 className="text-base font-bold text-text-primary mb-1">No Projects Found</h3>
+              <p className="text-sm text-text-secondary max-w-sm mx-auto mb-4">
+                No portfolio items matched your current filter &quot;{activeCategory}&quot;.
+              </p>
+              <button
+                onClick={() => setActiveCategory('All')}
+                className="inline-flex items-center gap-2 bg-accent-primary text-white text-xs font-semibold px-4 py-2 rounded-lg cursor-pointer hover:bg-accent-secondary transition-colors"
+              >
+                Reset Filter
+              </button>
             </div>
           ) : (
             <div className="relative" id="portfolio-slider-inner">
               {/* Desktop Slider Mode - 3 Card Grid */}
               <div className="hidden lg:grid lg:grid-cols-3 gap-6">
-                {/* We show three items starting from the current index, wrapping around */}
                 {Array.from({ length: Math.min(3, filteredProjects.length) }).map((_, stepIdx) => {
                   const projectIdx = (currentIndex + stepIdx) % filteredProjects.length;
                   const project = filteredProjects[projectIdx];
@@ -380,17 +421,16 @@ export default function PortfolioSection() {
                       exit={{ opacity: 0, scale: 0.98 }}
                       transition={{ duration: 0.3 }}
                       onClick={() => setSelectedProject(project)}
-                      className="bg-bg-card border border-border-color rounded-xl overflow-hidden cursor-pointer group hover:border-border-color/90 hover:shadow-sm transition-all duration-150"
+                      className="bg-bg-card border border-border-color rounded-xl overflow-hidden cursor-pointer group hover:border-accent-primary/40 hover:shadow-lg transition-all duration-200 flex flex-col justify-between"
                       id={`project-card-desktop-${project.id}`}
                     >
                       {/* Image Frame */}
                       <div className="aspect-[4/3] w-full overflow-hidden relative">
-                        {/* Overlay with details */}
-                        <div className="absolute inset-0 bg-gradient-to-t from-bg-primary/90 via-bg-primary/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex flex-col justify-end p-5 z-10 pointer-events-none">
+                        <div className="absolute inset-0 bg-gradient-to-t from-bg-primary/95 via-bg-primary/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex flex-col justify-end p-5 z-10 pointer-events-none">
                           <span className="text-xs text-accent-primary font-semibold uppercase tracking-wider mb-1">
                             {project.category}
                           </span>
-                          <h4 className="text-base font-bold text-text-primary mb-3 line-clamp-1">
+                          <h4 className="text-base font-bold text-text-primary mb-2 line-clamp-1">
                             {project.title}
                           </h4>
                           <span className="inline-flex items-center gap-1.5 bg-accent-primary text-white text-xs font-semibold px-3 py-1.5 rounded-lg self-start">
@@ -405,13 +445,36 @@ export default function PortfolioSection() {
                       </div>
 
                       {/* Info Panel under card */}
-                      <div className="p-4 sm:p-5">
-                        <span className="text-[11px] text-text-muted font-semibold uppercase tracking-wider block mb-1">
-                          {project.category}
-                        </span>
-                        <h3 className="text-base font-bold text-text-primary group-hover:text-accent-primary transition-colors line-clamp-1">
-                          {project.title}
-                        </h3>
+                      <div className="p-4 sm:p-5 flex-1 flex flex-col justify-between">
+                        <div>
+                          <span className="text-[11px] text-text-muted font-semibold uppercase tracking-wider block mb-1.5">
+                            {project.category}
+                          </span>
+                          <h3 className="text-base font-bold text-text-primary group-hover:text-accent-primary transition-colors line-clamp-1 mb-2">
+                            {project.title}
+                          </h3>
+                          <p className="text-text-secondary text-xs sm:text-sm line-clamp-2 mb-3">
+                            {project.description}
+                          </p>
+                        </div>
+
+                        {project.tools && project.tools.length > 0 && (
+                          <div className="flex flex-wrap gap-1.5 pt-2 border-t border-border-color/60">
+                            {project.tools.slice(0, 3).map((tool) => (
+                              <span
+                                key={tool}
+                                className="text-[10px] font-medium text-text-secondary bg-bg-secondary px-2 py-0.5 rounded-md border border-border-color"
+                              >
+                                {tool}
+                              </span>
+                            ))}
+                            {project.tools.length > 3 && (
+                              <span className="text-[10px] text-text-muted self-center">
+                                +{project.tools.length - 3}
+                              </span>
+                            )}
+                          </div>
+                        )}
                       </div>
                     </motion.div>
                   );
@@ -454,7 +517,7 @@ export default function PortfolioSection() {
                           {filteredProjects[currentIndex].description}
                         </p>
                         <div className="flex items-center justify-between pt-3 border-t border-border-color">
-                          <span className="text-xs text-text-muted font-medium">Tap to view case study</span>
+                          <span className="text-xs text-text-muted font-medium">Tap to view details</span>
                           <span className="inline-flex items-center gap-1 text-xs font-bold text-accent-primary">
                             Details &rarr;
                           </span>
@@ -488,7 +551,7 @@ export default function PortfolioSection() {
 
               {/* Slider Pagination Indicators (Dots) */}
               <div className="flex justify-center items-center gap-2 mt-6 sm:mt-8" id="carousel-dots-container">
-                {filteredProjects.map((_, dotIdx) => (
+                {filteredProjects.slice(0, 10).map((_, dotIdx) => (
                   <button
                     key={dotIdx}
                     onClick={() => setCurrentIndex(dotIdx)}
@@ -515,103 +578,103 @@ export default function PortfolioSection() {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
-                className="fixed inset-0 z-[99999] flex items-center justify-center p-3 sm:p-4 bg-black/85 backdrop-blur-md overflow-y-auto"
+                className="fixed inset-0 z-[99999] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm overflow-y-auto"
                 onClick={() => setSelectedProject(null)}
                 id="project-detail-modal-bg"
               >
                 <motion.div
-                  initial={{ scale: 0.92, y: 15 }}
+                  initial={{ scale: 0.95, y: 20 }}
                   animate={{ scale: 1, y: 0 }}
-                  exit={{ scale: 0.92, y: 15 }}
-                  transition={{ type: 'spring', duration: 0.4 }}
+                  exit={{ scale: 0.95, y: 20 }}
                   onClick={(e) => e.stopPropagation()}
-                  className="bg-bg-primary border border-border-color rounded-3xl w-full max-w-3xl max-h-[calc(100dvh-24px)] sm:max-h-[calc(100dvh-32px)] overflow-y-auto shadow-2xl relative my-auto"
+                  className="bg-bg-primary border border-border-color rounded-2xl w-full max-w-2xl max-h-[calc(100dvh-32px)] overflow-y-auto shadow-2xl relative my-auto"
                   id="project-detail-modal-card"
                 >
-              {/* Close Button - 44x44px Touch Target */}
-              <button
-                onClick={() => setSelectedProject(null)}
-                className="absolute top-3 right-3 sm:top-4 sm:right-4 w-11 h-11 min-w-[44px] min-h-[44px] rounded-full bg-bg-secondary/90 backdrop-blur-xs hover:bg-accent-primary/20 text-text-secondary hover:text-accent-primary border border-border-color transition-colors z-20 cursor-pointer flex items-center justify-center shadow-md active:scale-95"
-                id="modal-close-btn"
-                aria-label="Close modal"
-              >
-                <X className="w-5 h-5 stroke-[2.5]" />
-              </button>
-
-              {/* Large Image Header */}
-              <div className="w-full aspect-[16/9] overflow-hidden relative bg-bg-secondary" id="modal-project-image-container">
-                <div className="absolute inset-0 bg-gradient-to-t from-bg-primary via-transparent to-transparent z-10 pointer-events-none" />
-                <ProjectImage
-                  project={selectedProject}
-                  isModal={true}
-                />
-              </div>
-
-              {/* Details Content Box */}
-              <div className="p-6 md:p-8">
-                <div className="flex flex-wrap items-center gap-3 mb-4">
-                  <span className="text-xs text-accent-primary font-bold uppercase tracking-wider bg-accent-primary/10 px-2.5 py-1 rounded-full border border-accent-primary/10">
-                    {selectedProject.category}
-                  </span>
-                  {selectedProject.date && (
-                    <span className="flex items-center gap-1.5 text-xs text-text-secondary font-medium">
-                      <Calendar className="w-3.5 h-3.5 text-accent-primary" />
-                      {selectedProject.date}
-                    </span>
-                  )}
-                  {selectedProject.client && (
-                    <span className="flex items-center gap-1.5 text-xs text-text-secondary font-medium">
-                      <User className="w-3.5 h-3.5 text-accent-primary" />
-                      {selectedProject.client}
-                    </span>
-                  )}
-                </div>
-
-                <h3 className="text-2xl md:text-3xl font-extrabold text-text-primary mb-4">
-                  {selectedProject.title}
-                </h3>
-
-                <p className="text-text-secondary text-sm md:text-base leading-relaxed mb-6">
-                  {selectedProject.details || selectedProject.description}
-                </p>
-
-                {/* Technologies / Tools Used */}
-                <div className="mb-6">
-                  <h4 className="text-sm font-bold uppercase tracking-wider text-text-primary mb-2.5">
-                    Tools & Technologies
-                  </h4>
-                  <div className="flex flex-wrap gap-2">
-                    {selectedProject.tools.map((tool) => (
-                      <span
-                        key={tool}
-                        className="text-xs font-semibold text-text-secondary bg-bg-card border border-border-color px-3 py-1.5 rounded-xl"
-                      >
-                        {tool}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Call to action within Modal */}
-                <div className="flex justify-end pt-4 border-t border-border-color">
-                  <a
-                    href={selectedProject.link || 'https://www.behance.net/gallery/254351431/Rohit-Verma-Creative-Portfolio-2026'}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center gap-2 bg-accent-primary hover:bg-accent-secondary text-white font-bold text-xs px-5 py-3 rounded-full cursor-pointer transition-all"
-                    id="modal-view-portfolio-btn"
+                  {/* Close Button */}
+                  <button
+                    onClick={() => setSelectedProject(null)}
+                    className="absolute top-4 right-4 z-20 w-9 h-9 rounded-full bg-bg-card/80 backdrop-blur-xs text-text-secondary hover:text-text-primary hover:bg-bg-secondary border border-border-color transition-colors cursor-pointer flex items-center justify-center shadow-xs"
+                    id="modal-close-btn"
+                    aria-label="Close modal"
                   >
-                    View Portfolio
-                    <ExternalLink className="w-3.5 h-3.5" />
-                  </a>
-                </div>
-              </div>
-            </motion.div>
-          </motion.div>
+                    <X className="w-5 h-5" />
+                  </button>
+
+                  {/* Image Header */}
+                  <div className="w-full aspect-[16/9] overflow-hidden relative" id="modal-project-image-container">
+                    <ProjectImage
+                      project={selectedProject}
+                      isModal={true}
+                    />
+                  </div>
+
+                  {/* Details Content */}
+                  <div className="p-6 md:p-8 space-y-5">
+                    <div>
+                      <div className="flex flex-wrap items-center gap-2 mb-2">
+                        <span className="text-xs text-accent-primary font-semibold uppercase tracking-wider bg-accent-primary/10 px-2.5 py-0.5 rounded-full">
+                          {selectedProject.category}
+                        </span>
+                        {selectedProject.date && (
+                          <span className="flex items-center gap-1 text-xs text-text-secondary">
+                            <Calendar className="w-3.5 h-3.5 text-accent-primary" />
+                            {selectedProject.date}
+                          </span>
+                        )}
+                        {selectedProject.client && (
+                          <span className="flex items-center gap-1 text-xs text-text-secondary">
+                            <User className="w-3.5 h-3.5 text-accent-primary" />
+                            {selectedProject.client}
+                          </span>
+                        )}
+                      </div>
+
+                      <h3 className="text-2xl font-bold text-text-primary">
+                        {selectedProject.title}
+                      </h3>
+                    </div>
+
+                    <p className="text-text-secondary text-sm md:text-base leading-relaxed">
+                      {selectedProject.details || selectedProject.description}
+                    </p>
+
+                    {/* Tools */}
+                    <div>
+                      <h4 className="text-xs font-semibold uppercase tracking-wider text-text-muted mb-2">
+                        Tools & Technologies Used
+                      </h4>
+                      <div className="flex flex-wrap gap-2">
+                        {selectedProject.tools.map((tool) => (
+                          <span
+                            key={tool}
+                            className="text-xs font-medium text-text-primary bg-bg-card border border-border-color px-3 py-1 rounded-lg"
+                          >
+                            {tool}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Action Button */}
+                    <div className="pt-4 border-t border-border-color flex justify-end">
+                      <a
+                        href={selectedProject.link || 'https://www.behance.net/gallery/254351431/Rohit-Verma-Creative-Portfolio-2026'}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-2 bg-accent-primary hover:bg-accent-secondary text-white font-semibold text-xs px-5 py-2.5 rounded-lg cursor-pointer transition-all shadow-xs active:scale-[0.98]"
+                        id="modal-view-portfolio-btn"
+                      >
+                        <span>View on Behance</span>
+                        <ExternalLink className="w-3.5 h-3.5" />
+                      </a>
+                    </div>
+                  </div>
+                </motion.div>
+              </motion.div>
+            )}
+          </AnimatePresence>,
+          document.body
         )}
-      </AnimatePresence>,
-      document.body
-    )}
     </section>
   );
 }

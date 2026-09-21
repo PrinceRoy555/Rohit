@@ -9,6 +9,7 @@ import {
 } from '../servicesData';
 import { WHATSAPP_BUSINESS_URL } from '../data';
 import ServiceDetailModal from './ServiceDetailModal';
+import { useSiteConfig } from '../context/SiteConfigContext';
 
 function DynamicIcon({ name, className }: { name: string; className?: string }) {
   const IconComponent = (Icons as any)[name] || Icons.HelpCircle;
@@ -71,23 +72,81 @@ const SERVICE_CATEGORY_MAP: Record<string, CategoryFilterId[]> = {
 };
 
 export default function ServicesSection() {
+  const { activeConfig } = useSiteConfig();
+  const servicesConfig = activeConfig?.sections?.services;
+
   const [activeCategory, setActiveCategory] = useState<CategoryFilterId>('All Services');
   const [isExpanded, setIsExpanded] = useState<boolean>(false);
   const [selectedServiceDetail, setSelectedServiceDetail] = useState<DetailedService | null>(null);
   const shouldReduceMotion = useReducedMotion();
 
+  // Merge CMS configured services with detailed service base
+  const allServices = useMemo(() => {
+    if (!activeConfig?.services || activeConfig.services.length === 0) {
+      return SERVICES_LIST;
+    }
+    const cmsMap = new Map(activeConfig.services.map((s) => [s.id || s.title, s]));
+
+    const updated = SERVICES_LIST.map((srv) => {
+      const cmsItem = cmsMap.get(srv.id) || cmsMap.get(srv.title);
+      if (cmsItem) {
+        return {
+          ...srv,
+          title: cmsItem.title || srv.title,
+          description: cmsItem.description || srv.description,
+          iconName: (cmsItem as any).iconName || (cmsItem as any).icon || srv.iconName,
+          features: cmsItem.features && cmsItem.features.length ? cmsItem.features : srv.features,
+        };
+      }
+      return srv;
+    });
+
+    const existingIds = new Set(SERVICES_LIST.map((s) => s.id));
+    const existingTitles = new Set(SERVICES_LIST.map((s) => s.title.toLowerCase()));
+
+    activeConfig.services.forEach((cmsItem) => {
+      if (!existingIds.has(cmsItem.id) && !existingTitles.has((cmsItem.title || '').toLowerCase())) {
+        const newService: DetailedService = {
+          id: cmsItem.id || `s-custom-${Math.random().toString(36).slice(2, 7)}`,
+          title: cmsItem.title,
+          description: cmsItem.description,
+          category: 'Graphic Design',
+          categories: ['Graphic Design'],
+          iconName: (cmsItem as any).iconName || (cmsItem as any).icon || 'Sparkles',
+          features: cmsItem.features || [],
+          details: {
+            introduction: cmsItem.description,
+            included: cmsItem.features || [],
+            suitableClients: ['Startups, business owners & creators'],
+            process: ['Consultation & Scope', 'Concept & Design Draft', 'Client Review & Refinements', 'Final Delivery'],
+            tools: ['Photoshop', 'Illustrator', 'Figma'],
+            deliverables: ['High-res PNG, JPG, and Source Files'],
+            faqs: [
+              { question: 'What is the turnaround time?', answer: 'Timelines vary based on scope, typically 2-5 business days.' }
+            ]
+          }
+        };
+        updated.push(newService);
+      }
+    });
+
+    return updated;
+  }, [activeConfig?.services]);
+
   // Helper to open modal for details
   const handleOpenServiceDetail = useCallback((serviceOrIdentifier: DetailedService | string) => {
     if (!serviceOrIdentifier) return;
     if (typeof serviceOrIdentifier === 'string') {
-      const found = getServiceById(serviceOrIdentifier) || getServiceByTitle(serviceOrIdentifier);
+      const found = allServices.find((s) => s.id === serviceOrIdentifier || s.title === serviceOrIdentifier) ||
+        getServiceById(serviceOrIdentifier) ||
+        getServiceByTitle(serviceOrIdentifier);
       if (found) {
         setSelectedServiceDetail(found);
       }
     } else {
       setSelectedServiceDetail(serviceOrIdentifier);
     }
-  }, []);
+  }, [allServices]);
 
   // Helper to trigger quote inquiry flow
   const handleGetQuote = (serviceTitle: string) => {
@@ -108,44 +167,51 @@ export default function ServicesSection() {
   // Compute services matching active category
   const matchingServices = useMemo(() => {
     if (activeCategory === 'All Services') {
-      return SERVICES_LIST;
+      return allServices;
     }
-    return SERVICES_LIST.filter((s) => {
+    return allServices.filter((s) => {
       const mapped = SERVICE_CATEGORY_MAP[s.id];
-      return mapped && mapped.includes(activeCategory);
+      if (mapped && mapped.includes(activeCategory)) return true;
+      if (activeCategory === 'Graphic Design' && s.category === 'Graphic Design') return true;
+      return false;
     });
-  }, [activeCategory]);
+  }, [activeCategory, allServices]);
 
   // Compute services to render based on initial display rule:
-  // In "All Services": show 6 priority services initially, expand to all 19 when isExpanded is true.
+  // In "All Services": show 6 priority services initially, expand to all when isExpanded is true.
   // In specific category: show all matching services directly without 6-card limit.
   const displayedServices = useMemo(() => {
     if (activeCategory === 'All Services') {
       if (isExpanded) {
         // Return priority services first, followed by the rest
         const priorityServices = PRIORITY_SERVICE_IDS.map((id) =>
-          SERVICES_LIST.find((s) => s.id === id)
+          allServices.find((s) => s.id === id)
         ).filter(Boolean) as DetailedService[];
 
-        const remainingServices = SERVICES_LIST.filter(
+        const remainingServices = allServices.filter(
           (s) => !PRIORITY_SERVICE_IDS.includes(s.id)
         );
 
         return [...priorityServices, ...remainingServices];
       }
       // Initial 6 priority services
-      return PRIORITY_SERVICE_IDS.map((id) =>
-        SERVICES_LIST.find((s) => s.id === id)
+      const initialPriority = PRIORITY_SERVICE_IDS.map((id) =>
+        allServices.find((s) => s.id === id)
       ).filter(Boolean) as DetailedService[];
+
+      if (initialPriority.length === 0) {
+        return allServices.slice(0, 6);
+      }
+      return initialPriority;
     }
 
     return matchingServices;
-  }, [activeCategory, isExpanded, matchingServices]);
+  }, [activeCategory, isExpanded, matchingServices, allServices]);
 
   // Counts for each category filter badge
   const categoryCounts = useMemo(() => {
     const counts: Record<CategoryFilterId, number> = {
-      'All Services': SERVICES_LIST.length,
+      'All Services': allServices.length,
       'Graphic Design': 0,
       'Branding': 0,
       'Video & Motion': 0,
@@ -153,7 +219,7 @@ export default function ServicesSection() {
       'Marketing': 0,
     };
 
-    SERVICES_LIST.forEach((s) => {
+    allServices.forEach((s) => {
       const mapped = SERVICE_CATEGORY_MAP[s.id] || [];
       mapped.forEach((cat) => {
         if (counts[cat] !== undefined) {
@@ -163,7 +229,7 @@ export default function ServicesSection() {
     });
 
     return counts;
-  }, []);
+  }, [allServices]);
 
   // Handle category selection
   const handleCategoryClick = useCallback((categoryId: CategoryFilterId) => {
@@ -214,6 +280,10 @@ export default function ServicesSection() {
     return () => window.removeEventListener('hashchange', handleHashCheck);
   }, []);
 
+  if (servicesConfig && servicesConfig.isVisible === false) {
+    return null;
+  }
+
   return (
     <section
       id="services"
@@ -230,7 +300,7 @@ export default function ServicesSection() {
             className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-accent-primary/10 border border-accent-primary/20 text-accent-primary text-xs font-bold uppercase tracking-wider mb-3"
           >
             <Icons.Sparkles className="w-3.5 h-3.5" aria-hidden="true" />
-            <span>Featured Services</span>
+            <span>{servicesConfig?.badge || 'Featured Services'}</span>
           </motion.div>
 
           <motion.h2
@@ -240,7 +310,7 @@ export default function ServicesSection() {
             transition={{ delay: 0.08 }}
             className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-text-primary tracking-tight mb-4"
           >
-            Professional Services
+            {servicesConfig?.title || 'Professional Services'}
           </motion.h2>
 
           <motion.p
@@ -250,7 +320,7 @@ export default function ServicesSection() {
             transition={{ delay: 0.14 }}
             className="text-text-secondary text-sm sm:text-base leading-relaxed max-w-2xl mx-auto"
           >
-            Comprehensive graphic design, brand identity, video editing, social media management, and web design solutions tailored for brands seeking distinctive visual impact.
+            {servicesConfig?.subtitle || 'Comprehensive graphic design, brand identity, video editing, social media management, and web design solutions tailored for brands seeking distinctive visual impact.'}
           </motion.p>
         </div>
 

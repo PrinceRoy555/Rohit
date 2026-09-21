@@ -1,12 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Menu, X, FileText, MessageCircle } from 'lucide-react';
-import { WHATSAPP_BUSINESS_URL, contactConfig } from '../data';
+import { Menu, X, FileText, MessageCircle, ArrowRight } from 'lucide-react';
+import { WHATSAPP_BUSINESS_URL, contactConfig, ROHIT_PROFILE_IMAGE_URL, getAuthoritativeProfileImage } from '../data';
 import { useSiteConfig } from '../context/SiteConfigContext';
 import { useTheme } from '../context/ThemeContext';
 import { useBodyScrollLock } from '../lib/scrollLock';
 import ThemeToggle from './ThemeToggle';
-import avatarImg from '../assets/images/rohit-verma-portrait.jpg';
 
 interface HeaderProps {
   activeSection: string;
@@ -32,10 +31,22 @@ export default function Header({ activeSection, theme: propTheme, toggleTheme: p
   const theme = propTheme || themeContext.resolvedTheme;
   const toggleTheme = propToggleTheme || themeContext.toggleTheme;
   const branding = activeConfig?.branding;
-  const siteName = branding?.siteName || 'Rohit';
-  const avatar = branding?.avatarImage || avatarImg;
+  const siteName = branding?.siteName || branding?.logoText || 'Rohit';
+  const avatar = getAuthoritativeProfileImage(branding?.avatarImage);
   const EXACT_RESUME_URL = "https://ik.imagekit.io/auhuory9w/website%20work/resume/Rohit%20Verma%20(2)%20(3).pdf";
-  const resumeUrl = EXACT_RESUME_URL;
+  const resumeUrl = branding?.resumeUrl || EXACT_RESUME_URL;
+
+  const navItems = React.useMemo(() => {
+    if (activeConfig?.navigation?.items && activeConfig.navigation.items.length > 0) {
+      return activeConfig.navigation.items
+        .filter((item) => item.isVisible !== false)
+        .map((item) => ({
+          label: item.label,
+          id: item.route || item.id.replace(/^nav-/, ''),
+        }));
+    }
+    return navLinks;
+  }, [activeConfig?.navigation?.items]);
 
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -204,25 +215,32 @@ export default function Header({ activeSection, theme: propTheme, toggleTheme: p
           >
             <img
               src={avatar}
-              alt={siteName}
+              alt="Rohit Verma – Graphic Designer and Video Editor in Jaipur"
               width="36"
               height="36"
-              className="header-avatar header-brand-image object-cover object-[50%_25%] group-hover:scale-110 transition-transform duration-300 flex-shrink-0"
+              className="header-avatar header-brand-image object-cover object-[center_top] group-hover:scale-110 transition-transform duration-300 flex-shrink-0"
               referrerPolicy="no-referrer"
               onError={(e) => {
-                if (e.currentTarget.src !== window.location.origin + '/images/rohit-avatar.jpg') {
-                  e.currentTarget.src = '/images/rohit-avatar.jpg';
+                if (e.currentTarget.src !== ROHIT_PROFILE_IMAGE_URL) {
+                  e.currentTarget.src = ROHIT_PROFILE_IMAGE_URL;
                 }
               }}
             />
-            <span className="header-brand-text header-brand-name text-text-primary truncate">
-              {siteName}<span className="brand-dot text-accent-primary">.</span>
-            </span>
+            <div className="flex flex-col min-w-0">
+              <span className="header-brand-text header-brand-name text-text-primary truncate">
+                {siteName}<span className="brand-dot text-accent-primary">.</span>
+              </span>
+              {isHomeRoute && (
+                <span className="hidden sm:block text-[8px] font-mono tracking-[0.2em] text-text-muted uppercase leading-none mt-0.5">
+                  CREATIVE DESIGNER
+                </span>
+              )}
+            </div>
           </a>
 
           {/* Centre: Navigation Capsule */}
           <nav className="header-navigation main-navigation desktop-navigation" aria-label="Primary navigation">
-            {navLinks.map((link) => {
+            {navItems.map((link) => {
               const active = isLinkActive(link.id);
               const isHome = link.id === 'home';
               return (
@@ -284,6 +302,20 @@ export default function Header({ activeSection, theme: propTheme, toggleTheme: p
               <FileText className="w-4 h-4 text-white stroke-[2.25] flex-shrink-0" aria-hidden="true" />
               <span className="text-white font-bold">Resume</span>
             </a>
+
+            {/* Let's Work Together Button - Homepage wide desktop (>= 1440px only, avoiding any crowded spacing below 1440px) */}
+            {isHomeRoute && (
+              <a
+                href="#contact"
+                onClick={(e) => scrollToSection('contact', e)}
+                className="hidden min-[1440px]:inline-flex items-center justify-center gap-2 h-[42px] min-h-[42px] px-5 rounded-full !text-white font-bold text-xs sm:text-sm whitespace-nowrap active:scale-95 transition-all duration-200 shadow-md bg-gradient-to-r from-accent-primary via-[#C40812] to-accent-secondary hover:brightness-110 flex-shrink-0"
+                id="header-work-together-btn"
+                aria-label="Let's Work Together - Contact Rohit Verma"
+              >
+                <span className="!text-white">Let&apos;s Work Together</span>
+                <ArrowRight className="w-3.5 h-3.5 !text-white" aria-hidden="true" />
+              </a>
+            )}
 
             {/* Hamburger Menu Toggle (Mobile & Tablet < 1024px) - 44x44px Touch Target */}
             <button
@@ -348,7 +380,7 @@ export default function Header({ activeSection, theme: propTheme, toggleTheme: p
 
               {/* Navigation Links */}
               <div className="flex flex-col gap-1.5 pt-2 border-t border-border-color/60">
-                {navLinks.map((link, idx) => {
+                {navItems.map((link, idx) => {
                   const active = isLinkActive(link.id);
                   const isHome = link.id === 'home';
                   return (

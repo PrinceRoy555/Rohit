@@ -50,7 +50,8 @@ import {
   Mail,
   ArrowLeft,
   Check,
-  RefreshCw
+  RefreshCw,
+  Database
 } from 'lucide-react';
 
 import { DashboardTab } from './tabs/DashboardTab';
@@ -67,6 +68,8 @@ import { NavigationFooterTab } from './tabs/NavigationFooterTab';
 import { SeoMetaTab } from './tabs/SeoMetaTab';
 import { RevisionsTab } from './tabs/RevisionsTab';
 import { UsersRolesTab } from './tabs/UsersRolesTab';
+import { NewsletterSubscribersTab } from './tabs/NewsletterSubscribersTab';
+import { DataSourcesHealthTab } from './tabs/DataSourcesHealthTab';
 import AdminInsightsDashboard from './AdminInsightsDashboard';
 import { CrmNotificationsPopover } from './crm/CrmNotificationsPopover';
 import { AdminUserArea } from '../ui/AdminUserArea';
@@ -90,11 +93,13 @@ const NAV_ITEMS = [
   { id: 'skills', label: 'Skills & Experience', icon: Sparkles, category: 'Content' },
   { id: 'insights', label: 'AI Insights & Blog Studio', icon: FileText, category: 'Content' },
   { id: 'inquiries', label: 'Lead Inquiries & CRM', icon: Inbox, category: 'Growth' },
+  { id: 'newsletter', label: 'Newsletter Subscribers', icon: Mail, category: 'Growth' },
   { id: 'media', label: 'Media & Asset Library', icon: ImageIcon, category: 'Growth' },
   { id: 'navigation', label: 'Navigation & Footer', icon: Menu, category: 'Settings' },
   { id: 'seo', label: 'SEO & Social Graph', icon: Search, category: 'Settings' },
   { id: 'revisions', label: 'Revision History & Rollback', icon: History, category: 'System' },
-  { id: 'security', label: 'Users & Security Audit', icon: Shield, category: 'System' }
+  { id: 'security', label: 'Users & Security Audit', icon: Shield, category: 'System' },
+  { id: 'datasources', label: 'Firestore Collections Health', icon: Database, category: 'System' }
 ];
 
 export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose, onLogout }) => {
@@ -1096,6 +1101,8 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose, onLogout }) => 
           {activeTab === 'seo' && <SeoMetaTab />}
           {activeTab === 'revisions' && <RevisionsTab />}
           {activeTab === 'security' && <UsersRolesTab />}
+          {activeTab === 'newsletter' && <NewsletterSubscribersTab />}
+          {activeTab === 'datasources' && <DataSourcesHealthTab />}
 
       {/* MODAL: Publish Website Confirmation */}
       {showPublishModal && (

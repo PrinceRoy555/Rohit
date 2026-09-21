@@ -43,6 +43,8 @@ const TAB_METADATA: Record<string, { label: string; category: string }> = {
   seo: { label: 'SEO & Social Graph', category: 'Settings & System' },
   revisions: { label: 'Revision History', category: 'Settings & System' },
   security: { label: 'Users & Security Audit', category: 'Settings & System' },
+  newsletter: { label: 'Newsletter Subscribers', category: 'CRM & Inquiries' },
+  datasources: { label: 'Firestore Collections Health', category: 'Settings & System' },
 };
 
 export const AdminLayout: React.FC<AdminLayoutProps> = ({

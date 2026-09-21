@@ -75,7 +75,8 @@ export const InquiriesInboxTab: React.FC<InquiriesInboxTabProps> = ({
   }, [initialView, initialStatusFilter]);
 
   const handleUpdateLeadCrm = async (id: string, updates: Partial<InquiryRecord>) => {
-    await updateInquiryCrm(id, updates);
+    const targetLead = inquiries.find((i) => i.id === id);
+    await updateInquiryCrm(id, updates, targetLead?.sourceCollection, targetLead?.sourceDocumentId);
     setInquiries((prev) =>
       prev.map((inq) => (inq.id === id ? { ...inq, ...updates } : inq))
     );
@@ -92,7 +93,8 @@ export const InquiriesInboxTab: React.FC<InquiriesInboxTabProps> = ({
   };
 
   const handleStatusChange = async (id: string, status: InquiryStatus) => {
-    const res = await updateInquiry(id, { status });
+    const targetLead = inquiries.find((i) => i.id === id);
+    const res = await updateInquiry(id, { status }, targetLead?.sourceCollection, targetLead?.sourceDocumentId);
     if (res.success) {
       setInquiries((prev) =>
         prev.map((inq) => (inq.id === id ? { ...inq, status } : inq))
@@ -105,7 +107,8 @@ export const InquiriesInboxTab: React.FC<InquiriesInboxTabProps> = ({
 
   const handleDelete = async (id: string) => {
     if (!window.confirm('Delete this inquiry permanently?')) return;
-    const res = await deleteInquiry(id);
+    const targetLead = inquiries.find((i) => i.id === id);
+    const res = await deleteInquiry(id, targetLead?.sourceCollection, targetLead?.sourceDocumentId);
     if (res.success) {
       setInquiries((prev) => prev.filter((inq) => inq.id !== id));
       if (selectedInquiry?.id === id) {
@@ -116,9 +119,10 @@ export const InquiriesInboxTab: React.FC<InquiriesInboxTabProps> = ({
 
   const handleExportCsv = () => {
     if (!inquiries.length) return;
-    const headers = ['ID', 'Name', 'Email', 'Phone', 'Service', 'Budget', 'Status', 'Follow-up At', 'Priority', 'Is Hot Lead', 'Created At', 'Message'];
+    const headers = ['ID', 'Source Collection', 'Name', 'Email', 'Phone', 'Service', 'Budget', 'Status', 'Follow-up At', 'Priority', 'Is Hot Lead', 'Created At', 'Message'];
     const rows = inquiries.map((inq) => [
       inq.id,
+      `"${inq.sourceCollection || 'leads'}"`,
       `"${(inq.name || '').replace(/"/g, '""')}"`,
       `"${(inq.email || '').replace(/"/g, '""')}"`,
       `"${(inq.phone || '').replace(/"/g, '""')}"`,

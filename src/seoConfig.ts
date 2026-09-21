@@ -3,19 +3,14 @@
  * Rohit Verma Portfolio — Graphic Designer & Video Editor (Jaipur, Rajasthan, India)
  */
 
-import { contactConfig } from './data';
+import { contactConfig, ROHIT_PROFILE_IMAGE_URL } from './data';
+import { Insight } from './types';
+
+export const PRIMARY_DOMAIN = 'https://www.rohitwork.in';
 
 // Helper to determine the site URL safely across client and server
 export function getSiteBaseUrl(): string {
-  if (typeof window !== 'undefined' && window.location && window.location.origin) {
-    // If running in browser and VITE_SITE_URL is specified, prefer it; otherwise use window.location.origin
-    const envUrl = (import.meta as any)?.env?.VITE_SITE_URL;
-    if (envUrl && typeof envUrl === 'string' && envUrl.trim() && !envUrl.includes('rohitverma.portfolio')) {
-      return envUrl.trim().replace(/\/+$/, '');
-    }
-    return window.location.origin.replace(/\/+$/, '');
-  }
-  return 'https://rohitverma.com';
+  return PRIMARY_DOMAIN;
 }
 
 export interface RouteSeoData {
@@ -27,25 +22,26 @@ export interface RouteSeoData {
   breadcrumbs?: { name: string; path: string }[];
 }
 
-export const VERIFIED_SOCIAL_PROFILES = [
-  'https://www.linkedin.com/in/rohit-verma-487457374',
-  'https://github.com/PrinceRoy555',
+// Confirmed Professional Profiles: Strictly LinkedIn, Behance, and Professional Instagram
+export const CONFIRMED_PROFESSIONAL_PROFILES = [
   'https://www.instagram.com/thedesigngeek.rohit/',
-  'https://www.instagram.com/the1rohit__/',
-  'https://www.instagram.com/unicivix_solutions/'
+  'https://www.linkedin.com/in/rohit-verma-487457374/',
+  'https://www.behance.net/workall18'
 ];
+
+export const VERIFIED_SOCIAL_PROFILES = CONFIRMED_PROFESSIONAL_PROFILES;
 
 export const SEO_ROUTES: Record<string, RouteSeoData> = {
   home: {
-    title: 'Rohit Verma | Graphic Designer & Video Editor in Jaipur, India',
-    description: 'Professional portfolio of Rohit Verma, Graphic Designer & Video Editor in Jaipur, India. Specializing in brand identity, social media creatives, promotional videos, and motion graphics.',
+    title: 'Rohit Verma | Graphic Designer & Video Editor in Jaipur',
+    description: "Graphic designer and video editor in Jaipur specializing in branding, social media creatives, motion graphics and visual design. Explore Rohit Verma's work.",
     canonicalPath: '/',
     ogImage: '/images/rohit-verma-og.jpg',
     breadcrumbs: [{ name: 'Home', path: '/' }]
   },
   'about-rohit': {
-    title: 'About Rohit Verma | Graphic Designer, Video Editor & Founder of Unicivix Solutions',
-    description: 'Learn about Rohit Verma’s professional journey, experience at CBT and Hodu Academy, professional training at Red Sketch, and creative agency leadership in Jaipur, India.',
+    title: 'About Rohit Verma | Graphic Designer & Video Editor in Jaipur',
+    description: "Discover Rohit Verma's creative background, 3+ years of experience in graphic design and video editing, creative journey, and design philosophy.",
     canonicalPath: '/about-rohit',
     ogImage: '/images/rohit-verma-og.jpg',
     breadcrumbs: [
@@ -54,8 +50,8 @@ export const SEO_ROUTES: Record<string, RouteSeoData> = {
     ]
   },
   'rohit-verma': {
-    title: 'About Rohit Verma | Graphic Designer, Video Editor & Founder of Unicivix Solutions',
-    description: 'Learn about Rohit Verma’s professional journey, experience at CBT and Hodu Academy, professional training at Red Sketch, and creative agency leadership in Jaipur, India.',
+    title: 'About Rohit Verma | Graphic Designer & Video Editor in Jaipur',
+    description: "Discover Rohit Verma's creative background, 3+ years of experience in graphic design and video editing, creative journey, and design philosophy.",
     canonicalPath: '/about-rohit',
     ogImage: '/images/rohit-verma-og.jpg',
     breadcrumbs: [
@@ -64,18 +60,18 @@ export const SEO_ROUTES: Record<string, RouteSeoData> = {
     ]
   },
   about: {
-    title: 'About Me & Creative Expertise | Rohit Verma',
-    description: 'Creative design background, technical skills across Photoshop, Illustrator, Premiere Pro, and After Effects by Rohit Verma in Jaipur, Rajasthan.',
-    canonicalPath: '/about',
+    title: 'About Rohit Verma | Graphic Designer & Video Editor in Jaipur',
+    description: "Discover Rohit Verma's creative background, 3+ years of experience in graphic design and video editing, creative journey, and design philosophy.",
+    canonicalPath: '/about-rohit',
     ogImage: '/images/rohit-verma-og.jpg',
     breadcrumbs: [
       { name: 'Home', path: '/' },
-      { name: 'About', path: '/about' }
+      { name: 'About Rohit', path: '/about-rohit' }
     ]
   },
   services: {
-    title: 'Graphic Design & Video Editing Services | Rohit Verma — Jaipur',
-    description: 'Explore creative design, logo & brand identity, video editing, social media management, motion graphics, and vibe coding services tailored for growing businesses.',
+    title: 'Design & Video Editing Services | Rohit Verma — Jaipur',
+    description: 'Professional graphic design, brand identity, video editing, social media creatives, motion graphics, and UI/UX services by Rohit Verma in Jaipur, India.',
     canonicalPath: '/services',
     ogImage: '/images/rohit-verma-og.jpg',
     breadcrumbs: [
@@ -84,8 +80,8 @@ export const SEO_ROUTES: Record<string, RouteSeoData> = {
     ]
   },
   portfolio: {
-    title: 'Featured Projects & Creative Portfolio | Rohit Verma',
-    description: 'Explore real-world graphic design projects, branding packages, social media campaigns, YouTube thumbnails, and video edits by Rohit Verma.',
+    title: 'Creative Portfolio & Featured Projects | Rohit Verma',
+    description: 'Explore graphic design projects, branding packages, YouTube thumbnails, social media creatives, and commercial video edits by Rohit Verma.',
     canonicalPath: '/portfolio',
     ogImage: '/images/rohit-verma-og.jpg',
     breadcrumbs: [
@@ -94,8 +90,8 @@ export const SEO_ROUTES: Record<string, RouteSeoData> = {
     ]
   },
   experience: {
-    title: 'Career Experience & Timeline | Rohit Verma',
-    description: 'Professional career timeline of Rohit Verma: Graphic Designer at Hodu Academy, CBT (Center for Business & Technology), freelance clients, and Founder of Unicivix Solutions.',
+    title: 'Work Experience & Career Timeline | Rohit Verma',
+    description: 'Professional experience of Rohit Verma featuring 3+ years in graphic design and video editing across creative agencies, educational platforms, and client work.',
     canonicalPath: '/experience',
     ogImage: '/images/rohit-verma-og.jpg',
     breadcrumbs: [
@@ -104,8 +100,18 @@ export const SEO_ROUTES: Record<string, RouteSeoData> = {
     ]
   },
   blog: {
-    title: 'Creative Insights & Design Articles | Rohit Verma',
-    description: 'Read insightful articles on graphic design principles, motion graphics workflows, social media branding, and AI creative tools by Rohit Verma.',
+    title: 'Design Insights & Creative Articles | Rohit Verma',
+    description: 'Read actionable articles on visual design psychology, video editing workflows, YouTube thumbnail optimization, and creative strategy by Rohit Verma.',
+    canonicalPath: '/blog',
+    ogImage: '/images/rohit-verma-og.jpg',
+    breadcrumbs: [
+      { name: 'Home', path: '/' },
+      { name: 'Blog', path: '/blog' }
+    ]
+  },
+  insights: {
+    title: 'Design Insights & Creative Articles | Rohit Verma',
+    description: 'Read actionable articles on visual design psychology, video editing workflows, YouTube thumbnail optimization, and creative strategy by Rohit Verma.',
     canonicalPath: '/blog',
     ogImage: '/images/rohit-verma-og.jpg',
     breadcrumbs: [
@@ -115,7 +121,7 @@ export const SEO_ROUTES: Record<string, RouteSeoData> = {
   },
   contact: {
     title: 'Contact Rohit Verma | Graphic Designer & Video Editor in Jaipur',
-    description: 'Get in touch with Rohit Verma for project inquiries, freelance design, video editing, and brand collaborations. Contact via email, direct phone, or WhatsApp.',
+    description: 'Get in touch with Rohit Verma for graphic design, branding, and video editing inquiries. Direct WhatsApp, phone, email, and project intake brief available.',
     canonicalPath: '/contact',
     ogImage: '/images/rohit-verma-og.jpg',
     breadcrumbs: [
@@ -125,7 +131,7 @@ export const SEO_ROUTES: Record<string, RouteSeoData> = {
   },
   privacy: {
     title: 'Privacy Policy | Rohit Verma Portfolio',
-    description: 'Privacy policy for Rohit Verma Portfolio and Unicivix Solutions detailing user privacy, secure communications, and client confidentiality standards.',
+    description: 'Official privacy policy for Rohit Verma Portfolio detailing visitor data protection, contact brief confidentiality, and cookie usage standards.',
     canonicalPath: '/privacy-policy',
     ogImage: '/images/rohit-verma-og.jpg',
     breadcrumbs: [
@@ -135,7 +141,7 @@ export const SEO_ROUTES: Record<string, RouteSeoData> = {
   },
   'privacy-policy': {
     title: 'Privacy Policy | Rohit Verma Portfolio',
-    description: 'Privacy policy for Rohit Verma Portfolio and Unicivix Solutions detailing user privacy, secure communications, and client confidentiality standards.',
+    description: 'Official privacy policy for Rohit Verma Portfolio detailing visitor data protection, contact brief confidentiality, and cookie usage standards.',
     canonicalPath: '/privacy-policy',
     ogImage: '/images/rohit-verma-og.jpg',
     breadcrumbs: [
@@ -145,7 +151,7 @@ export const SEO_ROUTES: Record<string, RouteSeoData> = {
   },
   terms: {
     title: 'Terms & Conditions | Rohit Verma Portfolio',
-    description: 'Terms and conditions for creative design and video editing services provided by Rohit Verma and Unicivix Solutions.',
+    description: 'Terms and conditions governing creative design and video editing services, deliverable milestones, and intellectual property terms by Rohit Verma.',
     canonicalPath: '/terms-and-conditions',
     ogImage: '/images/rohit-verma-og.jpg',
     breadcrumbs: [
@@ -155,7 +161,7 @@ export const SEO_ROUTES: Record<string, RouteSeoData> = {
   },
   'terms-and-conditions': {
     title: 'Terms & Conditions | Rohit Verma Portfolio',
-    description: 'Terms and conditions for creative design and video editing services provided by Rohit Verma and Unicivix Solutions.',
+    description: 'Terms and conditions governing creative design and video editing services, deliverable milestones, and intellectual property terms by Rohit Verma.',
     canonicalPath: '/terms-and-conditions',
     ogImage: '/images/rohit-verma-og.jpg',
     breadcrumbs: [
@@ -163,9 +169,15 @@ export const SEO_ROUTES: Record<string, RouteSeoData> = {
       { name: 'Terms & Conditions', path: '/terms-and-conditions' }
     ]
   },
+  admin: {
+    title: 'Admin Portal | Rohit Verma Portfolio',
+    description: 'Restricted administrative and CMS management portal.',
+    canonicalPath: '/admin',
+    noindex: true
+  },
   '404': {
     title: 'Page Not Found (404) | Rohit Verma Portfolio',
-    description: 'The requested page could not be found. Please navigate back to Rohit Verma’s graphic design and video editing portfolio homepage.',
+    description: "The requested page could not be found. Return to Rohit Verma's graphic design and video editing portfolio homepage.",
     canonicalPath: '/404',
     noindex: true
   }
@@ -174,23 +186,29 @@ export const SEO_ROUTES: Record<string, RouteSeoData> = {
 /**
  * Generate Person and WebSite JSON-LD schemas
  */
-export function generateStructuredData(route: string = 'home', baseUrl: string): object {
+export function generateStructuredData(route: string = 'home', baseUrl: string = PRIMARY_DOMAIN): object | null {
   const cleanBase = baseUrl.replace(/\/+$/, '');
   const currentSeo = SEO_ROUTES[route] || SEO_ROUTES.home;
-  const canonicalUrl = `${cleanBase}${currentSeo.canonicalPath === '/' ? '' : currentSeo.canonicalPath}`;
+
+  // Do not generate public structured data for private or noindex routes
+  if (currentSeo.noindex) {
+    return null;
+  }
+
+  const canonicalUrl = `${cleanBase}${currentSeo.canonicalPath === '/' ? '/' : currentSeo.canonicalPath}`;
 
   const graph: any[] = [
     {
       '@type': 'Person',
       '@id': `${cleanBase}/#person`,
       name: 'Rohit Verma',
-      jobTitle: 'Graphic Designer, Video Editor & Digital Creator',
-      description: 'Jaipur-based Graphic Designer, Video Editor, Website Developer and Digital Marketing Professional with 3+ years of professional creative experience.',
-      url: cleanBase,
-      image: `${cleanBase}/images/rohit-verma-portrait.webp`,
+      jobTitle: 'Graphic Designer & Video Editor',
+      description: 'Graphic designer and video editor in Jaipur specializing in branding, social media creatives, motion graphics and visual design with 3+ years of professional creative experience.',
+      url: `${cleanBase}/`,
+      image: ROHIT_PROFILE_IMAGE_URL,
       telephone: contactConfig.phoneDisplay,
       email: contactConfig.emailDisplay,
-      sameAs: VERIFIED_SOCIAL_PROFILES,
+      sameAs: CONFIRMED_PROFESSIONAL_PROFILES,
       address: {
         '@type': 'PostalAddress',
         addressLocality: 'Jaipur',
@@ -204,6 +222,7 @@ export function generateStructuredData(route: string = 'home', baseUrl: string):
         'Logo Design',
         'Social Media Creatives',
         'Motion Graphics',
+        'Visual Design',
         'Adobe Photoshop',
         'Adobe Illustrator',
         'Adobe Premiere Pro',
@@ -213,9 +232,9 @@ export function generateStructuredData(route: string = 'home', baseUrl: string):
     {
       '@type': 'WebSite',
       '@id': `${cleanBase}/#website`,
-      url: cleanBase,
+      url: `${cleanBase}/`,
       name: 'Rohit Verma Portfolio',
-      description: 'Official portfolio and creative services website of Rohit Verma — Graphic Designer & Video Editor in Jaipur, India.',
+      description: 'Official portfolio of Rohit Verma — Graphic Designer & Video Editor in Jaipur, India.',
       publisher: {
         '@id': `${cleanBase}/#person`
       },
@@ -245,7 +264,7 @@ export function generateStructuredData(route: string = 'home', baseUrl: string):
         '@type': 'ListItem',
         position: idx + 1,
         name: b.name,
-        item: `${cleanBase}${b.path === '/' ? '' : b.path}`
+        item: `${cleanBase}${b.path === '/' ? '/' : b.path}`
       }))
     });
   }
@@ -263,8 +282,8 @@ export function updateDocumentMetadata(route: string): void {
   if (typeof document === 'undefined') return;
 
   const seoData = SEO_ROUTES[route] || SEO_ROUTES.home;
-  const baseUrl = getSiteBaseUrl();
-  const canonicalUrl = `${baseUrl}${seoData.canonicalPath === '/' ? '' : seoData.canonicalPath}`;
+  const baseUrl = PRIMARY_DOMAIN;
+  const canonicalUrl = `${baseUrl}${seoData.canonicalPath === '/' ? '/' : seoData.canonicalPath}`;
   const fullOgImage = seoData.ogImage ? `${baseUrl}${seoData.ogImage}` : `${baseUrl}/images/rohit-verma-og.jpg`;
 
   // 1. Update Title
@@ -289,13 +308,21 @@ export function updateDocumentMetadata(route: string): void {
   metaRobots.content = seoData.noindex ? 'noindex, nofollow' : 'index, follow';
 
   // 4. Update Canonical
+  // A canonical is not required for noindex Admin or arbitrary 404 pages.
+  // Do not point unknown URLs to the Homepage canonical.
   let linkCanonical = document.querySelector<HTMLLinkElement>('link[rel="canonical"]');
-  if (!linkCanonical) {
-    linkCanonical = document.createElement('link');
-    linkCanonical.rel = 'canonical';
-    document.head.appendChild(linkCanonical);
+  if (seoData.noindex) {
+    if (linkCanonical) {
+      linkCanonical.remove();
+    }
+  } else {
+    if (!linkCanonical) {
+      linkCanonical = document.createElement('link');
+      linkCanonical.rel = 'canonical';
+      document.head.appendChild(linkCanonical);
+    }
+    linkCanonical.href = canonicalUrl;
   }
-  linkCanonical.href = canonicalUrl;
 
   // 5. Update Open Graph Tags
   const setMetaProperty = (prop: string, content: string) => {
@@ -341,5 +368,157 @@ export function updateDocumentMetadata(route: string): void {
   }
 
   const structuredData = generateStructuredData(route, baseUrl);
-  jsonLdScript.textContent = JSON.stringify(structuredData, null, 2);
+  if (structuredData) {
+    jsonLdScript.textContent = JSON.stringify(structuredData, null, 2);
+  } else {
+    jsonLdScript.textContent = '';
+  }
 }
+
+/**
+ * Dedicated metadata updater for published Article/Insight detail pages
+ */
+export function updateArticleMetadata(insight: Insight): void {
+  if (typeof document === 'undefined') return;
+
+  const articleUrl = `${PRIMARY_DOMAIN}/insights/${insight.slug}`;
+  const title = insight.seoTitle || `${insight.title} | Rohit Verma`;
+  const description = insight.seoDescription || insight.shortDescription || `Read ${insight.title} by Rohit Verma.`;
+  const image = insight.featuredImage || `${PRIMARY_DOMAIN}/images/rohit-verma-og.jpg`;
+
+  // 1. Update Title
+  document.title = title;
+
+  // 2. Meta description
+  let metaDesc = document.querySelector<HTMLMetaElement>('meta[name="description"]');
+  if (!metaDesc) {
+    metaDesc = document.createElement('meta');
+    metaDesc.name = 'description';
+    document.head.appendChild(metaDesc);
+  }
+  metaDesc.content = description;
+
+  // 3. Robots
+  let metaRobots = document.querySelector<HTMLMetaElement>('meta[name="robots"]');
+  if (!metaRobots) {
+    metaRobots = document.createElement('meta');
+    metaRobots.name = 'robots';
+    document.head.appendChild(metaRobots);
+  }
+  metaRobots.content = 'index, follow';
+
+  // 4. Canonical
+  let linkCanonical = document.querySelector<HTMLLinkElement>('link[rel="canonical"]');
+  if (!linkCanonical) {
+    linkCanonical = document.createElement('link');
+    linkCanonical.rel = 'canonical';
+    document.head.appendChild(linkCanonical);
+  }
+  linkCanonical.href = articleUrl;
+
+  // 5. Open Graph
+  const setMetaProperty = (prop: string, content: string) => {
+    let tag = document.querySelector<HTMLMetaElement>(`meta[property="${prop}"]`);
+    if (!tag) {
+      tag = document.createElement('meta');
+      tag.setAttribute('property', prop);
+      document.head.appendChild(tag);
+    }
+    tag.content = content;
+  };
+
+  setMetaProperty('og:type', 'article');
+  setMetaProperty('og:title', title);
+  setMetaProperty('og:description', description);
+  setMetaProperty('og:url', articleUrl);
+  setMetaProperty('og:image', image);
+  setMetaProperty('og:site_name', 'Rohit Verma Portfolio');
+
+  // 6. Twitter
+  const setMetaName = (name: string, content: string) => {
+    let tag = document.querySelector<HTMLMetaElement>(`meta[name="${name}"]`);
+    if (!tag) {
+      tag = document.createElement('meta');
+      tag.setAttribute('name', name);
+      document.head.appendChild(tag);
+    }
+    tag.content = content;
+  };
+
+  setMetaName('twitter:card', 'summary_large_image');
+  setMetaName('twitter:title', title);
+  setMetaName('twitter:description', description);
+  setMetaName('twitter:image', image);
+
+  // 7. Article Schema JSON-LD
+  let jsonLdScript = document.getElementById('primary-jsonld-schema') as HTMLScriptElement | null;
+  if (!jsonLdScript) {
+    jsonLdScript = document.createElement('script');
+    jsonLdScript.type = 'application/ld+json';
+    jsonLdScript.id = 'primary-jsonld-schema';
+    document.head.appendChild(jsonLdScript);
+  }
+
+  const articleSchema = {
+    '@context': 'https://schema.org',
+    '@graph': [
+      {
+        '@type': 'BlogPosting',
+        '@id': `${articleUrl}#article`,
+        isPartOf: {
+          '@id': `${PRIMARY_DOMAIN}/#website`
+        },
+        headline: insight.title,
+        description: description,
+        url: articleUrl,
+        datePublished: insight.publishDate || insight.createdDate,
+        dateModified: insight.updatedDate || insight.publishDate || insight.createdDate,
+        author: {
+          '@type': 'Person',
+          '@id': `${PRIMARY_DOMAIN}/#person`,
+          name: 'Rohit Verma',
+          jobTitle: 'Graphic Designer & Video Editor',
+          url: `${PRIMARY_DOMAIN}/`
+        },
+        publisher: {
+          '@type': 'Person',
+          '@id': `${PRIMARY_DOMAIN}/#person`,
+          name: 'Rohit Verma'
+        },
+        image: image,
+        mainEntityOfPage: {
+          '@type': 'WebPage',
+          '@id': articleUrl
+        },
+        keywords: insight.tags?.join(', ') || 'Graphic Design, Video Editing, Motion Graphics, Creative Strategy'
+      },
+      {
+        '@type': 'BreadcrumbList',
+        '@id': `${articleUrl}#breadcrumb`,
+        itemListElement: [
+          {
+            '@type': 'ListItem',
+            position: 1,
+            name: 'Home',
+            item: `${PRIMARY_DOMAIN}/`
+          },
+          {
+            '@type': 'ListItem',
+            position: 2,
+            name: 'Blog',
+            item: `${PRIMARY_DOMAIN}/blog`
+          },
+          {
+            '@type': 'ListItem',
+            position: 3,
+            name: insight.title,
+            item: articleUrl
+          }
+        ]
+      }
+    ]
+  };
+
+  jsonLdScript.textContent = JSON.stringify(articleSchema, null, 2);
+}
+

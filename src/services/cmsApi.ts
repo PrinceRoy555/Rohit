@@ -1,4 +1,4 @@
-import { SiteConfig, SiteTemplate, SiteRevision, MediaItem, InquiryRecord, AdminUser } from '../types/cms';
+import { SiteConfig, SiteTemplate, SiteRevision, MediaItem, InquiryRecord, AdminUser, NewsletterSubscriberRecord, FirestoreHealthRecord } from '../types/cms';
 import { getAdminToken, setAdminToken } from './adminApi';
 import {
   fetchLiveSiteConfigFromFirestore,
@@ -14,6 +14,9 @@ import {
   updateLeadStatusInFirestore,
   updateLeadCrmDataInFirestore,
   deleteLeadFromFirestore,
+  fetchNewsletterSubscribersFromFirestore,
+  deleteNewsletterSubscriberFromFirestore,
+  checkFirestoreCollectionsHealth,
   fetchMediaItemsFromFirestore,
   saveMediaItemToFirestore,
   deleteMediaItemFromFirestore,
@@ -504,11 +507,11 @@ export async function fetchInquiries(filter?: { status?: string; search?: string
   }
 }
 
-export async function updateInquiry(id: string, updates: { status?: string; notes?: string }): Promise<{ success: boolean; inquiry?: InquiryRecord; error?: string }> {
+export async function updateInquiry(id: string, updates: { status?: string; notes?: string }, sourceCollection?: string, sourceDocumentId?: string): Promise<{ success: boolean; inquiry?: InquiryRecord; error?: string }> {
   // 1. Update in Firestore
   try {
     if (updates.status) {
-      await updateLeadStatusInFirestore(id, updates.status, updates.notes);
+      await updateLeadStatusInFirestore(id, updates.status, updates.notes, sourceCollection, sourceDocumentId);
     }
   } catch (e) {
     console.warn('[CMS] Firestore lead update error:', e);
@@ -533,10 +536,10 @@ export async function updateInquiry(id: string, updates: { status?: string; note
   }
 }
 
-export async function updateInquiryCrm(id: string, crmUpdates: Partial<InquiryRecord>): Promise<{ success: boolean; error?: string }> {
+export async function updateInquiryCrm(id: string, crmUpdates: Partial<InquiryRecord>, sourceCollection?: string, sourceDocumentId?: string): Promise<{ success: boolean; error?: string }> {
   // 1. Update in Firestore directly
   try {
-    const res = await updateLeadCrmDataInFirestore(id, crmUpdates);
+    const res = await updateLeadCrmDataInFirestore(id, crmUpdates, sourceCollection, sourceDocumentId);
     if (!res.success) {
       console.warn('[CMS] Firestore update error:', res.error);
     }
@@ -563,10 +566,10 @@ export async function updateInquiryCrm(id: string, crmUpdates: Partial<InquiryRe
   return { success: true };
 }
 
-export async function deleteInquiry(id: string): Promise<{ success: boolean; error?: string }> {
+export async function deleteInquiry(id: string, sourceCollection?: string, sourceDocumentId?: string): Promise<{ success: boolean; error?: string }> {
   // 1. Delete from Firestore
   try {
-    await deleteLeadFromFirestore(id);
+    await deleteLeadFromFirestore(id, sourceCollection, sourceDocumentId);
   } catch (e) {
     console.warn('[CMS] Firestore lead delete error:', e);
   }
@@ -585,6 +588,96 @@ export async function deleteInquiry(id: string): Promise<{ success: boolean; err
     return { success: true };
   } catch (err: any) {
     return { success: true };
+  }
+}
+
+/**
+ * Newsletter Subscribers API methods
+ */
+export async function fetchNewsletterSubscribers(): Promise<{ success: boolean; subscribers: NewsletterSubscriberRecord[]; error?: string }> {
+  // 1. Try direct Firestore
+  try {
+    const subs = await fetchNewsletterSubscribersFromFirestore();
+    if (subs && subs.length > 0) {
+      return { success: true, subscribers: subs };
+    }
+  } catch (e) {
+    console.warn('[CMS] Firestore newsletter subscribers error:', e);
+  }
+
+  // 2. Try server API
+  try {
+    const res = await fetch('/api/admin/newsletter-subscribers', {
+      headers: getAuthHeaders(),
+      credentials: 'include'
+    });
+    if (res.status === 401) {
+      setAdminToken(null);
+      return { success: false, subscribers: [], error: 'SESSION_EXPIRED' };
+    }
+    const data = await res.json();
+    return { success: true, subscribers: data.subscribers || [] };
+  } catch (err: any) {
+    return { success: true, subscribers: [] };
+  }
+}
+
+export async function deleteNewsletterSubscriber(id: string): Promise<{ success: boolean; error?: string }> {
+  try {
+    await deleteNewsletterSubscriberFromFirestore(id);
+  } catch (e) {
+    console.warn('[CMS] Firestore delete newsletter subscriber error:', e);
+  }
+
+  try {
+    await fetch(`/api/admin/newsletter-subscribers/${id}`, {
+      method: 'DELETE',
+      headers: getAuthHeaders(),
+      credentials: 'include'
+    });
+  } catch {}
+
+  return { success: true };
+}
+
+export function exportNewsletterSubscribersToCsv(subscribers: NewsletterSubscriberRecord[]) {
+  const headers = ['ID', 'Email', 'Status', 'Source', 'Subscribed At'];
+  const rows = subscribers.map(s => [
+    `"${s.id}"`,
+    `"${s.email}"`,
+    `"${s.status}"`,
+    `"${s.source || 'website-newsletter'}"`,
+    `"${s.subscribedAt}"`
+  ]);
+
+  const csvContent = 'data:text/csv;charset=utf-8,' + [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
+  const encodedUri = encodeURI(csvContent);
+  const link = document.createElement('a');
+  link.setAttribute('href', encodedUri);
+  link.setAttribute('download', `newsletter_subscribers_${new Date().toISOString().slice(0, 10)}.csv`);
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+}
+
+/**
+ * Data Sources & Collections Health API
+ */
+export async function fetchDataSourcesHealth(): Promise<{ success: boolean; health: FirestoreHealthRecord[]; error?: string }> {
+  try {
+    const directHealth = await checkFirestoreCollectionsHealth();
+    return { success: true, health: directHealth };
+  } catch (e: any) {
+    try {
+      const res = await fetch('/api/admin/data-sources/health', {
+        headers: getAuthHeaders(),
+        credentials: 'include'
+      });
+      const data = await res.json();
+      return { success: true, health: data.health || [] };
+    } catch (err: any) {
+      return { success: false, health: [], error: err.message || 'Failed to check data sources' };
+    }
   }
 }
 

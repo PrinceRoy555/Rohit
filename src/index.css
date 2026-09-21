@@ -519,6 +519,7 @@ main,
   min-width: 40px;
   border-radius: 50%;
   object-fit: cover;
+  object-position: center top;
   display: block;
   flex-shrink: 0;
   position: static;
@@ -935,7 +936,8 @@ a.btn-primary:hover {
   aspect-ratio: 1 / 1.05;
   overflow: hidden;
   border-radius: 24px;
-  background-color: var(--bg-card);
+  background-color: #750104;
+  background: radial-gradient(circle at 50% 35%, #820208 0%, #760104 45%, #6a0103 80%, #560002 100%);
   border: 1px solid var(--border-color, rgba(26, 9, 10, 0.12));
   box-shadow: 0 20px 40px rgba(26, 9, 10, 0.12);
   margin-left: auto;
@@ -949,7 +951,7 @@ a.btn-primary:hover {
   height: 40%;
   background: linear-gradient(
     to top,
-    rgba(26, 9, 10, 0.30) 0%,
+    rgba(26, 9, 10, 0.35) 0%,
     rgba(26, 9, 10, 0.08) 55%,
     transparent 100%
   );
@@ -971,14 +973,14 @@ a.btn-primary:hover {
   inset: 0;
   width: 100%;
   height: 100%;
-  object-fit: cover;
-  object-position: 50% 25%;
-  transform: scale(1);
-  transition: transform 0.5s ease;
+  object-fit: cover !important;
+  object-position: center top !important;
+  transform: none !important;
+  transition: transform 0.4s ease;
 }
 
 .profile-card:hover .profile-card-image {
-  transform: scale(1.025);
+  transform: none !important;
 }
 
 .profile-card-info {
@@ -1031,9 +1033,6 @@ a.btn-primary:hover {
     width: min(100%, 440px);
     aspect-ratio: 1 / 1.05;
   }
-  .profile-card-image {
-    object-position: 50% 24%;
-  }
 }
 
 @media (max-width: 640px) {
@@ -1041,9 +1040,6 @@ a.btn-primary:hover {
     width: min(100%, 420px);
     aspect-ratio: 4 / 4.6;
     border-radius: 20px;
-  }
-  .profile-card-image {
-    object-position: 50% 22%;
   }
   .profile-card-info {
     left: 14px;
@@ -2107,10 +2103,6 @@ img, video, canvas, svg {
 
 /* Mobile Hero Elements - Natural Responsive Dimensions (NO transform: scale) */
 @media (max-width: 640px) {
-  #portrait-container {
-    max-width: calc(100vw - 32px) !important;
-  }
-
   .software-floating-card {
     padding: 4px 8px !important;
     gap: 6px !important;
@@ -2122,10 +2114,6 @@ img, video, canvas, svg {
 }
 
 @media (max-width: 480px) {
-  #portrait-container {
-    max-width: calc(100vw - 24px) !important;
-  }
-
   .software-floating-card {
     padding: 3px 6px !important;
     gap: 4px !important;
@@ -2139,10 +2127,6 @@ img, video, canvas, svg {
 }
 
 @media (max-width: 360px) {
-  #portrait-container {
-    max-width: calc(100vw - 16px) !important;
-  }
-
   .software-floating-card {
     padding: 2px 5px !important;
     gap: 4px !important;
@@ -2946,4 +2930,66 @@ html:not(.dark) .admin-modal .bg-rose-500\/15 .text-rose-300 {
   background-color: #140C0E !important;
   color: #FFFFFF !important;
 }
+
+/* =========================================================================
+   HERO METRICS PANEL & LABELS (High Contrast in Light and Dark Modes)
+   ========================================================================= */
+#hero-metrics-panel {
+  background-color: #F5F2F4 !important;
+  border: 1px solid rgba(0, 0, 0, 0.12) !important;
+  opacity: 1 !important;
+}
+
+html[data-theme="dark"] #hero-metrics-panel,
+[data-theme="dark"] #hero-metrics-panel,
+html.dark #hero-metrics-panel,
+.dark #hero-metrics-panel {
+  background-color: rgba(10, 8, 10, 0.88) !important;
+  border: 1px solid rgba(255, 255, 255, 0.20) !important;
+}
+
+#hero-metric-projects-count,
+#hero-metric-years-count {
+  color: #1A1719 !important;
+  opacity: 1 !important;
+  font-weight: 900 !important;
+}
+
+html[data-theme="dark"] #hero-metric-projects-count,
+[data-theme="dark"] #hero-metric-projects-count,
+html.dark #hero-metric-projects-count,
+.dark #hero-metric-projects-count,
+html[data-theme="dark"] #hero-metric-years-count,
+[data-theme="dark"] #hero-metric-years-count,
+html.dark #hero-metric-years-count,
+.dark #hero-metric-years-count {
+  color: #FFFFFF !important;
+  opacity: 1 !important;
+}
+
+#hero-metric-projects-label,
+#hero-metric-years-label {
+  color: #4B4447 !important;
+  opacity: 1 !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.1em !important;
+  text-transform: uppercase !important;
+  -webkit-text-fill-color: #4B4447 !important;
+  visibility: visible !important;
+  display: block !important;
+}
+
+html[data-theme="dark"] #hero-metric-projects-label,
+[data-theme="dark"] #hero-metric-projects-label,
+html.dark #hero-metric-projects-label,
+.dark #hero-metric-projects-label,
+html[data-theme="dark"] #hero-metric-years-label,
+[data-theme="dark"] #hero-metric-years-label,
+html.dark #hero-metric-years-label,
+.dark #hero-metric-years-label {
+  color: #D6D1D3 !important;
+  -webkit-text-fill-color: #D6D1D3 !important;
+  opacity: 1 !important;
+}
+
 

@@ -1,8 +1,23 @@
 import { motion } from 'motion/react';
 import { ExternalLink, Calendar } from 'lucide-react';
 import { EXPERIENCE_DATA } from '../data';
+import { useSiteConfig } from '../context/SiteConfigContext';
 
 export default function ExperienceSection() {
+  const { activeConfig } = useSiteConfig();
+  const experienceConfig = activeConfig?.sections?.experience;
+
+  if (experienceConfig && experienceConfig.isVisible === false) {
+    return null;
+  }
+
+  const experiencesList =
+    activeConfig?.experiences && activeConfig.experiences.length > 0
+      ? activeConfig.experiences
+      : activeConfig?.experience && activeConfig.experience.length > 0
+      ? activeConfig.experience
+      : EXPERIENCE_DATA;
+
   return (
     <section id="experience" className="py-24 bg-bg-primary relative overflow-hidden transition-colors duration-300">
       {/* Background radial glows */}
@@ -19,7 +34,7 @@ export default function ExperienceSection() {
             viewport={{ once: true }}
             className="text-accent-primary font-bold text-xs uppercase tracking-widest bg-accent-primary/10 px-3 py-1.5 rounded-full inline-block mb-4"
           >
-            My Timeline
+            {experienceConfig?.badge || 'My Timeline'}
           </motion.span>
           <motion.h2
             initial={{ opacity: 0, y: 15 }}
@@ -28,7 +43,7 @@ export default function ExperienceSection() {
             transition={{ delay: 0.1 }}
             className="text-4xl md:text-5xl font-extrabold text-text-primary tracking-tight mb-4"
           >
-            My Work Experience
+            {experienceConfig?.title || 'My Work Experience'}
           </motion.h2>
           <motion.p
             initial={{ opacity: 0, y: 15 }}
@@ -37,13 +52,13 @@ export default function ExperienceSection() {
             transition={{ delay: 0.2 }}
             className="text-text-secondary text-base md:text-lg leading-relaxed"
           >
-            A narrative of persistent learning, commercial collaborations, and professional creativity spanning graphic design, video editing, and digital marketing.
+            {experienceConfig?.subtitle || 'A narrative of persistent learning, commercial collaborations, and professional creativity spanning graphic design, video editing, and digital marketing.'}
           </motion.p>
         </div>
 
         {/* Experience Cards Stack */}
         <div className="space-y-6" id="experience-timeline-stack">
-          {EXPERIENCE_DATA.map((exp, index) => (
+          {experiencesList.map((exp, index) => (
             <motion.div
               key={exp.id}
               initial={{ opacity: 0, y: 30 }}

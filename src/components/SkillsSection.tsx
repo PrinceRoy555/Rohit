@@ -8,6 +8,7 @@ import {
 } from 'react-icons/tb';
 import { SiFigma } from 'react-icons/si';
 import { Sparkles, Flame, PenTool } from 'lucide-react';
+import { useSiteConfig } from '../context/SiteConfigContext';
 
 interface Skill {
   name: string;
@@ -172,6 +173,21 @@ function SkillCard({ skill, index }: { skill: Skill; index: number; key?: string
 }
 
 export default function SkillsSection() {
+  const { activeConfig } = useSiteConfig();
+  const skillsConfig = activeConfig?.sections?.skills;
+
+  if (skillsConfig && skillsConfig.isVisible === false) {
+    return null;
+  }
+
+  const activeSkillsList: Skill[] =
+    activeConfig?.skills && activeConfig.skills.length > 0
+      ? activeConfig.skills.map((s) => ({
+          name: s.name,
+          percentage: s.percentage ?? (s.level ? s.level * 10 : 90),
+        }))
+      : skillsList;
+
   return (
     <section id="services-advantage" className="py-16 sm:py-24 bg-bg-primary relative overflow-hidden transition-colors duration-300">
       {/* Absolute Decorative Curved Background Lighting */}
@@ -188,7 +204,7 @@ export default function SkillsSection() {
             viewport={{ once: true }}
             className="text-accent-primary font-bold text-xs uppercase tracking-widest bg-accent-primary/10 px-3 py-1.5 rounded-full inline-block mb-3 sm:mb-4"
           >
-            My Advantage
+            {skillsConfig?.badge || 'My Advantage'}
           </motion.span>
           <motion.h2
             initial={{ opacity: 0, y: 15 }}
@@ -197,7 +213,7 @@ export default function SkillsSection() {
             transition={{ delay: 0.1 }}
             className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-text-primary tracking-tight mb-3 sm:mb-4"
           >
-            Creative Technologies
+            {skillsConfig?.title || 'Creative Technologies'}
           </motion.h2>
           <motion.p
             initial={{ opacity: 0, y: 15 }}
@@ -206,13 +222,13 @@ export default function SkillsSection() {
             transition={{ delay: 0.2 }}
             className="text-text-secondary text-sm sm:text-base md:text-lg leading-relaxed"
           >
-            The specialized industry-standard design programs and generative AI tools I leverage to translate complex visions into polished high-converting digital assets.
+            {skillsConfig?.subtitle || 'The specialized industry-standard design programs and generative AI tools I leverage to translate complex visions into polished high-converting digital assets.'}
           </motion.p>
         </div>
 
         {/* Grid of Skill Cards */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-6" id="skills-grid">
-          {skillsList.map((skill, index) => (
+          {activeSkillsList.map((skill, index) => (
             <SkillCard key={skill.name} skill={skill} index={index} />
           ))}
         </div>

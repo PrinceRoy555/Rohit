@@ -264,38 +264,57 @@ export const SectionsManagerTab: React.FC = () => {
       {/* SUB-SECTION 2: HERO HEADLINE & CTA */}
       {activeSubTab === 'hero' && (
         <div className="bg-bg-card border border-border-color rounded-xl sm:rounded-2xl p-4 sm:p-6 space-y-4 sm:space-y-6 shadow-xs">
-          <h3 className="text-sm sm:text-base font-bold text-text-primary mb-1 sm:mb-2">Homepage Hero Configuration</h3>
+          <div>
+            <h3 className="text-sm sm:text-base font-bold text-text-primary mb-1">Homepage Hero Configuration</h3>
+            <p className="text-xs text-text-muted">
+              Note: The primary name heading ("Rohit Verma.") is synced directly from <strong className="text-text-primary">Branding &rarr; Site Name</strong>.
+            </p>
+          </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-3 sm:gap-4">
             <div>
-              <label className="block text-xs font-semibold text-text-secondary mb-1.5">Headline Prefix</label>
+              <label className="block text-xs font-semibold text-text-secondary mb-1.5">Eyebrow (Small Tagline)</label>
               <input
                 type="text"
                 value={sections.hero.headlinePrefix || ''}
+                placeholder="CREATIVE EXCELLENCE IN"
                 onChange={(e) => handleUpdateSectionInfo('hero', 'headlinePrefix', e.target.value)}
                 className="w-full min-h-[42px] bg-bg-secondary border border-border-color rounded-xl px-3 py-2 text-sm text-text-primary focus:border-rose-500 focus:outline-none"
               />
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-text-secondary mb-1.5">Headline Highlight (Red Gradient)</label>
+              <label className="block text-xs font-semibold text-text-secondary mb-1.5">Professional Role</label>
               <input
                 type="text"
-                value={sections.hero.headlineHighlight || ''}
-                onChange={(e) => handleUpdateSectionInfo('hero', 'headlineHighlight', e.target.value)}
+                value={sections.hero.role || ''}
+                placeholder="Graphic Designer & Video Editor"
+                onChange={(e) => handleUpdateSectionInfo('hero', 'role', e.target.value)}
                 className="w-full min-h-[42px] bg-bg-secondary border border-border-color rounded-xl px-3 py-2 text-sm text-text-primary focus:border-rose-500 focus:outline-none"
               />
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-text-secondary mb-1.5">Headline Suffix</label>
+              <label className="block text-xs font-semibold text-text-secondary mb-1.5">Location</label>
               <input
                 type="text"
-                value={sections.hero.headlineSuffix || ''}
-                onChange={(e) => handleUpdateSectionInfo('hero', 'headlineSuffix', e.target.value)}
+                value={sections.hero.location || ''}
+                placeholder="Jaipur, India"
+                onChange={(e) => handleUpdateSectionInfo('hero', 'location', e.target.value)}
                 className="w-full min-h-[42px] bg-bg-secondary border border-border-color rounded-xl px-3 py-2 text-sm text-text-primary focus:border-rose-500 focus:outline-none"
               />
             </div>
+          </div>
+
+          <div>
+            <label className="block text-xs font-semibold text-text-secondary mb-1.5">Hero Introduction / Bio</label>
+            <textarea
+              rows={3}
+              value={sections.hero.subtitle || ''}
+              placeholder="Professional Graphic Designer, Video Editor, Website Developer and Digital Marketing Professional based in Jaipur, India..."
+              onChange={(e) => handleUpdateSectionInfo('hero', 'subtitle', e.target.value)}
+              className="w-full bg-bg-secondary border border-border-color rounded-xl px-3 py-2 text-sm text-text-primary focus:border-rose-500 focus:outline-none resize-y"
+            />
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4 pt-3.5 sm:pt-4 border-t border-border-color">
