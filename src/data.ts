@@ -363,13 +363,13 @@ Motion is no longer a luxury decoration—it is an essential storytelling asset.
  * Confirmed official portrait/profile photograph of Rohit Verma.
  * Hosted on ImageKit CDN with high availability and optimized delivery.
  */
-export const ROHIT_PROFILE_IMAGE_URL = "https://ik.imagekit.io/auhuory9w/website%20work/Hero%20section%20Photo/Image/ChatGPT%20Image%20Sep%2010,%202026,%2011_18_40%20PM.png";
+export const ROHIT_PROFILE_IMAGE_URL = "/images/rohit-verma-portrait.png";
 export const ROHIT_PORTRAIT_IMAGE_URL = ROHIT_PROFILE_IMAGE_URL;
 
 /**
  * Resolves the authoritative portrait/profile photograph of Rohit Verma across the platform.
- * 1. Uses the valid CMS profile image when configured (and not an obsolete local path).
- * 2. Otherwise uses the confirmed ImageKit URL as the default fallback.
+ * 1. Uses the valid CMS profile image when configured (and not an obsolete red/legacy image).
+ * 2. Otherwise uses the theme-matched portrait as the authoritative default.
  */
 export function getAuthoritativeProfileImage(configuredImage?: string | null): string {
   if (!configuredImage || typeof configuredImage !== 'string') {
@@ -378,14 +378,12 @@ export function getAuthoritativeProfileImage(configuredImage?: string | null): s
   const trimmed = configuredImage.trim();
   if (
     !trimmed ||
-    trimmed === '/images/rohit-verma-portrait.jpg' ||
+    trimmed.includes('ChatGPT%20Image') ||
+    trimmed.includes('rohit-avatar.jpg') ||
     trimmed === '/images/rohit-avatar.jpg' ||
     trimmed === '/images/rohit-avatar.webp' ||
     trimmed === '/images/rohit-hero.webp' ||
-    trimmed === '/images/rohit-verma-portrait.png' ||
-    trimmed === '/images/rohit-verma-portrait.webp' ||
-    trimmed.includes('rohit-verma-portrait.jpg') ||
-    trimmed.includes('rohit-avatar.jpg')
+    trimmed === '/images/rohit-verma-portrait.webp'
   ) {
     return ROHIT_PROFILE_IMAGE_URL;
   }

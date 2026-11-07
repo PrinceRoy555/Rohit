@@ -537,7 +537,7 @@ let serverMediaItems: MediaItem[] = [
   {
     id: 'med-1',
     name: 'rohit-verma-portrait.png',
-    url: 'https://ik.imagekit.io/auhuory9w/website%20work/Hero%20section%20Photo/Image/ChatGPT%20Image%20Sep%2010,%202026,%2011_18_40%20PM.png',
+    url: '/images/rohit-verma-portrait.png',
     size: '126 KB',
     type: 'image/png',
     category: 'avatars',
