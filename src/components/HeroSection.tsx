@@ -445,7 +445,7 @@ export default function HeroSection() {
               initial={{ opacity: 0, x: 15 }}
               animate={shouldReduceMotion ? { opacity: 1, x: 0 } : { opacity: 1, x: 0, y: [0, -5, 0] }}
               transition={shouldReduceMotion ? { duration: 0.4, delay: 0.3 } : { duration: 3.8, repeat: Infinity, ease: 'easeInOut', delay: 1 }}
-              className="absolute bottom-12 sm:bottom-16 -right-2 sm:right-0 lg:right-2 z-20 bg-white dark:bg-[#071B49] rounded-2xl px-3.5 py-2.5 sm:px-4 sm:py-3 shadow-[0_12px_28px_rgba(7,27,73,0.10)] border border-[#E2E8F0] dark:border-[#1E3A8A]/50 flex items-center gap-2.5 sm:gap-3 pointer-events-auto select-none"
+              className="absolute bottom-24 sm:bottom-28 lg:bottom-32 -right-2 sm:right-0 lg:right-2 z-20 bg-white dark:bg-[#071B49] rounded-2xl px-3.5 py-2.5 sm:px-4 sm:py-3 shadow-[0_12px_28px_rgba(7,27,73,0.10)] border border-[#E2E8F0] dark:border-[#1E3A8A]/50 flex items-center gap-2.5 sm:gap-3 pointer-events-auto select-none"
               id="hero-card-web-developer"
             >
               <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-[#EAF2FF] dark:bg-[#0866F5]/20 flex items-center justify-center text-[#0866F5] shrink-0 shadow-inner">
@@ -483,7 +483,7 @@ export default function HeroSection() {
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.45, delay: 0.35 }}
-          className="mt-10 sm:mt-14 lg:mt-16 w-full rounded-2xl sm:rounded-3xl bg-white dark:bg-[#071B49] border border-[#E2E8F0] dark:border-[#1E3A8A]/50 shadow-[0_12px_35px_rgba(7,27,73,0.06)] dark:shadow-[0_20px_50px_rgba(3,11,30,0.6)] p-5 sm:p-6 lg:p-7 relative z-20"
+          className="relative z-20 -mt-14 sm:-mt-18 lg:-mt-24 w-full rounded-2xl sm:rounded-3xl bg-white dark:bg-[#071B49] border border-[#E2E8F0] dark:border-[#1E3A8A]/50 shadow-[0_12px_35px_rgba(7,27,73,0.06)] dark:shadow-[0_20px_50px_rgba(3,11,30,0.6)] p-5 sm:p-6 lg:p-7"
           id="hero-stats-card"
         >
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6 divide-y sm:divide-y-0 sm:divide-x divide-[#E2E8F0] dark:divide-[#1E3A8A]/40">
