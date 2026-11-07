@@ -443,8 +443,11 @@ main,
   min-height: 76px;
   margin: 0 auto;
   padding: 0;
-  display: grid;
-  grid-template-columns: max-content minmax(480px, 1fr) max-content;
+  display: flex !important;
+  flex-direction: row !important;
+  flex-wrap: nowrap !important;
+  justify-content: space-between !important;
+  gap: 16px;
   align-items: center;
   column-gap: 24px;
   overflow: visible !important;

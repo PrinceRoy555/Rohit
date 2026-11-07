@@ -204,45 +204,45 @@ export default function Header({ activeSection, theme: propTheme, toggleTheme: p
         className={`site-header ${isScrolled ? 'py-2 sm:py-3 shadow-md' : 'py-2.5 sm:py-4'}`}
         id="app-header"
       >
-        <div className="header-inner header-container">
-          {/* Left: Rohit Brand Link */}
-          <a
-            className="header-brand group cursor-pointer min-w-0 flex-shrink"
-            href="/"
-            onClick={handleHomeNavigation}
-            id="logo-container"
-            aria-label="Rohit Verma Homepage"
-          >
-            <img
-              src={avatar}
-              alt="Rohit Verma – Graphic Designer and Video Editor in Jaipur"
-              width="36"
-              height="36"
-              className="header-avatar header-brand-image object-cover object-[center_top] group-hover:scale-110 transition-transform duration-300 flex-shrink-0"
-              referrerPolicy="no-referrer"
-              onError={(e) => {
-                if (e.currentTarget.src !== ROHIT_PROFILE_IMAGE_URL) {
-                  e.currentTarget.src = ROHIT_PROFILE_IMAGE_URL;
-                }
-              }}
-            />
-            <div className="flex flex-col min-w-0">
-              <span className="header-brand-text header-brand-name text-text-primary truncate">
-                {siteName}<span className="brand-dot text-accent-primary">.</span>
-              </span>
-              {isHomeRoute && (
-                <span className="hidden sm:block text-[8px] font-mono tracking-[0.2em] text-text-muted uppercase leading-none mt-0.5">
-                  CREATIVE DESIGNER
+        <div className="header-inner header-container flex items-center justify-between flex-nowrap w-full">
+          {/* Left: Rohit Brand Link & Subtle Divider */}
+          <div className="flex items-center gap-2.5 sm:gap-3 flex-shrink-0">
+            <a
+              className="header-brand group cursor-pointer"
+              href="/"
+              onClick={handleHomeNavigation}
+              id="logo-container"
+              aria-label="Rohit Verma Homepage"
+            >
+              <img
+                src={avatar}
+                alt="Rohit Verma – Graphic Designer and Video Editor in Jaipur"
+                width="38"
+                height="38"
+                className="header-avatar header-brand-image object-cover object-[center_top] group-hover:scale-105 transition-transform duration-300 flex-shrink-0 rounded-full"
+                referrerPolicy="no-referrer"
+                onError={(e) => {
+                  if (e.currentTarget.src !== ROHIT_PROFILE_IMAGE_URL) {
+                    e.currentTarget.src = ROHIT_PROFILE_IMAGE_URL;
+                  }
+                }}
+              />
+              <div className="flex flex-col min-w-0">
+                <span className="header-brand-text header-brand-name text-text-primary text-[17px] font-bold tracking-tight">
+                  {siteName}<span className="brand-dot text-[#0866F5]">.</span>
                 </span>
-              )}
-            </div>
-          </a>
-
-          {/* Subtle Vertical Divider from Reference Mockup */}
-          <div className="hidden lg:block h-6 w-[1px] bg-[#E2E8F0] dark:bg-[#1E3A8A]/50 mx-2" aria-hidden="true" />
+                {isHomeRoute && (
+                  <span className="hidden sm:block text-[8px] font-mono tracking-[0.2em] text-[#64748B] dark:text-[#94A3B8] uppercase leading-none mt-0.5">
+                    CREATIVE DESIGNER
+                  </span>
+                )}
+              </div>
+            </a>
+            <div className="hidden 2xl:block h-6 w-[1px] bg-[#E2E8F0] dark:bg-[#1E3A8A]/50 ml-1" aria-hidden="true" />
+          </div>
 
           {/* Centre: Navigation Capsule */}
-          <nav className="header-navigation main-navigation desktop-navigation" aria-label="Primary navigation">
+          <nav className="header-navigation main-navigation desktop-navigation flex-shrink-0" aria-label="Primary navigation">
             {navItems.map((link) => {
               const active = isLinkActive(link.id);
               const isHome = link.id === 'home';
@@ -289,13 +289,13 @@ export default function Header({ activeSection, theme: propTheme, toggleTheme: p
           </nav>
 
           {/* Right: Action Controls Group */}
-          <div className="header-actions">
+          <div className="header-actions flex items-center gap-2 sm:gap-2.5 flex-shrink-0 flex-nowrap">
             {/* WhatsApp Button - Visible on tablet/desktop (>= 640px) - Deep Navy */}
             <a
               href={WHATSAPP_BUSINESS_URL}
               target="_blank"
               rel="noopener noreferrer"
-              className="whatsapp-button hidden sm:inline-flex items-center justify-center gap-1.5 h-9 sm:h-[42px] px-3.5 sm:px-4 rounded-full text-white font-bold text-xs sm:text-sm whitespace-nowrap active:scale-95 transition-all duration-200 shadow-sm bg-[#071B49] hover:bg-[#0c286d] flex-shrink-0"
+              className="whatsapp-button hidden sm:inline-flex items-center justify-center gap-1.5 h-10 px-3.5 sm:px-4 rounded-full text-white font-bold text-xs sm:text-sm whitespace-nowrap active:scale-95 transition-all duration-200 shadow-sm bg-[#071B49] hover:bg-[#0c286d] flex-shrink-0"
               id="header-whatsapp-btn"
               aria-label="Contact Rohit Verma on WhatsApp Business"
             >
@@ -316,7 +316,7 @@ export default function Header({ activeSection, theme: propTheme, toggleTheme: p
               href={resumeUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="resume-button hidden lg:inline-flex items-center justify-center gap-2 h-[42px] min-h-[42px] px-5 rounded-full text-white font-bold text-xs sm:text-sm whitespace-nowrap active:scale-95 transition-all duration-200 shadow-sm bg-[#071B49] hover:bg-[#0c286d] flex-shrink-0"
+              className="resume-button hidden lg:inline-flex items-center justify-center gap-1.5 h-10 px-3.5 sm:px-4 rounded-full text-white font-bold text-xs sm:text-sm whitespace-nowrap active:scale-95 transition-all duration-200 shadow-sm bg-[#071B49] hover:bg-[#0c286d] flex-shrink-0"
               id="download-resume-btn"
               aria-label="Open Rohit Verma Resume PDF"
             >
@@ -329,7 +329,7 @@ export default function Header({ activeSection, theme: propTheme, toggleTheme: p
               <a
                 href="#contact"
                 onClick={(e) => scrollToSection('contact', e)}
-                className="hidden xl:inline-flex items-center justify-center gap-2 h-[42px] min-h-[42px] px-5 rounded-full !text-white font-bold text-xs sm:text-sm whitespace-nowrap active:scale-95 transition-all duration-200 shadow-md bg-[#0866F5] hover:bg-[#155EEF] shadow-[#0866F5]/25 flex-shrink-0"
+                className="hidden lg:inline-flex items-center justify-center gap-2 h-10 px-4 sm:px-5 rounded-full !text-white font-bold text-xs sm:text-sm whitespace-nowrap active:scale-95 transition-all duration-200 shadow-md bg-[#0866F5] hover:bg-[#155EEF] shadow-[#0866F5]/25 flex-shrink-0"
                 id="header-work-together-btn"
                 aria-label="Let's Work Together - Contact Rohit Verma"
               >
