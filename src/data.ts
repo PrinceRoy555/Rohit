@@ -378,7 +378,9 @@ export function getAuthoritativeProfileImage(configuredImage?: string | null): s
   const trimmed = configuredImage.trim();
   if (
     !trimmed ||
-    trimmed.includes('ChatGPT%20Image') ||
+    trimmed.includes('ChatGPT') ||
+    trimmed.includes('imagekit.io/auhuory9w') ||
+    trimmed.includes('Hero%20section') ||
     trimmed.includes('rohit-avatar.jpg') ||
     trimmed === '/images/rohit-avatar.jpg' ||
     trimmed === '/images/rohit-avatar.webp' ||
