@@ -110,7 +110,7 @@ export const DataSourcesHealthTab: React.FC = () => {
         </div>
 
         <div className="p-4 rounded-xl border border-border-color bg-bg-card flex items-center gap-3">
-          <div className="w-10 h-10 rounded-lg bg-rose-500/10 text-rose-600 dark:text-rose-400 flex items-center justify-center shrink-0">
+          <div className="w-10 h-10 rounded-lg bg-accent-primary/10 text-accent-primary flex items-center justify-center shrink-0">
             <ShieldCheck className="w-5 h-5" />
           </div>
           <div>
@@ -231,7 +231,7 @@ export const DataSourcesHealthTab: React.FC = () => {
                             Notice
                           </span>
                         ) : (
-                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-semibold bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-500/20">
+                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-semibold bg-red-500/10 text-red-600 dark:text-red-400 border border-red-500/20">
                             <XCircle className="w-3 h-3" />
                             Error: {rec.error || 'Failed'}
                           </span>

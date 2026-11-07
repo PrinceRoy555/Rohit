@@ -207,7 +207,7 @@ export const ServicesPricingTab: React.FC = () => {
           onClick={() => setActiveSubTab('services')}
           className={`flex-shrink-0 whitespace-nowrap min-h-[38px] flex items-center gap-2 px-3.5 sm:px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all active:scale-98 ${
             activeSubTab === 'services'
-              ? 'bg-rose-600 text-white shadow-xs'
+              ? 'bg-accent-primary text-white shadow-xs'
               : 'text-text-muted hover:text-text-primary hover:bg-bg-secondary'
           }`}
         >
@@ -218,7 +218,7 @@ export const ServicesPricingTab: React.FC = () => {
           onClick={() => setActiveSubTab('pricing')}
           className={`flex-shrink-0 whitespace-nowrap min-h-[38px] flex items-center gap-2 px-3.5 sm:px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all active:scale-98 ${
             activeSubTab === 'pricing'
-              ? 'bg-rose-600 text-white shadow-xs'
+              ? 'bg-accent-primary text-white shadow-xs'
               : 'text-text-muted hover:text-text-primary hover:bg-bg-secondary'
           }`}
         >
@@ -234,7 +234,7 @@ export const ServicesPricingTab: React.FC = () => {
             <h3 className="text-sm sm:text-base font-bold text-text-primary">Active Service Offerings</h3>
             <button
               onClick={handleOpenAddService}
-              className="min-h-[38px] px-3.5 sm:px-4 py-1.5 rounded-xl text-xs font-semibold bg-rose-600 hover:bg-rose-700 text-white shadow-xs flex items-center gap-1.5 active:scale-98"
+              className="min-h-[38px] px-3.5 sm:px-4 py-1.5 rounded-xl text-xs font-semibold bg-accent-primary hover:bg-accent-secondary text-white shadow-xs flex items-center gap-1.5 active:scale-98"
             >
               <Plus className="w-4 h-4" />
               <span>Add Service</span>
@@ -245,13 +245,13 @@ export const ServicesPricingTab: React.FC = () => {
             {services.map((s) => (
               <div
                 key={s.id}
-                className="p-4 sm:p-5 rounded-xl sm:rounded-2xl bg-bg-card border border-border-color hover:border-rose-500/30 transition-all flex flex-col justify-between shadow-xs"
+                className="p-4 sm:p-5 rounded-xl sm:rounded-2xl bg-bg-card border border-border-color hover:border-accent-primary/30 transition-all flex flex-col justify-between shadow-xs"
               >
                 <div>
                   <div className="flex items-center justify-between gap-2">
                     <h4 className="text-sm sm:text-base font-bold text-text-primary">{s.title}</h4>
                     {s.priceStartingAt && (
-                      <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-500/20 flex-shrink-0">
+                      <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-accent-primary/10 text-accent-primary border border-accent-primary/20 flex-shrink-0">
                         {s.priceStartingAt}
                       </span>
                     )}
@@ -262,7 +262,7 @@ export const ServicesPricingTab: React.FC = () => {
                     <ul className="mt-3 space-y-1">
                       {s.features.map((f, idx) => (
                         <li key={idx} className="text-xs text-text-secondary flex items-center gap-1.5">
-                          <CheckCircle2 className="w-3.5 h-3.5 text-rose-500 flex-shrink-0" />
+                          <CheckCircle2 className="w-3.5 h-3.5 text-accent-primary flex-shrink-0" />
                           <span>{f}</span>
                         </li>
                       ))}
@@ -281,7 +281,7 @@ export const ServicesPricingTab: React.FC = () => {
                   </button>
                   <button
                     onClick={() => handleDeleteService(s.id)}
-                    className="w-[38px] h-[38px] rounded-xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-600 dark:text-rose-400 border border-rose-500/20 flex items-center justify-center transition-colors active:scale-95"
+                    className="w-[38px] h-[38px] rounded-xl bg-accent-primary/10 hover:bg-accent-primary/20 text-accent-primary border border-accent-primary/20 flex items-center justify-center transition-colors active:scale-95"
                     title="Delete Service"
                     aria-label="Delete Service"
                   >
@@ -301,7 +301,7 @@ export const ServicesPricingTab: React.FC = () => {
             <h3 className="text-sm sm:text-base font-bold text-text-primary">Pricing & Retainer Packages</h3>
             <button
               onClick={handleOpenAddPricing}
-              className="min-h-[38px] px-3.5 sm:px-4 py-1.5 rounded-xl text-xs font-semibold bg-rose-600 hover:bg-rose-700 text-white shadow-xs flex items-center gap-1.5 active:scale-98"
+              className="min-h-[38px] px-3.5 sm:px-4 py-1.5 rounded-xl text-xs font-semibold bg-accent-primary hover:bg-accent-secondary text-white shadow-xs flex items-center gap-1.5 active:scale-98"
             >
               <Plus className="w-4 h-4" />
               <span>Add Package</span>
@@ -314,13 +314,13 @@ export const ServicesPricingTab: React.FC = () => {
                 key={p.id}
                 className={`p-4 sm:p-5 rounded-xl sm:rounded-2xl border transition-all flex flex-col justify-between relative shadow-xs ${
                   p.isPopular
-                    ? 'bg-bg-card border-rose-500 ring-1 ring-rose-500/30'
-                    : 'bg-bg-card border-border-color hover:border-rose-500/30'
+                    ? 'bg-bg-card border-accent-primary ring-1 ring-accent-primary/30'
+                    : 'bg-bg-card border-border-color hover:border-accent-primary/30'
                 }`}
               >
                 <div>
                   {p.isPopular && (
-                    <span className="inline-block px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-rose-600 text-white mb-2.5 shadow-xs">
+                    <span className="inline-block px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-accent-primary text-white mb-2.5 shadow-xs">
                       MOST POPULAR
                     </span>
                   )}
@@ -334,7 +334,7 @@ export const ServicesPricingTab: React.FC = () => {
                   <ul className="mt-3.5 space-y-1.5 border-t border-border-color pt-3">
                     {(p.features || []).map((f, idx) => (
                       <li key={idx} className="text-xs text-text-secondary flex items-center gap-1.5">
-                        <CheckCircle2 className="w-3.5 h-3.5 text-rose-500 flex-shrink-0" />
+                        <CheckCircle2 className="w-3.5 h-3.5 text-accent-primary flex-shrink-0" />
                         <span>{f}</span>
                       </li>
                     ))}
@@ -354,7 +354,7 @@ export const ServicesPricingTab: React.FC = () => {
                     </button>
                     <button
                       onClick={() => handleDeletePricing(p.id)}
-                      className="w-[38px] h-[38px] rounded-xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-600 dark:text-rose-400 border border-rose-500/20 flex items-center justify-center transition-colors active:scale-95"
+                      className="w-[38px] h-[38px] rounded-xl bg-accent-primary/10 hover:bg-accent-primary/20 text-accent-primary border border-accent-primary/20 flex items-center justify-center transition-colors active:scale-95"
                       title="Delete Package"
                       aria-label="Delete Package"
                     >
@@ -384,7 +384,7 @@ export const ServicesPricingTab: React.FC = () => {
                   required
                   value={serviceTitle}
                   onChange={(e) => setServiceTitle(e.target.value)}
-                  className="w-full min-h-[42px] bg-bg-secondary border border-border-color rounded-xl px-3 py-2 text-sm text-text-primary focus:border-rose-500 focus:outline-none"
+                  className="w-full min-h-[42px] bg-bg-secondary border border-border-color rounded-xl px-3 py-2 text-sm text-text-primary focus:border-accent-primary focus:outline-none"
                 />
               </div>
 
@@ -395,7 +395,7 @@ export const ServicesPricingTab: React.FC = () => {
                   placeholder="e.g. $499+ / project"
                   value={servicePrice}
                   onChange={(e) => setServicePrice(e.target.value)}
-                  className="w-full min-h-[42px] bg-bg-secondary border border-border-color rounded-xl px-3 py-2 text-sm text-text-primary focus:border-rose-500 focus:outline-none"
+                  className="w-full min-h-[42px] bg-bg-secondary border border-border-color rounded-xl px-3 py-2 text-sm text-text-primary focus:border-accent-primary focus:outline-none"
                 />
               </div>
 
@@ -405,7 +405,7 @@ export const ServicesPricingTab: React.FC = () => {
                   rows={3}
                   value={serviceDesc}
                   onChange={(e) => setServiceDesc(e.target.value)}
-                  className="w-full bg-bg-secondary border border-border-color rounded-xl p-3 text-sm text-text-primary focus:border-rose-500 focus:outline-none resize-none"
+                  className="w-full bg-bg-secondary border border-border-color rounded-xl p-3 text-sm text-text-primary focus:border-accent-primary focus:outline-none resize-none"
                 />
               </div>
 
@@ -415,7 +415,7 @@ export const ServicesPricingTab: React.FC = () => {
                   type="text"
                   value={serviceFeatures}
                   onChange={(e) => setServiceFeatures(e.target.value)}
-                  className="w-full min-h-[42px] bg-bg-secondary border border-border-color rounded-xl px-3 py-2 text-sm text-text-primary focus:border-rose-500 focus:outline-none"
+                  className="w-full min-h-[42px] bg-bg-secondary border border-border-color rounded-xl px-3 py-2 text-sm text-text-primary focus:border-accent-primary focus:outline-none"
                 />
               </div>
 
@@ -429,7 +429,7 @@ export const ServicesPricingTab: React.FC = () => {
                 </button>
                 <button
                   type="submit"
-                  className="min-h-[42px] px-5 py-2 rounded-xl text-xs font-semibold bg-rose-600 hover:bg-rose-700 text-white shadow-xs transition-all active:scale-98"
+                  className="min-h-[42px] px-5 py-2 rounded-xl text-xs font-semibold bg-accent-primary hover:bg-accent-secondary text-white shadow-xs transition-all active:scale-98"
                 >
                   Save Service
                 </button>
@@ -456,7 +456,7 @@ export const ServicesPricingTab: React.FC = () => {
                     required
                     value={tierName}
                     onChange={(e) => setTierName(e.target.value)}
-                    className="w-full min-h-[42px] bg-bg-secondary border border-border-color rounded-xl px-3 py-2 text-sm text-text-primary focus:border-rose-500 focus:outline-none"
+                    className="w-full min-h-[42px] bg-bg-secondary border border-border-color rounded-xl px-3 py-2 text-sm text-text-primary focus:border-accent-primary focus:outline-none"
                   />
                 </div>
 
@@ -467,7 +467,7 @@ export const ServicesPricingTab: React.FC = () => {
                     required
                     value={tierPrice}
                     onChange={(e) => setTierPrice(e.target.value)}
-                    className="w-full min-h-[42px] bg-bg-secondary border border-border-color rounded-xl px-3 py-2 text-sm text-text-primary focus:border-rose-500 focus:outline-none"
+                    className="w-full min-h-[42px] bg-bg-secondary border border-border-color rounded-xl px-3 py-2 text-sm text-text-primary focus:border-accent-primary focus:outline-none"
                   />
                 </div>
 
@@ -477,7 +477,7 @@ export const ServicesPricingTab: React.FC = () => {
                     type="text"
                     value={tierPeriod}
                     onChange={(e) => setTierPeriod(e.target.value)}
-                    className="w-full min-h-[42px] bg-bg-secondary border border-border-color rounded-xl px-3 py-2 text-sm text-text-primary focus:border-rose-500 focus:outline-none"
+                    className="w-full min-h-[42px] bg-bg-secondary border border-border-color rounded-xl px-3 py-2 text-sm text-text-primary focus:border-accent-primary focus:outline-none"
                   />
                 </div>
               </div>
@@ -488,7 +488,7 @@ export const ServicesPricingTab: React.FC = () => {
                   type="text"
                   value={tierDesc}
                   onChange={(e) => setTierDesc(e.target.value)}
-                  className="w-full min-h-[42px] bg-bg-secondary border border-border-color rounded-xl px-3 py-2 text-sm text-text-primary focus:border-rose-500 focus:outline-none"
+                  className="w-full min-h-[42px] bg-bg-secondary border border-border-color rounded-xl px-3 py-2 text-sm text-text-primary focus:border-accent-primary focus:outline-none"
                 />
               </div>
 
@@ -498,7 +498,7 @@ export const ServicesPricingTab: React.FC = () => {
                   rows={3}
                   value={tierFeatures}
                   onChange={(e) => setTierFeatures(e.target.value)}
-                  className="w-full bg-bg-secondary border border-border-color rounded-xl p-3 text-xs text-text-primary focus:border-rose-500 focus:outline-none resize-none"
+                  className="w-full bg-bg-secondary border border-border-color rounded-xl p-3 text-xs text-text-primary focus:border-accent-primary focus:outline-none resize-none"
                 />
               </div>
 
@@ -508,7 +508,7 @@ export const ServicesPricingTab: React.FC = () => {
                   id="popularCheck"
                   checked={tierIsPopular}
                   onChange={(e) => setTierIsPopular(e.target.checked)}
-                  className="w-4 h-4 text-rose-600 rounded bg-bg-secondary border-border-color focus:ring-rose-500"
+                  className="w-4 h-4 text-accent-primary rounded bg-bg-secondary border-border-color focus:ring-accent-primary"
                 />
                 <label htmlFor="popularCheck" className="text-xs font-semibold text-text-primary cursor-pointer">
                   Mark as &quot;Most Popular&quot; Tier
@@ -525,7 +525,7 @@ export const ServicesPricingTab: React.FC = () => {
                 </button>
                 <button
                   type="submit"
-                  className="min-h-[42px] px-5 py-2 rounded-xl text-xs font-semibold bg-rose-600 hover:bg-rose-700 text-white shadow-xs transition-all active:scale-98"
+                  className="min-h-[42px] px-5 py-2 rounded-xl text-xs font-semibold bg-accent-primary hover:bg-accent-secondary text-white shadow-xs transition-all active:scale-98"
                 >
                   Save Package
                 </button>

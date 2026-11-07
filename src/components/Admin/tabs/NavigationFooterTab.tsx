@@ -222,7 +222,7 @@ export const NavigationFooterTab: React.FC = () => {
           </div>
           <button
             onClick={() => setIsModalOpen(true)}
-            className="min-h-[38px] sm:min-h-[40px] px-3.5 py-2 rounded-xl text-xs font-semibold bg-rose-600 hover:bg-rose-700 text-white shadow-xs flex items-center justify-center gap-1.5 self-stretch sm:self-auto transition-all active:scale-98"
+            className="min-h-[38px] sm:min-h-[40px] px-3.5 py-2 rounded-xl text-xs font-semibold bg-accent-primary hover:bg-accent-secondary text-white shadow-xs flex items-center justify-center gap-1.5 self-stretch sm:self-auto transition-all active:scale-98"
           >
             <Plus className="w-3.5 h-3.5" />
             <span>Add Menu Link</span>
@@ -246,7 +246,7 @@ export const NavigationFooterTab: React.FC = () => {
                 </div>
                 <button
                   onClick={() => handleDeleteNavItem(item.id)}
-                  className="w-8 h-8 rounded-lg bg-rose-500/10 text-rose-500 hover:bg-rose-500/20 border border-rose-500/20 flex items-center justify-center transition-colors flex-shrink-0 active:scale-95"
+                  className="w-8 h-8 rounded-lg bg-accent-primary/10 text-accent-primary hover:bg-accent-primary/20 border border-accent-primary/20 flex items-center justify-center transition-colors flex-shrink-0 active:scale-95"
                   aria-label={`Delete ${item.label}`}
                 >
                   <Trash2 className="w-3.5 h-3.5" />
@@ -263,7 +263,7 @@ export const NavigationFooterTab: React.FC = () => {
               type="text"
               value={ctaButton.text || ctaButton.label || ''}
               onChange={(e) => handleUpdateHeaderCta('text', e.target.value)}
-              className="w-full min-h-[42px] bg-bg-secondary border border-border-color rounded-xl px-3 py-2 text-sm text-text-primary focus:border-rose-500 focus:outline-none"
+              className="w-full min-h-[42px] bg-bg-secondary border border-border-color rounded-xl px-3 py-2 text-sm text-text-primary focus:border-accent-primary focus:outline-none"
             />
           </div>
           <div>
@@ -272,7 +272,7 @@ export const NavigationFooterTab: React.FC = () => {
               type="text"
               value={ctaButton.link || ctaButton.route || ''}
               onChange={(e) => handleUpdateHeaderCta('link', e.target.value)}
-              className="w-full min-h-[42px] bg-bg-secondary border border-border-color rounded-xl px-3 py-2 text-sm text-text-primary focus:border-rose-500 focus:outline-none"
+              className="w-full min-h-[42px] bg-bg-secondary border border-border-color rounded-xl px-3 py-2 text-sm text-text-primary focus:border-accent-primary focus:outline-none"
             />
           </div>
         </div>
@@ -310,7 +310,7 @@ export const NavigationFooterTab: React.FC = () => {
                   type="text"
                   value={social.url || ''}
                   onChange={(e) => handleUpdateSocialUrl(social.id || socialId, e.target.value)}
-                  className="w-full min-h-[38px] bg-bg-card border border-border-color rounded-lg px-2.5 py-1.5 text-xs text-text-primary focus:border-rose-500 focus:outline-none font-mono"
+                  className="w-full min-h-[38px] bg-bg-card border border-border-color rounded-lg px-2.5 py-1.5 text-xs text-text-primary focus:border-accent-primary focus:outline-none font-mono"
                 />
               </div>
             );
@@ -335,7 +335,7 @@ export const NavigationFooterTab: React.FC = () => {
                 handleUpdateFooter('copyrightText', e.target.value);
                 handleUpdateFooter('copyright', e.target.value);
               }}
-              className="w-full min-h-[42px] bg-bg-secondary border border-border-color rounded-xl px-3 py-2 text-sm text-text-primary focus:border-rose-500 focus:outline-none"
+              className="w-full min-h-[42px] bg-bg-secondary border border-border-color rounded-xl px-3 py-2 text-sm text-text-primary focus:border-accent-primary focus:outline-none"
             />
           </div>
 
@@ -345,7 +345,7 @@ export const NavigationFooterTab: React.FC = () => {
               type="text"
               value={footer.tagline || ''}
               onChange={(e) => handleUpdateFooter('tagline', e.target.value)}
-              className="w-full min-h-[42px] bg-bg-secondary border border-border-color rounded-xl px-3 py-2 text-sm text-text-primary focus:border-rose-500 focus:outline-none"
+              className="w-full min-h-[42px] bg-bg-secondary border border-border-color rounded-xl px-3 py-2 text-sm text-text-primary focus:border-accent-primary focus:outline-none"
             />
           </div>
 
@@ -358,7 +358,7 @@ export const NavigationFooterTab: React.FC = () => {
                 handleUpdateFooter('bottomSubtext', e.target.value);
                 handleUpdateFooter('customNote', e.target.value);
               }}
-              className="w-full min-h-[42px] bg-bg-secondary border border-border-color rounded-xl px-3 py-2 text-sm text-text-primary focus:border-rose-500 focus:outline-none"
+              className="w-full min-h-[42px] bg-bg-secondary border border-border-color rounded-xl px-3 py-2 text-sm text-text-primary focus:border-accent-primary focus:outline-none"
             />
           </div>
         </div>
@@ -379,7 +379,7 @@ export const NavigationFooterTab: React.FC = () => {
                   placeholder="e.g., Insights"
                   value={newNavLabel}
                   onChange={(e) => setNewNavLabel(e.target.value)}
-                  className="w-full min-h-[42px] bg-bg-secondary border border-border-color rounded-xl px-3 py-2 text-sm text-text-primary focus:border-rose-500 focus:outline-none"
+                  className="w-full min-h-[42px] bg-bg-secondary border border-border-color rounded-xl px-3 py-2 text-sm text-text-primary focus:border-accent-primary focus:outline-none"
                 />
               </div>
 
@@ -391,7 +391,7 @@ export const NavigationFooterTab: React.FC = () => {
                   placeholder="e.g., #insights or /insights"
                   value={newNavPath}
                   onChange={(e) => setNewNavPath(e.target.value)}
-                  className="w-full min-h-[42px] bg-bg-secondary border border-border-color rounded-xl px-3 py-2 text-sm text-text-primary focus:border-rose-500 focus:outline-none font-mono"
+                  className="w-full min-h-[42px] bg-bg-secondary border border-border-color rounded-xl px-3 py-2 text-sm text-text-primary focus:border-accent-primary focus:outline-none font-mono"
                 />
               </div>
 
@@ -405,7 +405,7 @@ export const NavigationFooterTab: React.FC = () => {
                 </button>
                 <button
                   type="submit"
-                  className="min-h-[42px] px-5 py-2 rounded-xl text-xs font-semibold bg-rose-600 hover:bg-rose-700 text-white shadow-xs transition-all active:scale-98"
+                  className="min-h-[42px] px-5 py-2 rounded-xl text-xs font-semibold bg-accent-primary hover:bg-accent-secondary text-white shadow-xs transition-all active:scale-98"
                 >
                   Add Link
                 </button>

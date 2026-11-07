@@ -41,16 +41,16 @@ export type ThemeBorderRadius = 'none' | 'sm' | 'md' | 'lg' | 'full';
 
 export interface ThemeConfig {
   presetName?: string;
-  primaryAccent: string;     // e.g. #A50C18 or #6366F1
-  secondaryAccent: string;   // e.g. #D31322 or #4F46E5
-  accentDark?: string;       // e.g. #35070B
-  bgPrimary: string;         // e.g. #F8F5F2 or #080607
-  bgSecondary: string;       // e.g. #EFE8E5 or #100A0B
-  bgCard: string;            // e.g. #FFFFFF or #1D0709
-  bgCardHover: string;       // e.g. #F5ECEA or #35070B
-  textPrimary: string;       // e.g. #1A090A or #FFFFFF
-  textSecondary: string;     // e.g. rgba(26,9,10,0.82) or rgba(255,255,255,0.85)
-  borderColor: string;       // e.g. rgba(26,9,10,0.12)
+  primaryAccent: string;     // e.g. #0866F5 or #155EEF
+  secondaryAccent: string;   // e.g. #155EEF or #257BFD
+  accentDark?: string;       // e.g. #071B49
+  bgPrimary: string;         // e.g. #FFFFFF or #030B1E
+  bgSecondary: string;       // e.g. #F3F7FF or #05112E
+  bgCard: string;            // e.g. #FFFFFF or #071B49
+  bgCardHover: string;       // e.g. #EAF2FF or #0D2A6B
+  textPrimary: string;       // e.g. #101C38 or #FFFFFF
+  textSecondary: string;     // e.g. #53627C or #B8C9E8
+  borderColor: string;       // e.g. #DCE7F8 or rgba(220,231,248,0.14)
   fontHeading: string;       // e.g. 'Manrope', 'Plus Jakarta Sans', 'Syne', 'Outfit', 'Space Grotesk'
   fontBody: string;          // e.g. 'Manrope', 'Plus Jakarta Sans', 'Inter'
   borderRadius: ThemeBorderRadius;

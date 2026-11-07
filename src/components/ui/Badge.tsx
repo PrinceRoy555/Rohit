@@ -30,7 +30,7 @@ export const Badge: React.FC<BadgeProps> = ({
     primary: 'bg-accent-primary/10 text-accent-primary border border-accent-primary/20',
     success: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20',
     warning: 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20',
-    danger: 'bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-500/20',
+    danger: 'bg-red-500/10 text-red-600 dark:text-red-400 border border-red-500/20',
     outline: 'bg-transparent text-text-secondary border border-border-color',
   };
 
@@ -39,7 +39,7 @@ export const Badge: React.FC<BadgeProps> = ({
     primary: 'bg-accent-primary',
     success: 'bg-emerald-500',
     warning: 'bg-amber-500',
-    danger: 'bg-rose-500',
+    danger: 'bg-red-500',
     outline: 'bg-text-muted',
   };
 

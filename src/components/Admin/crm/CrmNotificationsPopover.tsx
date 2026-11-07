@@ -57,7 +57,7 @@ export const CrmNotificationsPopover: React.FC<CrmNotificationsPopoverProps> = (
       >
         <Bell className="w-4 h-4" />
         {totalActionCount > 0 && (
-          <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 rounded-full bg-rose-600 text-white text-[10px] font-extrabold flex items-center justify-center animate-pulse shadow-sm">
+          <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 rounded-full bg-accent-primary text-white text-[10px] font-extrabold flex items-center justify-center animate-pulse shadow-sm">
             {totalActionCount > 9 ? '9+' : totalActionCount}
           </span>
         )}
@@ -67,7 +67,7 @@ export const CrmNotificationsPopover: React.FC<CrmNotificationsPopoverProps> = (
         <div className="absolute right-0 mt-2 w-80 sm:w-96 rounded-2xl bg-bg-card border border-border-color shadow-2xl z-50 text-text-primary p-4 space-y-3 animate-in fade-in duration-150">
           <div className="flex items-center justify-between pb-2 border-b border-border-color">
             <div className="flex items-center gap-2">
-              <span className="w-2 h-2 rounded-full bg-rose-500" />
+              <span className="w-2 h-2 rounded-full bg-accent-primary" />
               <h4 className="text-xs font-bold uppercase tracking-wider text-text-primary">
                 Today&apos;s CRM Activity
               </h4>
@@ -88,14 +88,14 @@ export const CrmNotificationsPopover: React.FC<CrmNotificationsPopoverProps> = (
                   setIsOpen(false);
                   onNavigateToInquiries('followups_overdue');
                 }}
-                className="p-3 rounded-xl bg-rose-500/10 border border-rose-500/20 hover:bg-rose-500/15 cursor-pointer transition-colors flex items-center justify-between"
+                className="p-3 rounded-xl bg-accent-primary/10 border border-accent-primary/20 hover:bg-accent-primary/15 cursor-pointer transition-colors flex items-center justify-between"
               >
                 <div className="flex items-center gap-2.5">
-                  <div className="w-7 h-7 rounded-lg bg-rose-500/20 text-rose-600 dark:text-rose-400 flex items-center justify-center font-bold">
+                  <div className="w-7 h-7 rounded-lg bg-accent-primary/20 text-accent-primary flex items-center justify-center font-bold">
                     <AlertCircle className="w-4 h-4" />
                   </div>
                   <div>
-                    <div className="font-bold text-rose-600 dark:text-rose-400">
+                    <div className="font-bold text-accent-primary">
                       {overdueFollowUps.length} follow-up{overdueFollowUps.length > 1 ? 's' : ''} overdue
                     </div>
                     <div className="text-[11px] text-text-muted">Immediate action required</div>
@@ -139,7 +139,7 @@ export const CrmNotificationsPopover: React.FC<CrmNotificationsPopoverProps> = (
                 className="p-3 rounded-xl bg-bg-secondary hover:bg-bg-card-hover border border-border-color cursor-pointer transition-colors flex items-center justify-between"
               >
                 <div className="flex items-center gap-2.5">
-                  <div className="w-7 h-7 rounded-lg bg-rose-500/10 text-rose-600 dark:text-rose-400 flex items-center justify-center font-bold">
+                  <div className="w-7 h-7 rounded-lg bg-accent-primary/10 text-accent-primary flex items-center justify-center font-bold">
                     <Inbox className="w-4 h-4" />
                   </div>
                   <div>
@@ -168,7 +168,7 @@ export const CrmNotificationsPopover: React.FC<CrmNotificationsPopoverProps> = (
                 setIsOpen(false);
                 onNavigateToInquiries();
               }}
-              className="text-xs font-semibold text-rose-600 dark:text-rose-400 hover:underline"
+              className="text-xs font-semibold text-accent-primary hover:underline"
             >
               Open Lead Inquiries & CRM →
             </button>

@@ -79,11 +79,11 @@ export const RevisionsTab: React.FC = () => {
           {revisions.map((rev) => (
             <div
               key={rev.id}
-              className="p-3.5 sm:p-5 rounded-xl sm:rounded-2xl bg-bg-card border border-border-color hover:border-rose-500/30 transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 shadow-xs"
+              className="p-3.5 sm:p-5 rounded-xl sm:rounded-2xl bg-bg-card border border-border-color hover:border-accent-primary/40 transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 shadow-xs"
             >
               <div className="space-y-1 sm:space-y-1.5 min-w-0">
                 <div className="flex items-center gap-2 flex-wrap">
-                  <span className="px-2 py-0.5 rounded-full text-[10px] sm:text-xs font-bold bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-500/20">
+                  <span className="px-2 py-0.5 rounded-full text-[10px] sm:text-xs font-bold bg-accent-primary/10 text-accent-primary border border-accent-primary/20">
                     v{rev.version}
                   </span>
                   <h4 className="text-xs sm:text-sm font-bold text-text-primary truncate">{rev.summary}</h4>
@@ -113,7 +113,7 @@ export const RevisionsTab: React.FC = () => {
                 <button
                   onClick={() => handleRollback(rev)}
                   disabled={restoringId === rev.id}
-                  className="min-h-[38px] sm:min-h-[40px] px-3.5 py-1.5 rounded-xl text-xs font-semibold bg-rose-600 hover:bg-rose-700 text-white shadow-xs flex items-center justify-center gap-1.5 transition-all active:scale-98 flex-1 sm:flex-initial"
+                  className="min-h-[38px] sm:min-h-[40px] px-3.5 py-1.5 rounded-xl text-xs font-semibold bg-accent-primary hover:bg-accent-secondary text-white shadow-xs flex items-center justify-center gap-1.5 transition-all active:scale-98 flex-1 sm:flex-initial"
                 >
                   <RotateCcw className="w-3.5 h-3.5" />
                   <span>{restoringId === rev.id ? 'Restoring...' : 'Rollback to v' + rev.version}</span>
@@ -130,7 +130,7 @@ export const RevisionsTab: React.FC = () => {
           <div className="bg-bg-card border border-border-color rounded-xl sm:rounded-2xl max-w-2xl w-full p-4 sm:p-6 space-y-3 sm:space-y-4 shadow-xl max-h-[88vh] flex flex-col text-text-primary">
             <div className="flex items-center justify-between border-b border-border-color pb-2.5 sm:pb-3">
               <h3 className="text-sm sm:text-base font-bold text-text-primary flex items-center gap-2">
-                <FileCode className="w-4 h-4 text-rose-500" />
+                <FileCode className="w-4 h-4 text-accent-primary" />
                 <span>Revision v{inspectRevision.version} Data Dump</span>
               </h3>
               <button

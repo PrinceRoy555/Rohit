@@ -45,7 +45,7 @@ export const Avatar: React.FC<AvatarProps> = ({
   const statusColors: Record<string, string> = {
     online: 'bg-emerald-500',
     offline: 'bg-neutral-400',
-    busy: 'bg-rose-500',
+    busy: 'bg-red-500',
   };
 
   return (

@@ -2,6 +2,7 @@ import { motion } from 'motion/react';
 import { ExternalLink, Calendar } from 'lucide-react';
 import { EXPERIENCE_DATA } from '../data';
 import { useSiteConfig } from '../context/SiteConfigContext';
+import { StaggeredText } from './ui/staggered-text';
 
 export default function ExperienceSection() {
   const { activeConfig } = useSiteConfig();
@@ -37,13 +38,22 @@ export default function ExperienceSection() {
             {experienceConfig?.badge || 'My Timeline'}
           </motion.span>
           <motion.h2
-            initial={{ opacity: 0, y: 15 }}
-            whileInView={{ opacity: 1, y: 0 }}
+            initial={{ opacity: 1 }}
+            whileInView={{ opacity: 1 }}
             viewport={{ once: true }}
-            transition={{ delay: 0.1 }}
             className="text-4xl md:text-5xl font-extrabold text-text-primary tracking-tight mb-4"
           >
-            {experienceConfig?.title || 'My Work Experience'}
+            <StaggeredText
+              text={experienceConfig?.title || 'Career & Work Experience'}
+              as="span"
+              segmentBy="words"
+              delay={50}
+              duration={0.5}
+              direction="bottom"
+              blur={true}
+              staggerDirection="forward"
+              respectReducedMotion={true}
+            />
           </motion.h2>
           <motion.p
             initial={{ opacity: 0, y: 15 }}

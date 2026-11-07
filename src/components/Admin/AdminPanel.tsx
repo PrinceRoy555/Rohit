@@ -478,7 +478,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose, onLogout }) => 
     return (
       <div id="admin-portal-root" className="admin-panel-container fixed inset-0 z-50 bg-bg-primary flex items-center justify-center text-text-primary font-sans">
         <div className="flex flex-col items-center gap-3">
-          <div className="w-8 h-8 rounded-full border-2 border-rose-500 border-t-transparent animate-spin" />
+          <div className="w-8 h-8 rounded-full border-2 border-[#0866F5] border-t-transparent animate-spin" />
           <span className="text-sm text-text-muted">Verifying administrator credentials...</span>
         </div>
       </div>
@@ -489,10 +489,10 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose, onLogout }) => 
   if (isUnauthorizedUser && !isAuthenticated) {
     return (
       <div id="admin-portal-root" className="admin-panel-container fixed inset-0 z-50 bg-black/60 backdrop-blur-md flex items-center justify-center p-4 font-sans">
-        <div className="admin-modal bg-bg-card border border-rose-500/30 rounded-3xl max-w-md w-full p-6 sm:p-8 space-y-6 shadow-2xl relative overflow-hidden text-text-primary">
+        <div className="admin-modal bg-bg-card border border-red-500/30 rounded-3xl max-w-md w-full p-6 sm:p-8 space-y-6 shadow-2xl relative overflow-hidden text-text-primary">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2.5">
-              <div className="w-9 h-9 rounded-xl bg-rose-500/20 text-rose-400 border border-rose-500/30 flex items-center justify-center font-bold text-sm">
+              <div className="w-9 h-9 rounded-xl bg-red-500/20 text-red-400 border border-red-500/30 flex items-center justify-center font-bold text-sm">
                 <AlertCircle className="w-5 h-5" />
               </div>
               <div>
@@ -512,8 +512,8 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose, onLogout }) => 
             </div>
           </div>
 
-          <div className="p-4 rounded-xl bg-rose-500/10 border border-rose-500/20 text-xs text-rose-300 space-y-2">
-            <p className="font-semibold text-rose-400">
+          <div className="p-4 rounded-xl bg-red-500/10 border border-red-500/20 text-xs text-red-300 space-y-2">
+            <p className="font-semibold text-red-400">
               The account <span className="underline font-mono">{unauthorizedEmail}</span> is authenticated, but is not registered with administrator privileges.
             </p>
             <p className="text-text-muted">
@@ -527,7 +527,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose, onLogout }) => 
                 setIsUnauthorizedUser(false);
                 setLoginError(null);
               }}
-              className="w-full py-2.5 rounded-xl text-xs font-semibold bg-rose-600 hover:bg-rose-700 text-white shadow-md shadow-rose-600/30 flex items-center justify-center gap-2 transition-all"
+              className="w-full py-2.5 rounded-xl text-xs font-semibold bg-[#0866F5] hover:bg-[#155EEF] text-white shadow-md shadow-[#0866F5]/30 flex items-center justify-center gap-2 transition-all"
             >
               <LogOut className="w-3.5 h-3.5" />
               <span>Sign In with Different Account</span>
@@ -553,7 +553,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose, onLogout }) => 
     return (
       <div id="admin-portal-root" className="admin-panel-container fixed inset-0 z-50 bg-black/60 backdrop-blur-md flex items-center justify-center p-4 font-sans overflow-y-auto">
         <div className="admin-modal bg-bg-card border border-border-color rounded-3xl max-w-md w-full p-6 sm:p-8 space-y-6 shadow-2xl relative overflow-hidden my-auto text-text-primary">
-          <div className="absolute top-0 right-0 -mr-16 -mt-16 w-48 h-48 bg-rose-600/15 rounded-full blur-3xl pointer-events-none" />
+          <div className="absolute top-0 right-0 -mr-16 -mt-16 w-48 h-48 bg-[#0866F5]/15 rounded-full blur-3xl pointer-events-none" />
 
           {/* ========================================================================= */}
           {/* VIEW: 1. FORGOT PASSWORD                                                  */}
@@ -588,7 +588,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose, onLogout }) => 
               </div>
 
               <div className="space-y-1.5">
-                <div className="w-10 h-10 rounded-xl bg-rose-600/20 border border-rose-500/30 text-rose-400 flex items-center justify-center font-bold text-sm mb-3">
+                <div className="w-10 h-10 rounded-xl bg-[#0866F5]/15 border border-[#0866F5]/30 text-[#0866F5] flex items-center justify-center font-bold text-sm mb-3">
                   <KeyRound className="w-5 h-5" />
                 </div>
                 <h3 className="text-lg font-bold text-text-primary">Reset Administrator Password</h3>
@@ -628,8 +628,8 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose, onLogout }) => 
               ) : (
                 <form onSubmit={handleForgotSubmit} className="space-y-4">
                   {forgotError && (
-                    <div className="p-3.5 rounded-xl bg-rose-500/15 border border-rose-500/30 text-rose-300 text-xs flex items-center gap-2.5 animate-in fade-in duration-200">
-                      <AlertCircle className="w-4 h-4 flex-shrink-0 text-rose-400" />
+                    <div className="p-3.5 rounded-xl bg-red-500/15 border border-red-500/30 text-red-300 text-xs flex items-center gap-2.5 animate-in fade-in duration-200">
+                      <AlertCircle className="w-4 h-4 flex-shrink-0 text-red-400" />
                       <span>{forgotError}</span>
                     </div>
                   )}
@@ -643,7 +643,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose, onLogout }) => 
                         placeholder="admin@rohitverma.design"
                         value={forgotEmail}
                         onChange={(e) => setForgotEmail(e.target.value)}
-                        className="w-full bg-black/40 border border-white/10 rounded-xl pl-10 pr-3.5 py-2.5 text-sm text-white focus:border-rose-500 focus:outline-none transition-colors"
+                        className="w-full bg-black/40 border border-white/10 rounded-xl pl-10 pr-3.5 py-2.5 text-sm text-white focus:border-[#0866F5] focus:outline-none transition-colors"
                         autoComplete="email"
                       />
                       <Mail className="w-4 h-4 text-neutral-500 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
@@ -653,7 +653,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose, onLogout }) => 
                   <button
                     type="submit"
                     disabled={isSendingReset}
-                    className="w-full py-3 rounded-xl text-sm font-semibold bg-rose-600 hover:bg-rose-700 text-white shadow-lg shadow-rose-600/30 flex items-center justify-center gap-2 transition-all mt-2 disabled:opacity-50"
+                    className="w-full py-3 rounded-xl text-sm font-semibold bg-[#0866F5] hover:bg-[#155EEF] text-white shadow-lg shadow-[#0866F5]/30 flex items-center justify-center gap-2 transition-all mt-2 disabled:opacity-50"
                   >
                     {isSendingReset ? (
                       <>
@@ -684,7 +684,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose, onLogout }) => 
             <div className="space-y-6 animate-in fade-in duration-200">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2.5">
-                  <div className="w-9 h-9 rounded-xl bg-rose-600 flex items-center justify-center font-bold text-white shadow-lg shadow-rose-600/30 text-sm">
+                  <div className="w-9 h-9 rounded-xl bg-[#0866F5] flex items-center justify-center font-bold text-white shadow-lg shadow-[#0866F5]/30 text-sm">
                     <KeyRound className="w-4 h-4" />
                   </div>
                   <div>
@@ -704,14 +704,14 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose, onLogout }) => 
 
               {isVerifyingCode ? (
                 <div className="py-8 flex flex-col items-center justify-center gap-3 text-center">
-                  <div className="w-8 h-8 rounded-full border-2 border-rose-500 border-t-transparent animate-spin" />
+                  <div className="w-8 h-8 rounded-full border-2 border-[#0866F5] border-t-transparent animate-spin" />
                   <span className="text-xs text-neutral-400">Verifying secure reset link token...</span>
                 </div>
               ) : resetCodeError ? (
                 <div className="space-y-4">
-                  <div className="p-4 rounded-2xl bg-rose-500/15 border border-rose-500/30 text-rose-200 text-xs space-y-2">
-                    <div className="flex items-center gap-2 font-semibold text-rose-300 text-sm">
-                      <AlertCircle className="w-4 h-4 flex-shrink-0 text-rose-400" />
+                  <div className="p-4 rounded-2xl bg-red-500/15 border border-red-500/30 text-red-200 text-xs space-y-2">
+                    <div className="flex items-center gap-2 font-semibold text-red-300 text-sm">
+                      <AlertCircle className="w-4 h-4 flex-shrink-0 text-red-400" />
                       <span>Invalid or Expired Reset Link</span>
                     </div>
                     <p className="leading-relaxed text-neutral-300">{resetCodeError}</p>
@@ -724,7 +724,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose, onLogout }) => 
                         setAuthView('forgot');
                         setResetCodeError(null);
                       }}
-                      className="w-full py-2.5 rounded-xl text-xs font-semibold bg-rose-600 hover:bg-rose-700 text-white flex items-center justify-center gap-2 transition-all"
+                      className="w-full py-2.5 rounded-xl text-xs font-semibold bg-[#0866F5] hover:bg-[#155EEF] text-white flex items-center justify-center gap-2 transition-all shadow-md shadow-[#0866F5]/25"
                     >
                       <RefreshCw className="w-3.5 h-3.5" />
                       <span>Request a New Reset Link</span>
@@ -762,7 +762,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose, onLogout }) => 
                       setLoginError(null);
                       setAuthView('login');
                     }}
-                    className="w-full py-3 rounded-xl text-xs font-semibold bg-rose-600 hover:bg-rose-700 text-white shadow-lg shadow-rose-600/30 flex items-center justify-center gap-2 transition-all"
+                    className="w-full py-3 rounded-xl text-xs font-semibold bg-[#0866F5] hover:bg-[#155EEF] text-white shadow-lg shadow-[#0866F5]/30 flex items-center justify-center gap-2 transition-all"
                   >
                     <Lock className="w-3.5 h-3.5" />
                     <span>Proceed to Sign In with New Password</span>
@@ -778,8 +778,8 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose, onLogout }) => 
                   )}
 
                   {resetFormError && (
-                    <div className="p-3.5 rounded-xl bg-rose-500/15 border border-rose-500/30 text-rose-300 text-xs flex items-center gap-2.5 animate-in fade-in duration-200">
-                      <AlertCircle className="w-4 h-4 flex-shrink-0 text-rose-400" />
+                    <div className="p-3.5 rounded-xl bg-red-500/15 border border-red-500/30 text-red-300 text-xs flex items-center gap-2.5 animate-in fade-in duration-200">
+                      <AlertCircle className="w-4 h-4 flex-shrink-0 text-red-400" />
                       <span>{resetFormError}</span>
                     </div>
                   )}
@@ -793,7 +793,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose, onLogout }) => 
                         placeholder="••••••••••••"
                         value={newPassword}
                         onChange={(e) => setNewPassword(e.target.value)}
-                        className="w-full bg-black/40 border border-white/10 rounded-xl px-3.5 py-2.5 pr-10 text-sm text-white focus:border-rose-500 focus:outline-none transition-colors"
+                        className="w-full bg-black/40 border border-white/10 rounded-xl px-3.5 py-2.5 pr-10 text-sm text-white focus:border-[#0866F5] focus:outline-none transition-colors"
                         autoComplete="new-password"
                       />
                       <button
@@ -816,7 +816,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose, onLogout }) => 
                         placeholder="••••••••••••"
                         value={confirmPassword}
                         onChange={(e) => setConfirmPassword(e.target.value)}
-                        className="w-full bg-black/40 border border-white/10 rounded-xl px-3.5 py-2.5 pr-10 text-sm text-white focus:border-rose-500 focus:outline-none transition-colors"
+                        className="w-full bg-black/40 border border-white/10 rounded-xl px-3.5 py-2.5 pr-10 text-sm text-white focus:border-[#0866F5] focus:outline-none transition-colors"
                         autoComplete="new-password"
                       />
                       <button
@@ -836,7 +836,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose, onLogout }) => 
                       <span className="font-semibold text-neutral-300">Password Strength:</span>
                       <span className={`font-semibold ${
                         passwordStrength.score >= 5 ? 'text-emerald-400' :
-                        passwordStrength.score >= 3 ? 'text-amber-400' : 'text-rose-400'
+                        passwordStrength.score >= 3 ? 'text-amber-400' : 'text-red-400'
                       }`}>
                         {passwordStrength.score >= 5 ? 'Strong' :
                          passwordStrength.score >= 3 ? 'Good' : 'Needs Requirements'}
@@ -854,7 +854,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose, onLogout }) => 
                                 ? 'bg-emerald-500'
                                 : passwordStrength.score >= 3
                                 ? 'bg-amber-500'
-                                : 'bg-rose-500'
+                                : 'bg-red-500'
                               : 'bg-white/10'
                           }`}
                         />
@@ -893,7 +893,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose, onLogout }) => 
                   <button
                     type="submit"
                     disabled={isResettingPassword || !passwordStrength.isValid || !passwordsMatch}
-                    className="w-full py-3 rounded-xl text-sm font-semibold bg-rose-600 hover:bg-rose-700 text-white shadow-lg shadow-rose-600/30 flex items-center justify-center gap-2 transition-all mt-2 disabled:opacity-40 disabled:cursor-not-allowed"
+                    className="w-full py-3 rounded-xl text-sm font-semibold bg-[#0866F5] hover:bg-[#155EEF] text-white shadow-lg shadow-[#0866F5]/30 flex items-center justify-center gap-2 transition-all mt-2 disabled:opacity-40 disabled:cursor-not-allowed"
                   >
                     {isResettingPassword ? (
                       <>
@@ -924,7 +924,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose, onLogout }) => 
             <div className="space-y-6">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2.5">
-                  <div className="w-9 h-9 rounded-xl bg-rose-600 flex items-center justify-center font-bold text-white shadow-lg shadow-rose-600/30 text-sm">
+                  <div className="w-9 h-9 rounded-xl bg-[#0866F5] flex items-center justify-center font-bold text-white shadow-lg shadow-[#0866F5]/30 text-sm">
                     CMS
                   </div>
                   <div>
@@ -946,8 +946,8 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose, onLogout }) => 
               </div>
 
               {loginError && (
-                <div className="p-3.5 rounded-xl bg-rose-500/15 border border-rose-500/30 text-rose-300 text-xs flex items-center gap-2.5 animate-in fade-in duration-200">
-                  <AlertCircle className="w-4 h-4 flex-shrink-0 text-rose-400" />
+                <div className="p-3.5 rounded-xl bg-red-500/15 border border-red-500/30 text-red-300 text-xs flex items-center gap-2.5 animate-in fade-in duration-200">
+                  <AlertCircle className="w-4 h-4 flex-shrink-0 text-red-400" />
                   <span>{loginError}</span>
                 </div>
               )}
@@ -961,7 +961,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose, onLogout }) => 
                     disabled={isGoogleLoggingIn || isLoggingIn}
                     className="w-full py-2.5 px-4 rounded-xl text-xs font-semibold bg-white/10 hover:bg-white/15 text-white border border-white/10 flex items-center justify-center gap-2.5 transition-all disabled:opacity-50"
                   >
-                    <Globe className="w-4 h-4 text-rose-400" />
+                    <Globe className="w-4 h-4 text-[#0866F5]" />
                     <span>{isGoogleLoggingIn ? 'Connecting with Google...' : 'Sign in with Google Admin'}</span>
                   </button>
 
@@ -982,7 +982,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose, onLogout }) => 
                     placeholder=""
                     value={loginEmail}
                     onChange={(e) => setLoginEmail(e.target.value)}
-                    className="w-full bg-black/40 border border-white/10 rounded-xl px-3.5 py-2.5 text-sm text-white focus:border-rose-500 focus:outline-none transition-colors"
+                    className="w-full bg-black/40 border border-white/10 rounded-xl px-3.5 py-2.5 text-sm text-white focus:border-[#0866F5] focus:outline-none transition-colors"
                     autoComplete="email"
                   />
                 </div>
@@ -996,7 +996,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose, onLogout }) => 
                       placeholder="••••••••••••"
                       value={loginPassword}
                       onChange={(e) => setLoginPassword(e.target.value)}
-                      className="w-full bg-black/40 border border-white/10 rounded-xl px-3.5 py-2.5 pr-10 text-sm text-white focus:border-rose-500 focus:outline-none transition-colors"
+                      className="w-full bg-black/40 border border-white/10 rounded-xl px-3.5 py-2.5 pr-10 text-sm text-white focus:border-[#0866F5] focus:outline-none transition-colors"
                       autoComplete="current-password"
                     />
                     <button
@@ -1020,7 +1020,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose, onLogout }) => 
                         setForgotError(null);
                         setForgotMessage(null);
                       }}
-                      className="text-xs text-rose-400 hover:text-rose-300 transition-colors font-medium flex items-center gap-1 focus:outline-none focus:underline"
+                      className="text-xs text-[#0866F5] hover:text-[#155EEF] transition-colors font-medium flex items-center gap-1 focus:outline-none focus:underline"
                       id="admin-forgot-password-link"
                     >
                       <KeyRound className="w-3.5 h-3.5" />
@@ -1032,7 +1032,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose, onLogout }) => 
                 <button
                   type="submit"
                   disabled={isLoggingIn || isGoogleLoggingIn}
-                  className="w-full py-3 rounded-xl text-sm font-semibold bg-rose-600 hover:bg-rose-700 text-white shadow-lg shadow-rose-600/30 flex items-center justify-center gap-2 transition-all mt-2 disabled:opacity-50"
+                  className="w-full py-3 rounded-xl text-sm font-semibold bg-[#0866F5] hover:bg-[#155EEF] text-white shadow-lg shadow-[#0866F5]/30 flex items-center justify-center gap-2 transition-all mt-2 disabled:opacity-50"
                 >
                   <Lock className="w-4 h-4" />
                   <span>{isLoggingIn ? 'Authenticating...' : 'Sign In to Admin Panel'}</span>

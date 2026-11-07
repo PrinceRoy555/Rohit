@@ -62,11 +62,11 @@ export function CommonDefs() {
         <stop offset="100%" stopColor="#1ABCFE" />
       </linearGradient>
 
-      {/* 7. AI Design Tools Crimson Gradient */}
+      {/* 7. AI Design Tools Royal Blue Gradient */}
       <linearGradient id="aitools-grad" x1="0%" y1="0%" x2="100%" y2="100%">
-        <stop offset="0%" stopColor="#FF2A55" />
-        <stop offset="50%" stopColor="#C50D1E" />
-        <stop offset="100%" stopColor="#4A000D" />
+        <stop offset="0%" stopColor="#3B82F6" />
+        <stop offset="50%" stopColor="#0866F5" />
+        <stop offset="100%" stopColor="#071B49" />
       </linearGradient>
 
       {/* 8. Google AI Studio / Gemini Purple-Indigo Gradient */}
@@ -172,7 +172,7 @@ export function Premiere3DIcon({ className = "w-10 h-10" }: { className?: string
       <g filter="url(#symbol-shadow)">
         <rect x="12" y="13" width="24" height="22" rx="4" fill="#1A0033" opacity="0.5" />
         <rect x="11" y="12" width="24" height="22" rx="4" fill="white" />
-        {/* Play Triangle with Crimson Gradient */}
+        {/* Play Triangle with Premiere Gradient */}
         <path d="M 20 17 L 30 23 L 20 29 Z" fill="url(#pr-grad)" filter="url(#glow-light)" />
         {/* Film Strip Strips */}
         <rect x="11" y="12" width="24" height="4" fill="#2A085C" />

@@ -47,7 +47,7 @@ export const AdminUserArea: React.FC<AdminUserAreaProps> = ({
                 </span>
                 {isSuperAdmin ? (
                   <span title="Super Admin" className="shrink-0 flex items-center">
-                    <ShieldCheck className="w-3 h-3 text-rose-500" />
+                    <ShieldCheck className="w-3 h-3 text-[#0866F5]" />
                   </span>
                 ) : (
                   <span title="Admin" className="shrink-0 flex items-center">

@@ -191,7 +191,7 @@ export const PortfolioManagerTab: React.FC = () => {
             onClick={() => setFilterCategory(cat)}
             className={`flex-shrink-0 whitespace-nowrap min-h-[38px] px-3.5 py-1.5 rounded-xl text-xs font-semibold transition-all active:scale-98 ${
               filterCategory === cat
-                ? 'bg-rose-600 text-white shadow-xs'
+                ? 'bg-accent-primary text-white shadow-xs'
                 : 'bg-bg-card text-text-muted hover:text-text-primary border border-border-color'
             }`}
           >
@@ -205,7 +205,7 @@ export const PortfolioManagerTab: React.FC = () => {
         {filteredPortfolio.map((item) => (
           <div
             key={item.id}
-            className="bg-bg-card border border-border-color hover:border-rose-500/40 rounded-xl sm:rounded-2xl overflow-hidden transition-all flex flex-col justify-between group shadow-xs hover:shadow-sm"
+            className="bg-bg-card border border-border-color hover:border-accent-primary/40 rounded-xl sm:rounded-2xl overflow-hidden transition-all flex flex-col justify-between group shadow-xs hover:shadow-sm"
           >
             <div>
               {/* Media Thumbnail */}
@@ -235,7 +235,7 @@ export const PortfolioManagerTab: React.FC = () => {
 
               {/* Details */}
               <div className="p-3.5 sm:p-5">
-                <h4 className="text-sm sm:text-base font-bold text-text-primary group-hover:text-rose-600 dark:group-hover:text-rose-400 transition-colors">
+                <h4 className="text-sm sm:text-base font-bold text-text-primary group-hover:text-accent-primary transition-colors">
                   {item.title}
                 </h4>
                 <p className="text-xs text-text-muted mt-1.5 line-clamp-2">{item.description}</p>
@@ -276,7 +276,7 @@ export const PortfolioManagerTab: React.FC = () => {
                 </button>
                 <button
                   onClick={() => handleDelete(item.id, item.title)}
-                  className="w-[38px] h-[38px] rounded-xl bg-bg-secondary hover:bg-rose-500/10 text-text-muted hover:text-rose-600 dark:hover:text-rose-400 border border-border-color flex items-center justify-center transition-colors active:scale-95"
+                  className="w-[38px] h-[38px] rounded-xl bg-bg-secondary hover:bg-red-500/10 text-text-muted hover:text-red-500 border border-border-color flex items-center justify-center transition-colors active:scale-95"
                   title="Delete project"
                 >
                   <Trash2 className="w-3.5 h-3.5" />
@@ -305,7 +305,7 @@ export const PortfolioManagerTab: React.FC = () => {
                     placeholder="e.g., Luxury Brand Rebrand & Social Campaign"
                     value={title}
                     onChange={(e) => setTitle(e.target.value)}
-                    className="w-full min-h-[42px] bg-bg-secondary border border-border-color rounded-xl px-3 py-2 text-sm text-text-primary focus:border-rose-500 focus:outline-none"
+                    className="w-full min-h-[42px] bg-bg-secondary border border-border-color rounded-xl px-3 py-2 text-sm text-text-primary focus:border-accent-primary focus:outline-none"
                   />
                 </div>
 
@@ -317,7 +317,7 @@ export const PortfolioManagerTab: React.FC = () => {
                     placeholder="e.g., Graphic Design, Video Editing"
                     value={category}
                     onChange={(e) => setCategory(e.target.value)}
-                    className="w-full min-h-[42px] bg-bg-secondary border border-border-color rounded-xl px-3 py-2 text-sm text-text-primary focus:border-rose-500 focus:outline-none"
+                    className="w-full min-h-[42px] bg-bg-secondary border border-border-color rounded-xl px-3 py-2 text-sm text-text-primary focus:border-accent-primary focus:outline-none"
                   />
                 </div>
 
@@ -328,7 +328,7 @@ export const PortfolioManagerTab: React.FC = () => {
                     placeholder="e.g., Unicivix Global"
                     value={client}
                     onChange={(e) => setClient(e.target.value)}
-                    className="w-full min-h-[42px] bg-bg-secondary border border-border-color rounded-xl px-3 py-2 text-sm text-text-primary focus:border-rose-500 focus:outline-none"
+                    className="w-full min-h-[42px] bg-bg-secondary border border-border-color rounded-xl px-3 py-2 text-sm text-text-primary focus:border-accent-primary focus:outline-none"
                   />
                 </div>
 
@@ -340,7 +340,7 @@ export const PortfolioManagerTab: React.FC = () => {
                     placeholder="https://images.unsplash.com/..."
                     value={image}
                     onChange={(e) => setImage(e.target.value)}
-                    className="w-full min-h-[42px] bg-bg-secondary border border-border-color rounded-xl px-3 py-2 text-sm text-text-primary focus:border-rose-500 focus:outline-none"
+                    className="w-full min-h-[42px] bg-bg-secondary border border-border-color rounded-xl px-3 py-2 text-sm text-text-primary focus:border-accent-primary focus:outline-none"
                   />
                 </div>
 
@@ -351,7 +351,7 @@ export const PortfolioManagerTab: React.FC = () => {
                     placeholder="Explain the project scope and key results..."
                     value={description}
                     onChange={(e) => setDescription(e.target.value)}
-                    className="w-full bg-bg-secondary border border-border-color rounded-xl p-3 text-sm text-text-primary focus:border-rose-500 focus:outline-none resize-none"
+                    className="w-full bg-bg-secondary border border-border-color rounded-xl p-3 text-sm text-text-primary focus:border-accent-primary focus:outline-none resize-none"
                   />
                 </div>
 
@@ -362,7 +362,7 @@ export const PortfolioManagerTab: React.FC = () => {
                     placeholder="Photoshop, Premiere Pro, Figma"
                     value={toolsStr}
                     onChange={(e) => setToolsStr(e.target.value)}
-                    className="w-full min-h-[42px] bg-bg-secondary border border-border-color rounded-xl px-3 py-2 text-sm text-text-primary focus:border-rose-500 focus:outline-none"
+                    className="w-full min-h-[42px] bg-bg-secondary border border-border-color rounded-xl px-3 py-2 text-sm text-text-primary focus:border-accent-primary focus:outline-none"
                   />
                 </div>
 
@@ -373,7 +373,7 @@ export const PortfolioManagerTab: React.FC = () => {
                     placeholder="https://behance.net/..."
                     value={externalLink}
                     onChange={(e) => setExternalLink(e.target.value)}
-                    className="w-full min-h-[42px] bg-bg-secondary border border-border-color rounded-xl px-3 py-2 text-sm text-text-primary focus:border-rose-500 focus:outline-none"
+                    className="w-full min-h-[42px] bg-bg-secondary border border-border-color rounded-xl px-3 py-2 text-sm text-text-primary focus:border-accent-primary focus:outline-none"
                   />
                 </div>
               </div>
@@ -384,7 +384,7 @@ export const PortfolioManagerTab: React.FC = () => {
                   id="featuredCheck"
                   checked={isFeatured}
                   onChange={(e) => setIsFeatured(e.target.checked)}
-                  className="w-4 h-4 text-rose-600 rounded bg-bg-secondary border-border-color focus:ring-rose-500"
+                  className="w-4 h-4 text-accent-primary rounded bg-bg-secondary border-border-color focus:ring-accent-primary"
                 />
                 <label htmlFor="featuredCheck" className="text-xs font-semibold text-text-primary cursor-pointer">
                   Feature prominently on homepage
@@ -401,7 +401,7 @@ export const PortfolioManagerTab: React.FC = () => {
                 </button>
                 <button
                   type="submit"
-                  className="min-h-[42px] px-5 py-2 rounded-xl text-xs font-semibold bg-rose-600 hover:bg-rose-700 text-white shadow-xs active:scale-98"
+                  className="min-h-[42px] px-5 py-2 rounded-xl text-xs font-semibold bg-accent-primary hover:bg-accent-secondary text-white shadow-xs active:scale-98"
                 >
                   {editingItem ? 'Save Changes' : 'Create Project'}
                 </button>

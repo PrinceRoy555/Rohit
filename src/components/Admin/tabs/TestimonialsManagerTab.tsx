@@ -142,7 +142,7 @@ export const TestimonialsManagerTab: React.FC = () => {
         {testimonials.map((t) => (
           <div
             key={t.id}
-            className="p-4 sm:p-5 rounded-xl sm:rounded-2xl bg-bg-card border border-border-color hover:border-rose-500/30 transition-all flex flex-col justify-between shadow-xs"
+            className="p-4 sm:p-5 rounded-xl sm:rounded-2xl bg-bg-card border border-border-color hover:border-accent-primary/30 transition-all flex flex-col justify-between shadow-xs"
           >
             <div>
               <div className="flex items-center justify-between gap-2">
@@ -173,7 +173,7 @@ export const TestimonialsManagerTab: React.FC = () => {
               </div>
 
               {t.project && (
-                <div className="mt-2.5 text-[11px] sm:text-xs text-rose-600 dark:text-rose-400 font-medium">
+                <div className="mt-2.5 text-[11px] sm:text-xs text-accent-primary font-medium">
                   Project: {t.project}
                 </div>
               )}
@@ -189,7 +189,7 @@ export const TestimonialsManagerTab: React.FC = () => {
               </button>
               <button
                 onClick={() => handleDelete(t.id, t.name)}
-                className="w-9 h-9 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-600 dark:text-rose-400 border border-rose-500/20 flex items-center justify-center transition-colors active:scale-95"
+                className="w-9 h-9 rounded-xl bg-accent-primary/10 hover:bg-accent-primary/20 text-accent-primary border border-accent-primary/20 flex items-center justify-center transition-colors active:scale-95"
                 title="Delete review"
               >
                 <Trash2 className="w-3.5 h-3.5" />
@@ -216,7 +216,7 @@ export const TestimonialsManagerTab: React.FC = () => {
                     required
                     value={name}
                     onChange={(e) => setName(e.target.value)}
-                    className="w-full min-h-[42px] bg-bg-secondary border border-border-color rounded-xl px-3 py-2 text-sm text-text-primary focus:border-rose-500 focus:outline-none"
+                    className="w-full min-h-[42px] bg-bg-secondary border border-border-color rounded-xl px-3 py-2 text-sm text-text-primary focus:border-accent-primary focus:outline-none"
                   />
                 </div>
 
@@ -227,7 +227,7 @@ export const TestimonialsManagerTab: React.FC = () => {
                     placeholder="e.g. Marketing Director"
                     value={role}
                     onChange={(e) => setRole(e.target.value)}
-                    className="w-full min-h-[42px] bg-bg-secondary border border-border-color rounded-xl px-3 py-2 text-sm text-text-primary focus:border-rose-500 focus:outline-none"
+                    className="w-full min-h-[42px] bg-bg-secondary border border-border-color rounded-xl px-3 py-2 text-sm text-text-primary focus:border-accent-primary focus:outline-none"
                   />
                 </div>
 
@@ -238,7 +238,7 @@ export const TestimonialsManagerTab: React.FC = () => {
                     placeholder="e.g. Acme Media"
                     value={company}
                     onChange={(e) => setCompany(e.target.value)}
-                    className="w-full min-h-[42px] bg-bg-secondary border border-border-color rounded-xl px-3 py-2 text-sm text-text-primary focus:border-rose-500 focus:outline-none"
+                    className="w-full min-h-[42px] bg-bg-secondary border border-border-color rounded-xl px-3 py-2 text-sm text-text-primary focus:border-accent-primary focus:outline-none"
                   />
                 </div>
 
@@ -247,7 +247,7 @@ export const TestimonialsManagerTab: React.FC = () => {
                   <select
                     value={rating}
                     onChange={(e) => setRating(Number(e.target.value))}
-                    className="w-full min-h-[42px] bg-bg-secondary border border-border-color rounded-xl px-3 py-2 text-sm text-text-primary focus:border-rose-500 focus:outline-none"
+                    className="w-full min-h-[42px] bg-bg-secondary border border-border-color rounded-xl px-3 py-2 text-sm text-text-primary focus:border-accent-primary focus:outline-none"
                   >
                     <option value={5}>⭐⭐⭐⭐⭐ (5 Stars)</option>
                     <option value={4}>⭐⭐⭐⭐ (4 Stars)</option>
@@ -263,7 +263,7 @@ export const TestimonialsManagerTab: React.FC = () => {
                   placeholder="https://images.unsplash.com/..."
                   value={avatar}
                   onChange={(e) => setAvatar(e.target.value)}
-                  className="w-full min-h-[42px] bg-bg-secondary border border-border-color rounded-xl px-3 py-2 text-sm text-text-primary focus:border-rose-500 focus:outline-none"
+                  className="w-full min-h-[42px] bg-bg-secondary border border-border-color rounded-xl px-3 py-2 text-sm text-text-primary focus:border-accent-primary focus:outline-none"
                 />
               </div>
 
@@ -275,7 +275,7 @@ export const TestimonialsManagerTab: React.FC = () => {
                   placeholder="What did the client say about your work and turnaround time?"
                   value={content}
                   onChange={(e) => setContent(e.target.value)}
-                  className="w-full bg-bg-secondary border border-border-color rounded-xl p-3 text-sm text-text-primary focus:border-rose-500 focus:outline-none resize-none"
+                  className="w-full bg-bg-secondary border border-border-color rounded-xl p-3 text-sm text-text-primary focus:border-accent-primary focus:outline-none resize-none"
                 />
               </div>
 
@@ -286,7 +286,7 @@ export const TestimonialsManagerTab: React.FC = () => {
                   placeholder="e.g. YouTube Channel Rebrand & 4K Trailer"
                   value={project}
                   onChange={(e) => setProject(e.target.value)}
-                  className="w-full min-h-[42px] bg-bg-secondary border border-border-color rounded-xl px-3 py-2 text-sm text-text-primary focus:border-rose-500 focus:outline-none"
+                  className="w-full min-h-[42px] bg-bg-secondary border border-border-color rounded-xl px-3 py-2 text-sm text-text-primary focus:border-accent-primary focus:outline-none"
                 />
               </div>
 
@@ -300,7 +300,7 @@ export const TestimonialsManagerTab: React.FC = () => {
                 </button>
                 <button
                   type="submit"
-                  className="min-h-[42px] px-5 py-2 rounded-xl text-xs font-semibold bg-rose-600 hover:bg-rose-700 text-white shadow-xs transition-all active:scale-98"
+                  className="min-h-[42px] px-5 py-2 rounded-xl text-xs font-semibold bg-accent-primary hover:bg-accent-secondary text-white shadow-xs transition-all active:scale-98"
                 >
                   Save Testimonial
                 </button>

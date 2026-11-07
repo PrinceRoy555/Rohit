@@ -121,7 +121,7 @@ export default function FloatingElements() {
             rel="noopener noreferrer"
             onMouseEnter={() => setHoveredButton('whatsapp')}
             onMouseLeave={() => setHoveredButton(null)}
-            className="w-12 h-12 rounded-full bg-[#C50D1E] hover:bg-[#9F0B18] text-white flex items-center justify-center shadow-xl hover:scale-105 active:scale-95 transition-all duration-200 cursor-pointer border border-white/20 flex-shrink-0"
+            className="w-12 h-12 rounded-full bg-[#0866F5] hover:bg-[#155EEF] text-white flex items-center justify-center shadow-xl hover:scale-105 active:scale-95 transition-all duration-200 cursor-pointer border border-white/20 flex-shrink-0"
             id="whatsapp-floating-btn"
             aria-label="Contact Rohit Verma on WhatsApp Business"
           >
@@ -165,7 +165,7 @@ export default function FloatingElements() {
               onClick={handleToggleChatbot}
               onMouseEnter={() => setHoveredButton('chatbot')}
               onMouseLeave={() => setHoveredButton(null)}
-              className="w-11 h-11 sm:w-12 sm:h-12 rounded-full bg-[#A50C18] hover:bg-[#8B0A14] border border-white/20 text-white flex items-center justify-center transition-all duration-200 shadow-xl hover:scale-105 active:scale-95 cursor-pointer outline-none focus-visible:ring-4 focus-visible:ring-[#A50C18] flex-shrink-0 relative"
+              className="w-11 h-11 sm:w-12 sm:h-12 rounded-full bg-[#0866F5] hover:bg-[#155EEF] border border-white/20 text-white flex items-center justify-center transition-all duration-200 shadow-xl hover:scale-105 active:scale-95 cursor-pointer outline-none focus-visible:ring-4 focus-visible:ring-[#0866F5] flex-shrink-0 relative"
               aria-label="Ask Uni AI Creative Assistant"
               id="uni-ai-chatbot-btn"
             >

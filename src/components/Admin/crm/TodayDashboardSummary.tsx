@@ -42,9 +42,9 @@ export const TodayDashboardSummary: React.FC<TodayDashboardSummaryProps> = ({
       count: newEnquiriesCount,
       subtext: 'Uncontacted leads',
       icon: Inbox,
-      color: 'text-rose-600 dark:text-rose-400 bg-rose-500/10 border-rose-500/20',
+      color: 'text-red-500 bg-red-500/10 border-red-500/20',
       badge: newEnquiriesCount > 0 ? 'Action Needed' : undefined,
-      badgeColor: 'bg-rose-500/20 text-rose-600 dark:text-rose-400'
+      badgeColor: 'bg-red-500/20 text-red-500'
     },
     {
       id: 'followups_today' as const,
@@ -85,7 +85,7 @@ export const TodayDashboardSummary: React.FC<TodayDashboardSummaryProps> = ({
     <div className="space-y-2.5">
       <div className="flex items-center justify-between">
         <div className="text-[11px] font-bold uppercase tracking-wider text-text-muted flex items-center gap-1.5">
-          <span className="w-1.5 h-1.5 rounded-full bg-rose-500" />
+          <span className="w-1.5 h-1.5 rounded-full bg-red-500" />
           <span>Today&apos;s CRM Pulse</span>
         </div>
         <span className="text-[11px] text-text-muted">Live sync from Firestore</span>
@@ -101,7 +101,7 @@ export const TodayDashboardSummary: React.FC<TodayDashboardSummaryProps> = ({
               className={`p-3 sm:p-4 rounded-xl border transition-all cursor-pointer group shadow-xs hover:shadow-md flex flex-col justify-between select-none active:scale-98 ${
                 card.isAlert
                   ? 'bg-red-500/5 dark:bg-red-500/10 border-red-500/40 hover:border-red-500'
-                  : 'bg-bg-card hover:bg-bg-card-hover border-border-color hover:border-rose-500/40'
+                  : 'bg-bg-card hover:bg-bg-card-hover border-border-color hover:border-accent-primary/40'
               }`}
             >
               <div className="flex items-start justify-between gap-1.5">

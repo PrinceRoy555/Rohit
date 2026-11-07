@@ -182,7 +182,7 @@ export const InquiriesDataTable: React.FC<InquiriesDataTableProps> = ({
             }}
             className={`flex-shrink-0 min-h-[34px] px-2.5 py-1 rounded-lg text-xs font-semibold transition-all flex items-center gap-1.5 cursor-pointer border ${
               onlyHot
-                ? 'bg-rose-500/15 text-rose-600 dark:text-rose-400 border-rose-500/30'
+                ? 'bg-accent-primary text-white border-accent-primary'
                 : 'bg-bg-secondary hover:bg-bg-card-hover text-text-muted hover:text-text-primary border-border-color'
             }`}
           >
@@ -335,7 +335,7 @@ export const InquiriesDataTable: React.FC<InquiriesDataTableProps> = ({
                                 {inq.name}
                               </span>
                               {hotInfo.isHot && (
-                                <Flame className="w-3.5 h-3.5 text-rose-600 dark:text-rose-400 fill-current shrink-0" />
+                                <Flame className="w-3.5 h-3.5 text-amber-500 fill-amber-500 shrink-0" />
                               )}
                             </div>
                             <div className="text-[11px] text-text-muted truncate flex items-center gap-1.5 mt-0.5">
@@ -369,7 +369,7 @@ export const InquiriesDataTable: React.FC<InquiriesDataTableProps> = ({
                         <span
                           className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-semibold border ${
                             inq.status === 'new'
-                              ? 'bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-500/20'
+                              ? 'bg-amber-500/15 text-amber-600 dark:text-amber-400 border-amber-500/30'
                               : inq.status === 'contacted'
                               ? 'bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border-indigo-500/20'
                               : 'bg-neutral-500/10 text-neutral-600 dark:text-neutral-400 border-neutral-500/20'
@@ -378,7 +378,7 @@ export const InquiriesDataTable: React.FC<InquiriesDataTableProps> = ({
                           <span
                             className={`w-1.5 h-1.5 rounded-full ${
                               inq.status === 'new'
-                                ? 'bg-rose-500'
+                                ? 'bg-accent-primary'
                                 : inq.status === 'contacted'
                                 ? 'bg-indigo-500'
                                 : 'bg-neutral-400'

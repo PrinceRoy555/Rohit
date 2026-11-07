@@ -208,7 +208,7 @@ export default function ContactSection() {
   return (
     <section id="contact" className="bg-bg-primary transition-colors duration-300">
       
-      {/* 1. Large Crimson Patterned CTA Banner */}
+      {/* 1. Large Blue Patterned CTA Banner */}
       <div className="bg-gradient-to-r from-bg-card via-bg-secondary to-bg-card border-y border-border-color py-16 px-6 md:px-12 relative overflow-hidden" id="contact-cta-banner">
         {/* Subtle geometric lines / hexagon SVG background */}
         <div className="absolute inset-0 opacity-10 pointer-events-none">

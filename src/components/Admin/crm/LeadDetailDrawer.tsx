@@ -137,8 +137,8 @@ export const LeadDetailDrawer: React.FC<LeadDetailDrawerProps> = ({
             <div className="flex items-center gap-2 flex-wrap">
               <h2 className="text-lg sm:text-xl font-bold text-text-primary truncate">{lead.name}</h2>
               {isHotLead && (
-                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-bold bg-rose-500/15 text-rose-600 dark:text-rose-400 border border-rose-500/30 flex-shrink-0">
-                  <Flame className="w-3 h-3 fill-current text-rose-500" />
+                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-bold bg-amber-500/15 text-amber-600 dark:text-amber-400 border border-amber-500/30 flex-shrink-0">
+                  <Flame className="w-3 h-3 fill-current text-amber-500" />
                   <span>HOT LEAD</span>
                 </span>
               )}
@@ -197,7 +197,7 @@ export const LeadDetailDrawer: React.FC<LeadDetailDrawerProps> = ({
 
             <a
               href={`mailto:${lead.email}?subject=${encodeURIComponent(`Regarding your inquiry for ${lead.service}`)}`}
-              className="min-h-[42px] px-3 py-2 rounded-xl text-xs font-semibold bg-rose-600 hover:bg-rose-700 text-white flex items-center justify-center gap-1.5 shadow-xs transition-all active:scale-98"
+              className="min-h-[42px] px-3 py-2 rounded-xl text-xs font-semibold bg-accent-primary hover:bg-accent-secondary text-white flex items-center justify-center gap-1.5 shadow-xs transition-all active:scale-98"
             >
               <Mail className="w-3.5 h-3.5" />
               <span>Email</span>
@@ -207,11 +207,11 @@ export const LeadDetailDrawer: React.FC<LeadDetailDrawerProps> = ({
               onClick={handleToggleHotLead}
               className={`min-h-[42px] px-3 py-2 rounded-xl text-xs font-semibold flex items-center justify-center gap-1.5 border transition-all active:scale-98 ${
                 isHotLead
-                  ? 'bg-rose-500/20 text-rose-600 dark:text-rose-400 border-rose-500/40 hover:bg-rose-500/30'
+                  ? 'bg-amber-500/20 text-amber-600 dark:text-amber-400 border-amber-500/40 hover:bg-amber-500/30'
                   : 'bg-bg-card hover:bg-bg-card-hover text-text-muted border-border-color'
               }`}
             >
-              <Flame className={`w-3.5 h-3.5 ${isHotLead ? 'fill-current text-rose-500' : ''}`} />
+              <Flame className={`w-3.5 h-3.5 ${isHotLead ? 'fill-current text-amber-500' : ''}`} />
               <span>{isHotLead ? 'Remove Hot' : 'Mark Hot'}</span>
             </button>
           </div>
@@ -220,14 +220,14 @@ export const LeadDetailDrawer: React.FC<LeadDetailDrawerProps> = ({
           <div className="p-4 sm:p-5 rounded-xl sm:rounded-2xl bg-bg-secondary border border-border-color space-y-3.5">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <Calendar className="w-4 h-4 text-rose-600 dark:text-rose-400" />
+                <Calendar className="w-4 h-4 text-accent-primary" />
                 <h3 className="text-sm font-bold text-text-primary">Follow-up Management</h3>
               </div>
 
               {lead.followUpAt && (
                 <div className="flex items-center gap-2 text-xs">
                   {followUpCategory === 'overdue' && (
-                    <span className="px-2 py-0.5 rounded-full text-[11px] font-bold bg-rose-500/15 text-rose-600 dark:text-rose-400 border border-rose-500/30 flex items-center gap-1">
+                    <span className="px-2 py-0.5 rounded-full text-[11px] font-bold bg-red-500/15 text-red-600 dark:text-red-400 border border-red-500/30 flex items-center gap-1">
                       <AlertCircle className="w-3 h-3" />
                       <span>{formatOverdueDuration(lead.followUpAt)}</span>
                     </span>
@@ -276,7 +276,7 @@ export const LeadDetailDrawer: React.FC<LeadDetailDrawerProps> = ({
                   type="date"
                   value={followUpDate}
                   onChange={(e) => setFollowUpDate(e.target.value)}
-                  className="w-full min-h-[42px] bg-bg-card border border-border-color rounded-xl px-3 py-2 text-xs text-text-primary focus:border-rose-500 focus:outline-none"
+                  className="w-full min-h-[42px] bg-bg-card border border-border-color rounded-xl px-3 py-2 text-xs text-text-primary focus:border-accent-primary focus:outline-none"
                 />
               </div>
 
@@ -288,7 +288,7 @@ export const LeadDetailDrawer: React.FC<LeadDetailDrawerProps> = ({
                   type="time"
                   value={followUpTime}
                   onChange={(e) => setFollowUpTime(e.target.value)}
-                  className="w-full min-h-[42px] bg-bg-card border border-border-color rounded-xl px-3 py-2 text-xs text-text-primary focus:border-rose-500 focus:outline-none"
+                  className="w-full min-h-[42px] bg-bg-card border border-border-color rounded-xl px-3 py-2 text-xs text-text-primary focus:border-accent-primary focus:outline-none"
                 />
               </div>
             </div>
@@ -302,7 +302,7 @@ export const LeadDetailDrawer: React.FC<LeadDetailDrawerProps> = ({
                 placeholder="e.g., Send revised quotation, follow up regarding contract"
                 value={nextAction}
                 onChange={(e) => setNextAction(e.target.value)}
-                className="w-full min-h-[42px] bg-bg-card border border-border-color rounded-xl px-3 py-2 text-xs text-text-primary focus:border-rose-500 focus:outline-none"
+                className="w-full min-h-[42px] bg-bg-card border border-border-color rounded-xl px-3 py-2 text-xs text-text-primary focus:border-accent-primary focus:outline-none"
               />
             </div>
 
@@ -314,7 +314,7 @@ export const LeadDetailDrawer: React.FC<LeadDetailDrawerProps> = ({
                 <select
                   value={priority}
                   onChange={(e) => setPriority(e.target.value as LeadPriority)}
-                  className="w-full min-h-[42px] bg-bg-card border border-border-color rounded-xl px-3 py-2 text-xs text-text-primary focus:border-rose-500 focus:outline-none"
+                  className="w-full min-h-[42px] bg-bg-card border border-border-color rounded-xl px-3 py-2 text-xs text-text-primary focus:border-accent-primary focus:outline-none"
                 >
                   <option value="low">Low Priority</option>
                   <option value="medium">Medium Priority</option>
@@ -329,7 +329,7 @@ export const LeadDetailDrawer: React.FC<LeadDetailDrawerProps> = ({
                 <select
                   value={status}
                   onChange={(e) => handleStatusChange(e.target.value as InquiryStatus)}
-                  className="w-full min-h-[42px] bg-bg-card border border-border-color rounded-xl px-3 py-2 text-xs text-text-primary focus:border-rose-500 focus:outline-none"
+                  className="w-full min-h-[42px] bg-bg-card border border-border-color rounded-xl px-3 py-2 text-xs text-text-primary focus:border-accent-primary focus:outline-none"
                 >
                   <option value="new">New</option>
                   <option value="contacted">Contacted</option>
@@ -345,7 +345,7 @@ export const LeadDetailDrawer: React.FC<LeadDetailDrawerProps> = ({
                 type="button"
                 onClick={handleSaveFollowUp}
                 disabled={isSaving}
-                className="min-h-[42px] px-4 py-2 rounded-xl text-xs font-semibold bg-rose-600 hover:bg-rose-700 text-white shadow-xs flex items-center justify-center gap-1.5 transition-all w-full sm:w-auto active:scale-98"
+                className="min-h-[42px] px-4 py-2 rounded-xl text-xs font-semibold bg-accent-primary hover:bg-accent-secondary text-white shadow-xs flex items-center justify-center gap-1.5 transition-all w-full sm:w-auto active:scale-98"
               >
                 <Clock className="w-3.5 h-3.5" />
                 <span>{lead.followUpAt ? 'Reschedule Follow-up' : 'Schedule Follow-up'}</span>
@@ -411,7 +411,7 @@ export const LeadDetailDrawer: React.FC<LeadDetailDrawerProps> = ({
           {lead.attachmentUrl && (
             <div className="p-3.5 rounded-xl bg-bg-secondary border border-border-color flex items-center justify-between gap-3 text-xs">
               <div className="flex items-center gap-2 truncate">
-                <FileText className="w-4 h-4 text-rose-600 dark:text-rose-400 flex-shrink-0" />
+                <FileText className="w-4 h-4 text-accent-primary flex-shrink-0" />
                 <span className="truncate text-text-primary font-medium">Attached Brief File</span>
               </div>
               <a
@@ -448,7 +448,7 @@ export const LeadDetailDrawer: React.FC<LeadDetailDrawerProps> = ({
               placeholder="Add confidential notes on client preferences, pricing discussion, or negotiation history..."
               value={internalNotes}
               onChange={(e) => setInternalNotes(e.target.value)}
-              className="w-full bg-bg-secondary border border-border-color rounded-xl p-3 text-xs text-text-primary focus:border-rose-500 focus:outline-none"
+              className="w-full bg-bg-secondary border border-border-color rounded-xl p-3 text-xs text-text-primary focus:border-accent-primary focus:outline-none"
             />
           </div>
         </div>
@@ -464,7 +464,7 @@ export const LeadDetailDrawer: React.FC<LeadDetailDrawerProps> = ({
                   onClose();
                 }
               }}
-              className="min-h-[42px] px-3.5 py-2 rounded-xl text-xs font-semibold text-rose-600 dark:text-rose-400 hover:bg-rose-500/10 transition-colors flex items-center"
+              className="min-h-[42px] px-3.5 py-2 rounded-xl text-xs font-semibold text-accent-primary hover:bg-red-500/10 transition-colors flex items-center"
             >
               Delete Lead
             </button>

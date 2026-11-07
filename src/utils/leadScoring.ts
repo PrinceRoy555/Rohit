@@ -114,8 +114,8 @@ export function getLeadScoreCategory(score: number): {
   if (score >= 85) {
     return {
       label: 'High Intent',
-      color: 'text-rose-500 dark:text-rose-400',
-      badgeBg: 'bg-rose-500/15 text-rose-600 dark:text-rose-300 border-rose-500/30'
+      color: 'text-accent-primary',
+      badgeBg: 'bg-accent-primary/15 text-accent-primary border-accent-primary/30'
     };
   }
   if (score >= 70) {

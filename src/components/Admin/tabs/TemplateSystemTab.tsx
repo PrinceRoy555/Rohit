@@ -190,15 +190,15 @@ export const TemplateSystemTab: React.FC = () => {
       )}
 
       {actionError && (
-        <div className="p-3.5 sm:p-4 rounded-xl bg-rose-500/15 border border-rose-500/30 text-rose-600 dark:text-rose-400 text-xs sm:text-sm flex items-center gap-2.5 sm:gap-3">
-          <ShieldAlert className="w-4 sm:w-5 h-4 sm:h-5 text-rose-500 flex-shrink-0" />
+        <div className="p-3.5 sm:p-4 rounded-xl bg-red-500/15 border border-red-500/30 text-red-500 dark:text-red-400 text-xs sm:text-sm flex items-center gap-2.5 sm:gap-3">
+          <ShieldAlert className="w-4 sm:w-5 h-4 sm:h-5 text-accent-primary flex-shrink-0" />
           <span>{actionError}</span>
         </div>
       )}
 
       {/* Info Callout */}
       <div className="p-3.5 sm:p-4 rounded-xl sm:rounded-2xl bg-bg-card border border-border-color flex items-start gap-2.5 sm:gap-3.5 text-xs sm:text-sm text-text-secondary shadow-xs">
-        <Info className="w-4 sm:w-5 h-4 sm:h-5 text-rose-500 flex-shrink-0 mt-0.5" />
+        <Info className="w-4 sm:w-5 h-4 sm:h-5 text-accent-primary flex-shrink-0 mt-0.5" />
         <div>
           <strong className="text-text-primary font-semibold">How the Template System works:</strong> When you activate a template, your existing website is immediately backed up to the <strong>Revision History</strong>. You can restore it anytime with one click.
         </div>
@@ -211,7 +211,7 @@ export const TemplateSystemTab: React.FC = () => {
           return (
             <div
               key={tpl.id}
-              className="bg-bg-card border border-border-color hover:border-rose-500/30 rounded-xl sm:rounded-2xl overflow-hidden transition-all duration-200 flex flex-col justify-between group shadow-xs"
+              className="bg-bg-card border border-border-color hover:border-accent-primary/30 rounded-xl sm:rounded-2xl overflow-hidden transition-all duration-200 flex flex-col justify-between group shadow-xs"
             >
               <div>
                 {/* Thumbnail Image */}
@@ -227,7 +227,7 @@ export const TemplateSystemTab: React.FC = () => {
                       {tpl.category}
                     </span>
                     {tpl.isBuiltIn && (
-                      <span className="px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-full text-[10px] sm:text-xs font-bold bg-rose-600 text-white backdrop-blur-md">
+                      <span className="px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-full text-[10px] sm:text-xs font-bold bg-accent-primary text-white backdrop-blur-md">
                         Official Preset
                       </span>
                     )}
@@ -236,7 +236,7 @@ export const TemplateSystemTab: React.FC = () => {
 
                 {/* Content */}
                 <div className="p-3.5 sm:p-5">
-                  <h3 className="text-base sm:text-lg font-bold text-text-primary group-hover:text-rose-500 transition-colors">
+                  <h3 className="text-base sm:text-lg font-bold text-text-primary group-hover:text-accent-primary transition-colors">
                     {tpl.name}
                   </h3>
                   <p className="text-xs sm:text-sm text-text-muted mt-1.5 line-clamp-2 leading-relaxed">
@@ -255,7 +255,7 @@ export const TemplateSystemTab: React.FC = () => {
                 <button
                   onClick={() => handleActivate(tpl.id, tpl.name)}
                   disabled={isActivating}
-                  className="flex-1 min-h-[40px] py-2 px-3 sm:px-4 rounded-xl text-xs sm:text-sm font-semibold bg-rose-600 hover:bg-rose-700 text-white shadow-xs flex items-center justify-center gap-1.5 sm:gap-2 transition-all active:scale-98"
+                  className="flex-1 min-h-[40px] py-2 px-3 sm:px-4 rounded-xl text-xs sm:text-sm font-semibold bg-accent-primary hover:bg-accent-secondary text-white shadow-xs flex items-center justify-center gap-1.5 sm:gap-2 transition-all active:scale-98"
                 >
                   <Sparkles className="w-3.5 sm:w-4 h-3.5 sm:h-4" />
                   <span>{isActivating ? 'Activating...' : '1-Click Activate'}</span>
@@ -273,7 +273,7 @@ export const TemplateSystemTab: React.FC = () => {
                   <button
                     onClick={() => handleDeleteTemplate(tpl.id, tpl.name)}
                     title="Delete Custom Template"
-                    className="min-h-[40px] min-w-[40px] p-2 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-500 border border-rose-500/20 transition-all flex items-center justify-center active:scale-95"
+                    className="min-h-[40px] min-w-[40px] p-2 rounded-xl bg-accent-primary/10 hover:bg-accent-primary/20 text-accent-primary border border-accent-primary/20 transition-all flex items-center justify-center active:scale-95"
                   >
                     <Trash2 className="w-4 h-4" />
                   </button>
@@ -285,10 +285,10 @@ export const TemplateSystemTab: React.FC = () => {
       </div>
 
       {/* Danger Zone: Reset Website */}
-      <div className="p-4 sm:p-6 rounded-xl sm:rounded-2xl bg-bg-card border border-rose-500/20 flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 shadow-xs">
+      <div className="p-4 sm:p-6 rounded-xl sm:rounded-2xl bg-bg-card border border-accent-primary/20 flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 shadow-xs">
         <div>
           <h4 className="text-xs sm:text-sm font-bold text-text-primary flex items-center gap-2">
-            <RotateCcw className="w-4 h-4 text-rose-500" />
+            <RotateCcw className="w-4 h-4 text-accent-primary" />
             <span>Reset Website to Default Baseline</span>
           </h4>
           <p className="text-xs text-text-muted mt-0.5 sm:mt-1">
@@ -297,7 +297,7 @@ export const TemplateSystemTab: React.FC = () => {
         </div>
         <button
           onClick={() => setShowResetModal(true)}
-          className="min-h-[40px] px-4 py-2 rounded-xl text-xs font-semibold bg-rose-500/10 hover:bg-rose-500/20 text-rose-600 dark:text-rose-400 border border-rose-500/30 transition-all self-stretch sm:self-auto flex items-center justify-center active:scale-98"
+          className="min-h-[40px] px-4 py-2 rounded-xl text-xs font-semibold bg-accent-primary/10 hover:bg-accent-primary/20 text-accent-primary border border-accent-primary/30 transition-all self-stretch sm:self-auto flex items-center justify-center active:scale-98"
         >
           Reset Website
         </button>
@@ -321,7 +321,7 @@ export const TemplateSystemTab: React.FC = () => {
                   placeholder="e.g., Client Luxe Fashion Studio"
                   value={newTemplateName}
                   onChange={(e) => setNewTemplateName(e.target.value)}
-                  className="w-full min-h-[42px] bg-bg-secondary border border-border-color rounded-xl px-3 py-2 text-sm text-text-primary focus:border-rose-500 focus:outline-none"
+                  className="w-full min-h-[42px] bg-bg-secondary border border-border-color rounded-xl px-3 py-2 text-sm text-text-primary focus:border-accent-primary focus:outline-none"
                 />
               </div>
 
@@ -330,7 +330,7 @@ export const TemplateSystemTab: React.FC = () => {
                 <select
                   value={newTemplateCategory}
                   onChange={(e) => setNewTemplateCategory(e.target.value as any)}
-                  className="w-full min-h-[42px] bg-bg-secondary border border-border-color rounded-xl px-3 py-2 text-sm text-text-primary focus:border-rose-500 focus:outline-none"
+                  className="w-full min-h-[42px] bg-bg-secondary border border-border-color rounded-xl px-3 py-2 text-sm text-text-primary focus:border-accent-primary focus:outline-none"
                 >
                   <option value="Creator & Motion">Creator & Motion</option>
                   <option value="Creative Agency">Creative Agency</option>
@@ -347,7 +347,7 @@ export const TemplateSystemTab: React.FC = () => {
                   placeholder="Brief description of this template layout..."
                   value={newTemplateDesc}
                   onChange={(e) => setNewTemplateDesc(e.target.value)}
-                  className="w-full bg-bg-secondary border border-border-color rounded-xl px-3 py-2 text-sm text-text-primary focus:border-rose-500 focus:outline-none resize-none"
+                  className="w-full bg-bg-secondary border border-border-color rounded-xl px-3 py-2 text-sm text-text-primary focus:border-accent-primary focus:outline-none resize-none"
                 />
               </div>
 
@@ -361,7 +361,7 @@ export const TemplateSystemTab: React.FC = () => {
                 </button>
                 <button
                   type="submit"
-                  className="min-h-[42px] px-5 py-2 rounded-xl text-xs font-semibold bg-rose-600 hover:bg-rose-700 text-white shadow-xs active:scale-98"
+                  className="min-h-[42px] px-5 py-2 rounded-xl text-xs font-semibold bg-accent-primary hover:bg-accent-secondary text-white shadow-xs active:scale-98"
                 >
                   Save Template
                 </button>
@@ -388,7 +388,7 @@ export const TemplateSystemTab: React.FC = () => {
                   placeholder='Paste JSON here: { "name": "...", "config": { ... } }'
                   value={importJsonText}
                   onChange={(e) => setImportJsonText(e.target.value)}
-                  className="w-full bg-bg-secondary border border-border-color rounded-xl p-3 text-xs font-mono text-text-primary focus:border-rose-500 focus:outline-none"
+                  className="w-full bg-bg-secondary border border-border-color rounded-xl p-3 text-xs font-mono text-text-primary focus:border-accent-primary focus:outline-none"
                 />
               </div>
 
@@ -402,7 +402,7 @@ export const TemplateSystemTab: React.FC = () => {
                 </button>
                 <button
                   type="submit"
-                  className="min-h-[42px] px-5 py-2 rounded-xl text-xs font-semibold bg-rose-600 hover:bg-rose-700 text-white shadow-xs active:scale-98"
+                  className="min-h-[42px] px-5 py-2 rounded-xl text-xs font-semibold bg-accent-primary hover:bg-accent-secondary text-white shadow-xs active:scale-98"
                 >
                   Import Template
                 </button>
@@ -415,9 +415,9 @@ export const TemplateSystemTab: React.FC = () => {
       {/* MODAL: Reset Site Confirmation */}
       {showResetModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/60 backdrop-blur-xs">
-          <div className="bg-bg-card border border-rose-500/30 rounded-xl sm:rounded-2xl max-w-md w-full p-4 sm:p-6 space-y-3.5 sm:space-y-4 shadow-xl">
+          <div className="bg-bg-card border border-red-500/30 rounded-xl sm:rounded-2xl max-w-md w-full p-4 sm:p-6 space-y-3.5 sm:space-y-4 shadow-xl">
             <h3 className="text-base sm:text-lg font-bold text-text-primary flex items-center gap-2">
-              <ShieldAlert className="w-5 h-5 text-rose-500" />
+              <ShieldAlert className="w-5 h-5 text-accent-primary" />
               <span>Confirm Site Reset</span>
             </h3>
             <p className="text-xs sm:text-sm text-text-secondary">
@@ -435,7 +435,7 @@ export const TemplateSystemTab: React.FC = () => {
               <button
                 type="button"
                 onClick={handleResetSite}
-                className="min-h-[42px] px-5 py-2 rounded-xl text-xs font-semibold bg-rose-600 hover:bg-rose-700 text-white shadow-xs active:scale-98"
+                className="min-h-[42px] px-5 py-2 rounded-xl text-xs font-semibold bg-accent-primary hover:bg-accent-secondary text-white shadow-xs active:scale-98"
               >
                 Confirm Reset
               </button>

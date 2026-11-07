@@ -10,6 +10,7 @@ import {
 import { WHATSAPP_BUSINESS_URL } from '../data';
 import ServiceDetailModal from './ServiceDetailModal';
 import { useSiteConfig } from '../context/SiteConfigContext';
+import { StaggeredText } from './ui/staggered-text';
 
 function DynamicIcon({ name, className }: { name: string; className?: string }) {
   const IconComponent = (Icons as any)[name] || Icons.HelpCircle;
@@ -304,13 +305,22 @@ export default function ServicesSection() {
           </motion.div>
 
           <motion.h2
-            initial={shouldReduceMotion ? { opacity: 1 } : { opacity: 0, y: 12 }}
-            whileInView={{ opacity: 1, y: 0 }}
+            initial={shouldReduceMotion ? { opacity: 1 } : { opacity: 1 }}
+            whileInView={{ opacity: 1 }}
             viewport={{ once: true }}
-            transition={{ delay: 0.08 }}
             className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-text-primary tracking-tight mb-4"
           >
-            {servicesConfig?.title || 'Professional Services'}
+            <StaggeredText
+              text={servicesConfig?.title || 'My Creative Services'}
+              as="span"
+              segmentBy="words"
+              delay={50}
+              duration={0.5}
+              direction="bottom"
+              blur={true}
+              staggerDirection="forward"
+              respectReducedMotion={true}
+            />
           </motion.h2>
 
           <motion.p

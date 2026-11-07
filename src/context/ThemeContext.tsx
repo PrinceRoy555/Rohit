@@ -45,7 +45,7 @@ function applyThemeToDom(resolved: ResolvedTheme) {
   // Update browser mobile toolbar theme color
   const metaThemeColor = document.querySelector('meta[name="theme-color"]');
   if (metaThemeColor) {
-    metaThemeColor.setAttribute('content', resolved === 'dark' ? '#080607' : '#F8F5F2');
+    metaThemeColor.setAttribute('content', resolved === 'dark' ? '#030B1E' : '#FFFFFF');
   }
 }
 

@@ -249,7 +249,7 @@ export const NewsletterSubscribersTab: React.FC = () => {
                         type="button"
                         onClick={() => handleDelete(sub.id, sub.email)}
                         disabled={deletingId === sub.id}
-                        className="p-1.5 text-text-muted hover:text-rose-500 hover:bg-rose-500/10 rounded-lg transition-colors"
+                        className="p-1.5 text-text-muted hover:text-red-500 hover:bg-red-500/10 rounded-lg transition-colors"
                         title="Delete Subscriber"
                       >
                         <Trash2 className="w-4 h-4" />

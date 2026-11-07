@@ -137,7 +137,7 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({
           icon: Inbox,
           category: 'CRM & Inquiries',
           badge: newLeadsCount > 0 ? newLeadsCount : undefined,
-          badgeColor: 'bg-rose-500 text-white',
+          badgeColor: 'bg-accent-primary text-white',
           viewOptions: { view: 'inbox' },
         },
         {
@@ -155,7 +155,7 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({
           icon: Flame,
           category: 'CRM & Inquiries',
           badge: hotLeadsCount > 0 ? hotLeadsCount : undefined,
-          badgeColor: 'bg-rose-600 text-white',
+          badgeColor: 'bg-amber-500 text-neutral-950 font-bold',
           viewOptions: { view: 'hot_leads' },
         },
         {
@@ -472,7 +472,7 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({
                       {siteName || 'Rohit Verma'}
                     </span>
                     {adminRole === 'super_admin' ? (
-                      <ShieldCheck className="w-3 h-3 text-rose-500 shrink-0" />
+                      <ShieldCheck className="w-3 h-3 text-accent-primary shrink-0" />
                     ) : (
                       <Shield className="w-3 h-3 text-indigo-500 shrink-0" />
                     )}
@@ -505,7 +505,7 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({
                   {adminEmail}
                 </div>
                 <div className="mt-1">
-                  <span className="inline-block px-1.5 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-500/20">
+                  <span className="inline-block px-1.5 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider bg-accent-primary/10 text-accent-primary border border-accent-primary/20">
                     {adminRole === 'super_admin' ? 'Super Administrator' : 'Administrator'}
                   </span>
                 </div>

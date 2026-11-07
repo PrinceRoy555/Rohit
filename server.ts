@@ -2692,7 +2692,16 @@ Context:
 
 // Set up Vite dev server middleware or serve production static assets
 const startServer = async () => {
-  if (process.env.NODE_ENV !== 'production') {
+  const isProduction =
+    process.env.NODE_ENV === 'production' ||
+    fs.existsSync(path.join(process.cwd(), 'dist', 'index.html')) ||
+    (typeof __filename !== 'undefined' && __filename.endsWith('.cjs'));
+
+  if (!isProduction) {
+    const publicPath = path.join(process.cwd(), 'public');
+    if (fs.existsSync(publicPath)) {
+      app.use(express.static(publicPath));
+    }
     const { createServer: createViteServer } = await import('vite');
     const vite = await createViteServer({
       server: { middlewareMode: true },
@@ -2700,15 +2709,23 @@ const startServer = async () => {
     });
     app.use(vite.middlewares);
   } else {
-    const distPath = path.join(process.cwd(), 'dist');
+    const distPath = fs.existsSync(path.join(process.cwd(), 'dist'))
+      ? path.join(process.cwd(), 'dist')
+      : path.join(__dirname, '..', 'dist');
+
     app.use(express.static(distPath));
     app.get('*', (req, res) => {
       res.sendFile(path.join(distPath, 'index.html'));
     });
   }
 
-  app.listen(PORT, '0.0.0.0', () => {
+  const server = app.listen(PORT, '0.0.0.0', () => {
     console.log(`Server running on http://localhost:${PORT}`);
+  });
+
+  server.on('error', (err: any) => {
+    console.error('Server listen error:', err);
+    process.exit(1);
   });
 };
 
@@ -2721,20 +2738,11 @@ const isServerless = Boolean(
   process.env.IS_SERVERLESS
 );
 
-if (!isServerless && (!process.env.NODE_ENV || process.env.NODE_ENV !== 'test')) {
-  const isDirectRun = Boolean(
-    process.argv[1] && (
-      process.argv[1].endsWith('server.ts') ||
-      process.argv[1].endsWith('server.cjs') ||
-      process.argv[1].endsWith('server.js')
-    )
-  );
-
-  if (isDirectRun) {
-    startServer().catch((err) => {
-      console.error('Failed to start server:', err);
-    });
-  }
+if (!isServerless && process.env.NODE_ENV !== 'test') {
+  startServer().catch((err) => {
+    console.error('Failed to start server:', err);
+    process.exit(1);
+  });
 }
 
 export default app;

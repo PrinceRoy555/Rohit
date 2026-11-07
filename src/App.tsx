@@ -547,8 +547,8 @@ export default function App() {
 
       {/* React Bits Pro Custom Cursor with target morphing & spring physics */}
       <CustomCursor
-        circleColor={theme === 'dark' ? 'rgba(255, 59, 78, 0.65)' : 'rgba(165, 12, 24, 0.65)'}
-        dotColor={theme === 'dark' ? '#FF3B4E' : '#A50C18'}
+        circleColor={theme === 'dark' ? 'rgba(37, 123, 253, 0.65)' : 'rgba(8, 102, 245, 0.65)'}
+        dotColor={theme === 'dark' ? '#257BFD' : '#0866F5'}
         circleSize={36}
         dotSize={6}
         circleBorderWidth={1.5}

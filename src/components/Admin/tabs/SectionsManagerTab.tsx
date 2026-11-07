@@ -157,7 +157,7 @@ export const SectionsManagerTab: React.FC = () => {
               onClick={() => setActiveSubTab(tab.id as any)}
               className={`flex-shrink-0 whitespace-nowrap min-h-[38px] flex items-center gap-2 px-3.5 sm:px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all active:scale-98 ${
                 isActive
-                  ? 'bg-rose-600 text-white shadow-xs'
+                  ? 'bg-accent-primary text-white shadow-xs'
                   : 'text-text-muted hover:text-text-primary hover:bg-bg-secondary'
               }`}
             >
@@ -199,7 +199,7 @@ export const SectionsManagerTab: React.FC = () => {
                       <div className="flex items-center gap-2 flex-wrap">
                         <h4 className="text-sm sm:text-base font-bold text-text-primary">{sec.title}</h4>
                         {sec.badge && (
-                          <span className="px-2 py-0.5 rounded-full text-[10px] sm:text-xs font-semibold bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-500/20">
+                          <span className="px-2 py-0.5 rounded-full text-[10px] sm:text-xs font-semibold bg-accent-primary/10 text-accent-primary border border-accent-primary/20">
                             {sec.badge}
                           </span>
                         )}
@@ -230,7 +230,7 @@ export const SectionsManagerTab: React.FC = () => {
                         type="text"
                         value={sec.title || ''}
                         onChange={(e) => handleUpdateSectionInfo(key, 'title', e.target.value)}
-                        className="w-full min-h-[40px] bg-bg-secondary border border-border-color rounded-xl px-3 py-2 text-xs text-text-primary focus:border-rose-500 focus:outline-none"
+                        className="w-full min-h-[40px] bg-bg-secondary border border-border-color rounded-xl px-3 py-2 text-xs text-text-primary focus:border-accent-primary focus:outline-none"
                       />
                     </div>
 
@@ -240,7 +240,7 @@ export const SectionsManagerTab: React.FC = () => {
                         type="text"
                         value={sec.badge || ''}
                         onChange={(e) => handleUpdateSectionInfo(key, 'badge', e.target.value)}
-                        className="w-full min-h-[40px] bg-bg-secondary border border-border-color rounded-xl px-3 py-2 text-xs text-text-primary focus:border-rose-500 focus:outline-none"
+                        className="w-full min-h-[40px] bg-bg-secondary border border-border-color rounded-xl px-3 py-2 text-xs text-text-primary focus:border-accent-primary focus:outline-none"
                       />
                     </div>
 
@@ -250,7 +250,7 @@ export const SectionsManagerTab: React.FC = () => {
                         type="text"
                         value={sec.subtitle || ''}
                         onChange={(e) => handleUpdateSectionInfo(key, 'subtitle', e.target.value)}
-                        className="w-full min-h-[40px] bg-bg-secondary border border-border-color rounded-xl px-3 py-2 text-xs text-text-primary focus:border-rose-500 focus:outline-none"
+                        className="w-full min-h-[40px] bg-bg-secondary border border-border-color rounded-xl px-3 py-2 text-xs text-text-primary focus:border-accent-primary focus:outline-none"
                       />
                     </div>
                   </div>
@@ -279,7 +279,7 @@ export const SectionsManagerTab: React.FC = () => {
                 value={sections.hero.headlinePrefix || ''}
                 placeholder="CREATIVE EXCELLENCE IN"
                 onChange={(e) => handleUpdateSectionInfo('hero', 'headlinePrefix', e.target.value)}
-                className="w-full min-h-[42px] bg-bg-secondary border border-border-color rounded-xl px-3 py-2 text-sm text-text-primary focus:border-rose-500 focus:outline-none"
+                className="w-full min-h-[42px] bg-bg-secondary border border-border-color rounded-xl px-3 py-2 text-sm text-text-primary focus:border-accent-primary focus:outline-none"
               />
             </div>
 
@@ -290,7 +290,7 @@ export const SectionsManagerTab: React.FC = () => {
                 value={sections.hero.role || ''}
                 placeholder="Graphic Designer & Video Editor"
                 onChange={(e) => handleUpdateSectionInfo('hero', 'role', e.target.value)}
-                className="w-full min-h-[42px] bg-bg-secondary border border-border-color rounded-xl px-3 py-2 text-sm text-text-primary focus:border-rose-500 focus:outline-none"
+                className="w-full min-h-[42px] bg-bg-secondary border border-border-color rounded-xl px-3 py-2 text-sm text-text-primary focus:border-accent-primary focus:outline-none"
               />
             </div>
 
@@ -301,7 +301,7 @@ export const SectionsManagerTab: React.FC = () => {
                 value={sections.hero.location || ''}
                 placeholder="Jaipur, India"
                 onChange={(e) => handleUpdateSectionInfo('hero', 'location', e.target.value)}
-                className="w-full min-h-[42px] bg-bg-secondary border border-border-color rounded-xl px-3 py-2 text-sm text-text-primary focus:border-rose-500 focus:outline-none"
+                className="w-full min-h-[42px] bg-bg-secondary border border-border-color rounded-xl px-3 py-2 text-sm text-text-primary focus:border-accent-primary focus:outline-none"
               />
             </div>
           </div>
@@ -313,7 +313,7 @@ export const SectionsManagerTab: React.FC = () => {
               value={sections.hero.subtitle || ''}
               placeholder="Professional Graphic Designer, Video Editor, Website Developer and Digital Marketing Professional based in Jaipur, India..."
               onChange={(e) => handleUpdateSectionInfo('hero', 'subtitle', e.target.value)}
-              className="w-full bg-bg-secondary border border-border-color rounded-xl px-3 py-2 text-sm text-text-primary focus:border-rose-500 focus:outline-none resize-y"
+              className="w-full bg-bg-secondary border border-border-color rounded-xl px-3 py-2 text-sm text-text-primary focus:border-accent-primary focus:outline-none resize-y"
             />
           </div>
 
@@ -324,7 +324,7 @@ export const SectionsManagerTab: React.FC = () => {
                 type="text"
                 value={sections.hero.ctaPrimaryText || ''}
                 onChange={(e) => handleUpdateSectionInfo('hero', 'ctaPrimaryText', e.target.value)}
-                className="w-full min-h-[42px] bg-bg-secondary border border-border-color rounded-xl px-3 py-2 text-sm text-text-primary focus:border-rose-500 focus:outline-none"
+                className="w-full min-h-[42px] bg-bg-secondary border border-border-color rounded-xl px-3 py-2 text-sm text-text-primary focus:border-accent-primary focus:outline-none"
               />
             </div>
 
@@ -334,7 +334,7 @@ export const SectionsManagerTab: React.FC = () => {
                 type="text"
                 value={sections.hero.ctaPrimaryLink || ''}
                 onChange={(e) => handleUpdateSectionInfo('hero', 'ctaPrimaryLink', e.target.value)}
-                className="w-full min-h-[42px] bg-bg-secondary border border-border-color rounded-xl px-3 py-2 text-sm text-text-primary focus:border-rose-500 focus:outline-none"
+                className="w-full min-h-[42px] bg-bg-secondary border border-border-color rounded-xl px-3 py-2 text-sm text-text-primary focus:border-accent-primary focus:outline-none"
               />
             </div>
 
@@ -344,7 +344,7 @@ export const SectionsManagerTab: React.FC = () => {
                 type="text"
                 value={sections.hero.ctaSecondaryText || ''}
                 onChange={(e) => handleUpdateSectionInfo('hero', 'ctaSecondaryText', e.target.value)}
-                className="w-full min-h-[42px] bg-bg-secondary border border-border-color rounded-xl px-3 py-2 text-sm text-text-primary focus:border-rose-500 focus:outline-none"
+                className="w-full min-h-[42px] bg-bg-secondary border border-border-color rounded-xl px-3 py-2 text-sm text-text-primary focus:border-accent-primary focus:outline-none"
               />
             </div>
 
@@ -354,7 +354,7 @@ export const SectionsManagerTab: React.FC = () => {
                 type="text"
                 value={sections.hero.ctaSecondaryLink || ''}
                 onChange={(e) => handleUpdateSectionInfo('hero', 'ctaSecondaryLink', e.target.value)}
-                className="w-full min-h-[42px] bg-bg-secondary border border-border-color rounded-xl px-3 py-2 text-sm text-text-primary focus:border-rose-500 focus:outline-none"
+                className="w-full min-h-[42px] bg-bg-secondary border border-border-color rounded-xl px-3 py-2 text-sm text-text-primary focus:border-accent-primary focus:outline-none"
               />
             </div>
           </div>
@@ -368,7 +368,7 @@ export const SectionsManagerTab: React.FC = () => {
             <h3 className="text-sm sm:text-base font-bold text-text-primary">Custom Pages & Legal Documents</h3>
             <button
               onClick={() => setShowAddPageModal(true)}
-              className="min-h-[38px] sm:min-h-[40px] px-4 py-2 rounded-xl text-xs font-semibold bg-rose-600 hover:bg-rose-700 text-white shadow-xs flex items-center justify-center gap-1.5 self-stretch sm:self-auto active:scale-98"
+              className="min-h-[38px] sm:min-h-[40px] px-4 py-2 rounded-xl text-xs font-semibold bg-accent-primary hover:bg-accent-secondary text-white shadow-xs flex items-center justify-center gap-1.5 self-stretch sm:self-auto active:scale-98"
             >
               <Plus className="w-4 h-4" />
               <span>Create New Page</span>
@@ -379,7 +379,7 @@ export const SectionsManagerTab: React.FC = () => {
             {(draftConfig.customPages || []).map((page) => (
               <div
                 key={page.id}
-                className="p-4 sm:p-5 rounded-xl sm:rounded-2xl bg-bg-card border border-border-color hover:border-rose-500/30 transition-all flex flex-col justify-between shadow-xs"
+                className="p-4 sm:p-5 rounded-xl sm:rounded-2xl bg-bg-card border border-border-color hover:border-accent-primary/30 transition-all flex flex-col justify-between shadow-xs"
               >
                 <div>
                   <div className="flex items-center justify-between">
@@ -398,7 +398,7 @@ export const SectionsManagerTab: React.FC = () => {
                   <div className="flex items-center gap-2">
                     <button
                       onClick={() => handleDeletePage(page.id)}
-                      className="w-8 h-8 rounded-lg bg-rose-500/10 text-rose-600 dark:text-rose-400 hover:bg-rose-500/20 border border-rose-500/20 flex items-center justify-center transition-colors active:scale-95"
+                      className="w-8 h-8 rounded-lg bg-accent-primary/10 text-accent-primary hover:bg-accent-primary/20 border border-accent-primary/20 flex items-center justify-center transition-colors active:scale-95"
                       title="Delete page"
                     >
                       <Trash2 className="w-3.5 h-3.5" />
@@ -426,7 +426,7 @@ export const SectionsManagerTab: React.FC = () => {
                   placeholder="e.g., Client FAQ & Onboarding"
                   value={newPageTitle}
                   onChange={(e) => setNewPageTitle(e.target.value)}
-                  className="w-full min-h-[42px] bg-bg-secondary border border-border-color rounded-xl px-3 py-2 text-sm text-text-primary focus:border-rose-500 focus:outline-none"
+                  className="w-full min-h-[42px] bg-bg-secondary border border-border-color rounded-xl px-3 py-2 text-sm text-text-primary focus:border-accent-primary focus:outline-none"
                 />
               </div>
 
@@ -437,7 +437,7 @@ export const SectionsManagerTab: React.FC = () => {
                   placeholder="e.g., client-faq"
                   value={newPageSlug}
                   onChange={(e) => setNewPageSlug(e.target.value)}
-                  className="w-full min-h-[42px] bg-bg-secondary border border-border-color rounded-xl px-3 py-2 text-sm text-text-primary focus:border-rose-500 focus:outline-none font-mono"
+                  className="w-full min-h-[42px] bg-bg-secondary border border-border-color rounded-xl px-3 py-2 text-sm text-text-primary focus:border-accent-primary focus:outline-none font-mono"
                 />
               </div>
 
@@ -448,7 +448,7 @@ export const SectionsManagerTab: React.FC = () => {
                   placeholder="SEO meta summary..."
                   value={newPageDesc}
                   onChange={(e) => setNewPageDesc(e.target.value)}
-                  className="w-full min-h-[42px] bg-bg-secondary border border-border-color rounded-xl px-3 py-2 text-sm text-text-primary focus:border-rose-500 focus:outline-none"
+                  className="w-full min-h-[42px] bg-bg-secondary border border-border-color rounded-xl px-3 py-2 text-sm text-text-primary focus:border-accent-primary focus:outline-none"
                 />
               </div>
 
@@ -459,7 +459,7 @@ export const SectionsManagerTab: React.FC = () => {
                   placeholder="# Page Heading&#10;&#10;Enter detailed page content here..."
                   value={newPageContent}
                   onChange={(e) => setNewPageContent(e.target.value)}
-                  className="w-full bg-bg-secondary border border-border-color rounded-xl p-3 text-xs font-mono text-text-primary focus:border-rose-500 focus:outline-none"
+                  className="w-full bg-bg-secondary border border-border-color rounded-xl p-3 text-xs font-mono text-text-primary focus:border-accent-primary focus:outline-none"
                 />
               </div>
 
@@ -473,7 +473,7 @@ export const SectionsManagerTab: React.FC = () => {
                 </button>
                 <button
                   type="submit"
-                  className="min-h-[42px] px-5 py-2 rounded-xl text-xs font-semibold bg-rose-600 hover:bg-rose-700 text-white shadow-xs transition-all active:scale-98"
+                  className="min-h-[42px] px-5 py-2 rounded-xl text-xs font-semibold bg-accent-primary hover:bg-accent-secondary text-white shadow-xs transition-all active:scale-98"
                 >
                   Save Page
                 </button>

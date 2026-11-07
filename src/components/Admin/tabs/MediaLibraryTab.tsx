@@ -109,7 +109,7 @@ export const MediaLibraryTab: React.FC = () => {
             placeholder="Search media files..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full min-h-[42px] bg-bg-card border border-border-color rounded-xl pl-9 pr-3.5 py-2 text-xs sm:text-sm text-text-primary placeholder:text-text-muted focus:border-rose-500 focus:outline-none"
+            className="w-full min-h-[42px] bg-bg-card border border-border-color rounded-xl pl-9 pr-3.5 py-2 text-xs sm:text-sm text-text-primary placeholder:text-text-muted focus:border-accent-primary focus:outline-none"
           />
         </div>
 
@@ -120,7 +120,7 @@ export const MediaLibraryTab: React.FC = () => {
               onClick={() => setFilterCategory(cat)}
               className={`flex-shrink-0 whitespace-nowrap min-h-[38px] px-3.5 py-1.5 rounded-xl text-xs font-semibold capitalize transition-all active:scale-98 ${
                 filterCategory === cat
-                  ? 'bg-rose-600 text-white shadow-xs'
+                  ? 'bg-accent-primary text-white shadow-xs'
                   : 'bg-bg-card text-text-secondary hover:text-text-primary border border-border-color hover:bg-bg-secondary'
               }`}
             >
@@ -146,7 +146,7 @@ export const MediaLibraryTab: React.FC = () => {
             return (
               <div
                 key={item.id}
-                className="bg-bg-card border border-border-color hover:border-rose-500/40 rounded-xl sm:rounded-2xl overflow-hidden transition-all flex flex-col justify-between group shadow-xs"
+                className="bg-bg-card border border-border-color hover:border-accent-primary/40 rounded-xl sm:rounded-2xl overflow-hidden transition-all flex flex-col justify-between group shadow-xs"
               >
                 <div className="relative h-36 sm:h-40 w-full bg-black/10 dark:bg-black/60 overflow-hidden">
                   <img
@@ -185,7 +185,7 @@ export const MediaLibraryTab: React.FC = () => {
 
                   <button
                     onClick={() => handleDelete(item.id, item.name)}
-                    className="min-w-[38px] min-h-[38px] p-1.5 rounded-xl bg-bg-secondary hover:bg-rose-500/10 text-text-muted hover:text-rose-600 dark:hover:text-rose-400 border border-border-color flex items-center justify-center active:scale-95"
+                    className="min-w-[38px] min-h-[38px] p-1.5 rounded-xl bg-bg-secondary hover:bg-accent-primary/10 text-text-muted hover:text-accent-primary dark:hover:text-accent-primary border border-border-color flex items-center justify-center active:scale-95"
                     title="Delete"
                   >
                     <Trash2 className="w-3.5 h-3.5" />
@@ -212,7 +212,7 @@ export const MediaLibraryTab: React.FC = () => {
                   placeholder="e.g. Agency Hero Header Dark"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  className="w-full min-h-[42px] bg-bg-secondary border border-border-color rounded-xl px-3 py-2 text-sm text-text-primary focus:border-rose-500 focus:outline-none"
+                  className="w-full min-h-[42px] bg-bg-secondary border border-border-color rounded-xl px-3 py-2 text-sm text-text-primary focus:border-accent-primary focus:outline-none"
                 />
               </div>
 
@@ -224,7 +224,7 @@ export const MediaLibraryTab: React.FC = () => {
                   placeholder="https://images.unsplash.com/..."
                   value={url}
                   onChange={(e) => setUrl(e.target.value)}
-                  className="w-full min-h-[42px] bg-bg-secondary border border-border-color rounded-xl px-3 py-2 text-sm text-text-primary focus:border-rose-500 focus:outline-none"
+                  className="w-full min-h-[42px] bg-bg-secondary border border-border-color rounded-xl px-3 py-2 text-sm text-text-primary focus:border-accent-primary focus:outline-none"
                 />
               </div>
 
@@ -233,7 +233,7 @@ export const MediaLibraryTab: React.FC = () => {
                 <select
                   value={category}
                   onChange={(e) => setCategory(e.target.value)}
-                  className="w-full min-h-[42px] bg-bg-secondary border border-border-color rounded-xl px-3 py-2 text-sm text-text-primary focus:border-rose-500 focus:outline-none"
+                  className="w-full min-h-[42px] bg-bg-secondary border border-border-color rounded-xl px-3 py-2 text-sm text-text-primary focus:border-accent-primary focus:outline-none"
                 >
                   <option value="portfolio">Portfolio</option>
                   <option value="branding">Branding</option>
@@ -249,7 +249,7 @@ export const MediaLibraryTab: React.FC = () => {
                   placeholder="e.g. 4k, mockup, dark-theme"
                   value={tagsStr}
                   onChange={(e) => setTagsStr(e.target.value)}
-                  className="w-full min-h-[42px] bg-bg-secondary border border-border-color rounded-xl px-3 py-2 text-sm text-text-primary focus:border-rose-500 focus:outline-none"
+                  className="w-full min-h-[42px] bg-bg-secondary border border-border-color rounded-xl px-3 py-2 text-sm text-text-primary focus:border-accent-primary focus:outline-none"
                 />
               </div>
 
@@ -263,7 +263,7 @@ export const MediaLibraryTab: React.FC = () => {
                 </button>
                 <button
                   type="submit"
-                  className="min-h-[42px] px-5 py-2 rounded-xl text-xs font-semibold bg-rose-600 hover:bg-rose-700 text-white shadow-xs active:scale-98"
+                  className="min-h-[42px] px-5 py-2 rounded-xl text-xs font-semibold bg-accent-primary hover:bg-accent-secondary text-white shadow-xs active:scale-98"
                 >
                   Save Asset
                 </button>

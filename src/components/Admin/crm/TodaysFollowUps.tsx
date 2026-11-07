@@ -77,13 +77,13 @@ export const TodaysFollowUps: React.FC<TodaysFollowUpsProps> = ({
         <div className="space-y-1">
           <div className="flex items-center gap-2 flex-wrap">
             <h3 className="text-base sm:text-xl font-bold text-text-primary flex items-center gap-2">
-              <Clock className="w-4 sm:w-5 h-4 sm:h-5 text-rose-600 dark:text-rose-400" />
+              <Clock className="w-4 sm:w-5 h-4 sm:h-5 text-accent-primary" />
               <span>Today&apos;s Follow-ups</span>
             </h3>
 
             {overdueLeads.length > 0 && (
-              <span className="px-2 py-0.5 rounded-full text-[11px] font-bold bg-rose-500/15 text-rose-600 dark:text-rose-400 border border-rose-500/30 flex items-center gap-1">
-                <span className="w-1.5 h-1.5 rounded-full bg-rose-500 animate-pulse" />
+              <span className="px-2 py-0.5 rounded-full text-[11px] font-bold bg-red-500/15 text-red-600 dark:text-red-400 border border-red-500/30 flex items-center gap-1">
+                <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse" />
                 <span>{overdueLeads.length} Overdue</span>
               </span>
             )}
@@ -100,7 +100,7 @@ export const TodaysFollowUps: React.FC<TodaysFollowUpsProps> = ({
         {onViewAll && !isFullView && (
           <button
             onClick={onViewAll}
-            className="flex items-center gap-1.5 text-xs font-semibold text-rose-600 dark:text-rose-400 hover:text-rose-700 dark:hover:text-rose-300 transition-colors self-start sm:self-auto py-1 min-h-[36px]"
+            className="flex items-center gap-1.5 text-xs font-semibold text-accent-primary hover:text-accent-secondary transition-colors self-start sm:self-auto py-1 min-h-[36px]"
           >
             <span>View All ({leads.filter((l) => Boolean(l.followUpAt)).length})</span>
             <ArrowRight className="w-3.5 h-3.5" />
@@ -115,7 +115,7 @@ export const TodaysFollowUps: React.FC<TodaysFollowUpsProps> = ({
             onClick={() => setActiveFilter('today')}
             className={`min-h-[38px] px-3.5 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition-all flex items-center gap-2 ${
               activeFilter === 'today'
-                ? 'bg-rose-600 text-white shadow-xs'
+                ? 'bg-accent-primary text-white shadow-xs'
                 : 'bg-bg-secondary text-text-muted hover:text-text-primary border border-border-color'
             }`}
           >
@@ -127,7 +127,7 @@ export const TodaysFollowUps: React.FC<TodaysFollowUpsProps> = ({
             onClick={() => setActiveFilter('overdue')}
             className={`min-h-[38px] px-3.5 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition-all flex items-center gap-2 ${
               activeFilter === 'overdue'
-                ? 'bg-rose-600 text-white shadow-xs'
+                ? 'bg-accent-primary text-white shadow-xs'
                 : 'bg-bg-secondary text-text-muted hover:text-text-primary border border-border-color'
             }`}
           >
@@ -139,7 +139,7 @@ export const TodaysFollowUps: React.FC<TodaysFollowUpsProps> = ({
             onClick={() => setActiveFilter('upcoming')}
             className={`min-h-[38px] px-3.5 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition-all flex items-center gap-2 ${
               activeFilter === 'upcoming'
-                ? 'bg-rose-600 text-white shadow-xs'
+                ? 'bg-accent-primary text-white shadow-xs'
                 : 'bg-bg-secondary text-text-muted hover:text-text-primary border border-border-color'
             }`}
           >
@@ -151,7 +151,7 @@ export const TodaysFollowUps: React.FC<TodaysFollowUpsProps> = ({
             onClick={() => setActiveFilter('completed')}
             className={`min-h-[38px] px-3.5 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition-all flex items-center gap-2 ${
               activeFilter === 'completed'
-                ? 'bg-rose-600 text-white shadow-xs'
+                ? 'bg-accent-primary text-white shadow-xs'
                 : 'bg-bg-secondary text-text-muted hover:text-text-primary border border-border-color'
             }`}
           >
@@ -185,10 +185,10 @@ export const TodaysFollowUps: React.FC<TodaysFollowUpsProps> = ({
                 onClick={() => onOpenLead(lead)}
                 className={`p-3.5 sm:p-5 rounded-xl sm:rounded-2xl border transition-all cursor-pointer group flex flex-col md:flex-row md:items-center justify-between gap-3 sm:gap-4 ${
                   isOverdue
-                    ? 'bg-rose-500/5 dark:bg-rose-500/10 border-rose-500/30 hover:border-rose-500/50 shadow-xs'
+                    ? 'bg-red-500/5 dark:bg-red-500/10 border-red-500/30 hover:border-red-500/50 shadow-xs'
                     : isCompleted
                     ? 'bg-bg-secondary border-border-color opacity-75'
-                    : 'bg-bg-secondary hover:bg-bg-card-hover border-border-color hover:border-rose-500/30'
+                    : 'bg-bg-secondary hover:bg-bg-card-hover border-border-color hover:border-accent-primary/30'
                 }`}
               >
                 {/* Left: Client & Action details */}
@@ -197,13 +197,13 @@ export const TodaysFollowUps: React.FC<TodaysFollowUpsProps> = ({
                     {/* Time Badge */}
                     <span className={`px-2 py-0.5 rounded-lg text-xs font-semibold tabular-nums ${
                       isOverdue
-                        ? 'bg-rose-500/20 text-rose-600 dark:text-rose-400'
+                        ? 'bg-red-500/15 text-red-600 dark:text-red-400'
                         : 'bg-bg-card text-text-primary border border-border-color'
                     }`}>
                       {lead.followUpAt ? formatFollowUpDateTime(lead.followUpAt) : 'Scheduled'}
                     </span>
 
-                    <h4 className="text-sm font-bold text-text-primary truncate group-hover:text-rose-600 dark:group-hover:text-rose-400 transition-colors">
+                    <h4 className="text-sm font-bold text-text-primary truncate group-hover:text-accent-primary transition-colors">
                       {lead.name}
                     </h4>
 
@@ -214,7 +214,7 @@ export const TodaysFollowUps: React.FC<TodaysFollowUpsProps> = ({
                     )}
 
                     {lead.isHotLead && (
-                      <span className="inline-flex items-center gap-0.5 px-2 py-0.5 rounded-full text-[10px] font-bold bg-rose-500/15 text-rose-600 dark:text-rose-400 border border-rose-500/30">
+                      <span className="inline-flex items-center gap-0.5 px-2 py-0.5 rounded-full text-[10px] font-bold bg-red-500/15 text-red-600 dark:text-red-400 border border-red-500/30">
                         <Flame className="w-2.5 h-2.5 fill-current" />
                         <span>HOT</span>
                       </span>
@@ -222,14 +222,14 @@ export const TodaysFollowUps: React.FC<TodaysFollowUpsProps> = ({
 
                     {/* Priority Badge */}
                     {lead.priority === 'high' && (
-                      <span className="px-2 py-0.5 rounded-md text-[10px] font-bold bg-rose-500/15 text-rose-600 dark:text-rose-400">
+                      <span className="px-2 py-0.5 rounded-md text-[10px] font-bold bg-amber-500/15 text-amber-600 dark:text-amber-400">
                         High
                       </span>
                     )}
 
                     {/* Overdue Badge */}
                     {isOverdue && lead.followUpAt && (
-                      <span className="px-2 py-0.5 rounded-md text-[10px] font-bold bg-rose-600 text-white">
+                      <span className="px-2 py-0.5 rounded-md text-[10px] font-bold bg-red-600 text-white">
                         {formatOverdueDuration(lead.followUpAt)}
                       </span>
                     )}
@@ -285,7 +285,7 @@ export const TodaysFollowUps: React.FC<TodaysFollowUpsProps> = ({
 
                     <a
                       href={`mailto:${lead.email}?subject=${encodeURIComponent(`Follow-up: ${lead.service}`)}`}
-                      className="w-9 h-9 rounded-xl bg-bg-card hover:bg-rose-500/20 text-rose-600 dark:text-rose-400 border border-border-color hover:border-rose-500/30 transition-colors flex items-center justify-center active:scale-95"
+                      className="w-9 h-9 rounded-xl bg-bg-card hover:bg-accent-primary/10 text-accent-primary border border-border-color hover:border-accent-primary/30 transition-colors flex items-center justify-center active:scale-95"
                       title={`Email ${lead.email}`}
                       aria-label="Email Client"
                     >

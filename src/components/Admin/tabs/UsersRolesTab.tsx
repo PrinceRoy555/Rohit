@@ -113,7 +113,7 @@ export const UsersRolesTab: React.FC = () => {
           onClick={() => setActiveSubTab('users')}
           className={`flex-1 min-h-[40px] flex items-center justify-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 rounded-lg sm:rounded-xl text-xs sm:text-sm font-semibold transition-all active:scale-98 ${
             activeSubTab === 'users'
-              ? 'bg-rose-600 text-white shadow-xs'
+              ? 'bg-accent-primary text-white shadow-xs'
               : 'text-text-muted hover:text-text-primary hover:bg-bg-secondary'
           }`}
         >
@@ -124,7 +124,7 @@ export const UsersRolesTab: React.FC = () => {
           onClick={() => setActiveSubTab('audit')}
           className={`flex-1 min-h-[40px] flex items-center justify-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 rounded-lg sm:rounded-xl text-xs sm:text-sm font-semibold transition-all active:scale-98 ${
             activeSubTab === 'audit'
-              ? 'bg-rose-600 text-white shadow-xs'
+              ? 'bg-accent-primary text-white shadow-xs'
               : 'text-text-muted hover:text-text-primary hover:bg-bg-secondary'
           }`}
         >
@@ -144,7 +144,7 @@ export const UsersRolesTab: React.FC = () => {
               <div className="space-y-1 min-w-0">
                 <div className="flex items-center gap-2 flex-wrap">
                   <h4 className="text-xs sm:text-sm font-bold text-text-primary truncate">{u.name}</h4>
-                  <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-500/20 uppercase tracking-wider">
+                  <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-accent-primary/10 text-accent-primary border border-accent-primary/20 uppercase tracking-wider">
                     {u.role.replace('_', ' ')}
                   </span>
                 </div>
@@ -154,7 +154,7 @@ export const UsersRolesTab: React.FC = () => {
               {u.role !== 'super_admin' && (
                 <button
                   onClick={() => handleDeleteUser(u.id, u.email)}
-                  className="min-h-[40px] min-w-[40px] p-2 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-500 transition-colors flex items-center justify-center flex-shrink-0 active:scale-95"
+                  className="min-h-[40px] min-w-[40px] p-2 rounded-xl bg-accent-primary/10 hover:bg-accent-primary/20 text-accent-primary transition-colors flex items-center justify-center flex-shrink-0 active:scale-95"
                   title="Delete user account"
                 >
                   <Trash2 className="w-4 h-4" />
@@ -183,10 +183,10 @@ export const UsersRolesTab: React.FC = () => {
                         ? 'bg-emerald-500'
                         : log.status === 'warning'
                         ? 'bg-amber-500'
-                        : 'bg-rose-500'
+                        : 'bg-accent-primary'
                     }`}
                   />
-                  <span className="text-rose-600 dark:text-rose-400 font-bold">{log.action}</span>
+                  <span className="text-accent-primary font-bold">{log.action}</span>
                   <span className="text-text-muted truncate">({log.userEmail})</span>
                   <span className="text-text-secondary truncate">{log.details}</span>
                 </div>
@@ -215,7 +215,7 @@ export const UsersRolesTab: React.FC = () => {
                   placeholder="e.g. Client Manager"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  className="w-full min-h-[42px] bg-bg-secondary border border-border-color rounded-xl px-3 py-2 text-sm text-text-primary focus:border-rose-500 focus:outline-none"
+                  className="w-full min-h-[42px] bg-bg-secondary border border-border-color rounded-xl px-3 py-2 text-sm text-text-primary focus:border-accent-primary focus:outline-none"
                 />
               </div>
 
@@ -227,7 +227,7 @@ export const UsersRolesTab: React.FC = () => {
                   placeholder="admin@client.com"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full min-h-[42px] bg-bg-secondary border border-border-color rounded-xl px-3 py-2 text-sm text-text-primary focus:border-rose-500 focus:outline-none"
+                  className="w-full min-h-[42px] bg-bg-secondary border border-border-color rounded-xl px-3 py-2 text-sm text-text-primary focus:border-accent-primary focus:outline-none"
                 />
               </div>
 
@@ -239,7 +239,7 @@ export const UsersRolesTab: React.FC = () => {
                   placeholder="••••••••••••"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full min-h-[42px] bg-bg-secondary border border-border-color rounded-xl px-3 py-2 text-sm text-text-primary focus:border-rose-500 focus:outline-none"
+                  className="w-full min-h-[42px] bg-bg-secondary border border-border-color rounded-xl px-3 py-2 text-sm text-text-primary focus:border-accent-primary focus:outline-none"
                 />
               </div>
 
@@ -248,7 +248,7 @@ export const UsersRolesTab: React.FC = () => {
                 <select
                   value={role}
                   onChange={(e) => setRole(e.target.value as any)}
-                  className="w-full min-h-[42px] bg-bg-secondary border border-border-color rounded-xl px-3 py-2 text-sm text-text-primary focus:border-rose-500 focus:outline-none"
+                  className="w-full min-h-[42px] bg-bg-secondary border border-border-color rounded-xl px-3 py-2 text-sm text-text-primary focus:border-accent-primary focus:outline-none"
                 >
                   <option value="editor">Editor (Content & Media Only)</option>
                   <option value="admin">Admin (Full Customizer & Sections)</option>
@@ -266,7 +266,7 @@ export const UsersRolesTab: React.FC = () => {
                 </button>
                 <button
                   type="submit"
-                  className="min-h-[42px] px-5 py-2 rounded-xl text-xs font-semibold bg-rose-600 hover:bg-rose-700 text-white shadow-xs active:scale-98"
+                  className="min-h-[42px] px-5 py-2 rounded-xl text-xs font-semibold bg-accent-primary hover:bg-accent-secondary text-white shadow-xs active:scale-98"
                 >
                   Create Account
                 </button>

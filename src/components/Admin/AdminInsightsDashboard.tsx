@@ -561,7 +561,7 @@ export default function AdminInsightsDashboard({ onClose, onPreviewInsight }: Ad
             </div>
 
             {authError && (
-              <div className="flex items-center gap-2 text-rose-400 text-xs bg-rose-500/10 p-3.5 rounded-xl border border-rose-500/20">
+              <div className="flex items-center gap-2 text-red-400 text-xs bg-red-500/10 p-3.5 rounded-xl border border-red-500/20">
                 <AlertCircle className="w-4 h-4 flex-shrink-0" />
                 <span>{authError}</span>
               </div>
@@ -688,7 +688,7 @@ export default function AdminInsightsDashboard({ onClose, onPreviewInsight }: Ad
           <button
             onClick={handleLogout}
             title="Securely Log Out"
-            className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-bg-primary hover:bg-rose-500/10 hover:border-rose-500/30 text-text-secondary hover:text-rose-400 border border-border-color text-xs font-semibold transition-colors cursor-pointer"
+            className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-bg-primary hover:bg-red-500/10 hover:border-red-500/30 text-text-secondary hover:text-red-500 border border-border-color text-xs font-semibold transition-colors cursor-pointer"
           >
             <LogOut className="w-3.5 h-3.5" />
             Sign Out
@@ -708,7 +708,7 @@ export default function AdminInsightsDashboard({ onClose, onPreviewInsight }: Ad
           className={`px-6 py-3 text-xs font-bold flex items-center justify-between z-30 ${
             feedbackMsg.type === 'success'
               ? 'bg-emerald-500/15 text-emerald-400 border-b border-emerald-500/30'
-              : 'bg-rose-500/15 text-rose-400 border-b border-rose-500/30'
+              : 'bg-red-500/15 text-red-400 border-b border-red-500/30'
           }`}
         >
           <span>{feedbackMsg.text}</span>
@@ -942,7 +942,7 @@ export default function AdminInsightsDashboard({ onClose, onPreviewInsight }: Ad
                         <button
                           onClick={() => setDeleteConfirmId(item.id)}
                           title="Delete Insight"
-                          className="p-2 rounded-xl bg-bg-primary hover:bg-rose-500/10 hover:border-rose-500/30 text-text-secondary hover:text-rose-400 border border-border-color transition-colors cursor-pointer"
+                          className="p-2 rounded-xl bg-bg-primary hover:bg-red-500/10 hover:border-red-500/30 text-text-secondary hover:text-red-500 border border-border-color transition-colors cursor-pointer"
                         >
                           <Trash2 className="w-4 h-4" />
                         </button>
@@ -1222,7 +1222,7 @@ export default function AdminInsightsDashboard({ onClose, onPreviewInsight }: Ad
                           <button
                             type="button"
                             onClick={() => handleRemoveTag(tag)}
-                            className="hover:text-rose-400 cursor-pointer"
+                            className="hover:text-red-500 cursor-pointer"
                           >
                             <X className="w-3 h-3" />
                           </button>
@@ -1567,7 +1567,7 @@ export default function AdminInsightsDashboard({ onClose, onPreviewInsight }: Ad
                                 log.status === 'success'
                                   ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'
                                   : log.status === 'failure'
-                                  ? 'bg-rose-500/10 text-rose-400 border-rose-500/20'
+                                  ? 'bg-red-500/10 text-red-400 border-red-500/20'
                                   : log.status === 'warning'
                                   ? 'bg-amber-500/10 text-amber-400 border-amber-500/20'
                                   : 'bg-sky-500/10 text-sky-400 border-sky-500/20'
@@ -1655,7 +1655,7 @@ export default function AdminInsightsDashboard({ onClose, onPreviewInsight }: Ad
               exit={{ scale: 0.95, opacity: 0 }}
               className="bg-bg-card border border-border-color rounded-2xl p-6 max-w-sm w-full text-center shadow-2xl"
             >
-              <div className="w-12 h-12 rounded-full bg-rose-500/10 border border-rose-500/30 text-rose-400 flex items-center justify-center mx-auto mb-4">
+              <div className="w-12 h-12 rounded-full bg-red-500/10 border border-red-500/30 text-red-500 flex items-center justify-center mx-auto mb-4">
                 <Trash2 className="w-6 h-6" />
               </div>
               <h3 className="text-base font-extrabold text-text-primary mb-2">Delete Insight?</h3>
@@ -1671,7 +1671,7 @@ export default function AdminInsightsDashboard({ onClose, onPreviewInsight }: Ad
                 </button>
                 <button
                   onClick={() => handleDeleteInsight(deleteConfirmId)}
-                  className="px-4 py-2 rounded-xl bg-rose-500 hover:bg-rose-600 text-white text-xs font-bold cursor-pointer"
+                  className="px-4 py-2 rounded-xl bg-red-600 hover:bg-red-700 text-white text-xs font-bold cursor-pointer"
                 >
                   Confirm Delete
                 </button>

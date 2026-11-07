@@ -19,19 +19,19 @@ import {
 
 const PRESET_PALETTES: { name: string; theme: Partial<ThemeConfig> }[] = [
   {
-    name: 'Scarlet Prestige (Default)',
+    name: 'Rohit Verma Signature Blue (Default)',
     theme: {
-      presetName: 'Scarlet Prestige',
-      primaryAccent: '#A50C18',
-      secondaryAccent: '#D31322',
-      accentDark: '#35070B',
-      bgPrimary: '#F8F5F2',
-      bgSecondary: '#EFE8E5',
+      presetName: 'Rohit Verma Signature Blue',
+      primaryAccent: '#0866F5',
+      secondaryAccent: '#155EEF',
+      accentDark: '#071B49',
+      bgPrimary: '#FFFFFF',
+      bgSecondary: '#F3F7FF',
       bgCard: '#FFFFFF',
-      bgCardHover: '#F5ECEA',
-      textPrimary: '#1A090A',
-      textSecondary: 'rgba(26, 9, 10, 0.82)',
-      borderColor: 'rgba(26, 9, 10, 0.12)',
+      bgCardHover: '#EAF2FF',
+      textPrimary: '#101C38',
+      textSecondary: '#53627C',
+      borderColor: '#DCE7F8',
       fontHeading: 'Manrope',
       fontBody: 'Manrope',
       borderRadius: 'full',
@@ -99,19 +99,19 @@ const PRESET_PALETTES: { name: string; theme: Partial<ThemeConfig> }[] = [
     }
   },
   {
-    name: 'Sunset Crimson (Luxury Dark)',
+    name: 'Ocean Sapphire (Deep Blue Dark)',
     theme: {
-      presetName: 'Sunset Crimson',
-      primaryAccent: '#E11D48',
-      secondaryAccent: '#F43F5E',
-      accentDark: '#4C0519',
-      bgPrimary: '#0C0A09',
-      bgSecondary: '#1C1917',
-      bgCard: '#1C1917',
-      bgCardHover: '#292524',
-      textPrimary: '#FAFAF9',
-      textSecondary: 'rgba(250, 250, 249, 0.82)',
-      borderColor: 'rgba(225, 29, 72, 0.20)',
+      presetName: 'Ocean Sapphire',
+      primaryAccent: '#0866F5',
+      secondaryAccent: '#257BFD',
+      accentDark: '#071B49',
+      bgPrimary: '#030B1E',
+      bgSecondary: '#05112E',
+      bgCard: '#071B49',
+      bgCardHover: '#0D2A6B',
+      textPrimary: '#FFFFFF',
+      textSecondary: 'rgba(184, 201, 232, 0.85)',
+      borderColor: 'rgba(8, 102, 245, 0.25)',
       fontHeading: 'Manrope',
       fontBody: 'Manrope',
       borderRadius: 'full',
@@ -244,7 +244,7 @@ export const CustomizerTab: React.FC = () => {
               onClick={() => setActiveSubSection(tab.id as any)}
               className={`flex-shrink-0 whitespace-nowrap min-h-[38px] flex items-center gap-2 px-3.5 sm:px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all active:scale-98 ${
                 isActive
-                  ? 'bg-rose-600 text-white shadow-xs'
+                  ? 'bg-accent-primary text-white shadow-xs'
                   : 'text-text-muted hover:text-text-primary hover:bg-bg-secondary'
               }`}
             >
@@ -267,16 +267,16 @@ export const CustomizerTab: React.FC = () => {
                   onClick={() => handleApplyPreset(preset)}
                   className={`p-4 sm:p-5 rounded-xl sm:rounded-2xl border cursor-pointer transition-all duration-200 relative overflow-hidden group shadow-xs active:scale-99 ${
                     isSelected
-                      ? 'bg-bg-card border-rose-500 ring-2 ring-rose-500/30 shadow-sm'
+                      ? 'bg-bg-card border-accent-primary ring-2 ring-accent-primary/30 shadow-sm'
                       : 'bg-bg-card border-border-color hover:border-border-hover hover:bg-bg-card-hover'
                   }`}
                 >
                   <div className="flex items-center justify-between mb-2 sm:mb-3">
-                    <span className="text-xs sm:text-sm font-bold text-text-primary group-hover:text-rose-600 dark:group-hover:text-rose-400 transition-colors">
+                    <span className="text-xs sm:text-sm font-bold text-text-primary group-hover:text-accent-primary transition-colors">
                       {preset.name}
                     </span>
                     {isSelected && (
-                      <span className="w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-rose-500 text-white flex items-center justify-center flex-shrink-0">
+                      <span className="w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-accent-primary text-white flex items-center justify-center flex-shrink-0">
                         <Check className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
                       </span>
                     )}
@@ -331,7 +331,7 @@ export const CustomizerTab: React.FC = () => {
               <div className="flex items-center gap-2.5">
                 <input
                   type="color"
-                  value={currentTheme.primaryAccent || '#A50C18'}
+                  value={currentTheme.primaryAccent || '#0866F5'}
                   onChange={(e) => handleColorChange('primaryAccent', e.target.value)}
                   className="w-10 h-10 rounded-lg cursor-pointer bg-transparent border border-border-color flex-shrink-0"
                 />
@@ -339,7 +339,7 @@ export const CustomizerTab: React.FC = () => {
                   type="text"
                   value={currentTheme.primaryAccent || ''}
                   onChange={(e) => handleColorChange('primaryAccent', e.target.value)}
-                  className="flex-1 min-h-[42px] bg-bg-secondary border border-border-color rounded-xl px-3 py-2 text-sm text-text-primary font-mono focus:border-rose-500 focus:outline-none transition-colors"
+                  className="flex-1 min-h-[42px] bg-bg-secondary border border-border-color rounded-xl px-3 py-2 text-sm text-text-primary font-mono focus:border-accent-primary focus:outline-none transition-colors"
                 />
               </div>
             </div>
@@ -349,7 +349,7 @@ export const CustomizerTab: React.FC = () => {
               <div className="flex items-center gap-2.5">
                 <input
                   type="color"
-                  value={currentTheme.secondaryAccent || '#D31322'}
+                  value={currentTheme.secondaryAccent || '#155EEF'}
                   onChange={(e) => handleColorChange('secondaryAccent', e.target.value)}
                   className="w-10 h-10 rounded-lg cursor-pointer bg-transparent border border-border-color flex-shrink-0"
                 />
@@ -357,7 +357,7 @@ export const CustomizerTab: React.FC = () => {
                   type="text"
                   value={currentTheme.secondaryAccent || ''}
                   onChange={(e) => handleColorChange('secondaryAccent', e.target.value)}
-                  className="flex-1 min-h-[42px] bg-bg-secondary border border-border-color rounded-xl px-3 py-2 text-sm text-text-primary font-mono focus:border-rose-500 focus:outline-none transition-colors"
+                  className="flex-1 min-h-[42px] bg-bg-secondary border border-border-color rounded-xl px-3 py-2 text-sm text-text-primary font-mono focus:border-accent-primary focus:outline-none transition-colors"
                 />
               </div>
             </div>
@@ -367,7 +367,7 @@ export const CustomizerTab: React.FC = () => {
               <div className="flex items-center gap-2.5">
                 <input
                   type="color"
-                  value={currentTheme.accentDark || '#35070B'}
+                  value={currentTheme.accentDark || '#071B49'}
                   onChange={(e) => handleColorChange('accentDark', e.target.value)}
                   className="w-10 h-10 rounded-lg cursor-pointer bg-transparent border border-border-color flex-shrink-0"
                 />
@@ -375,7 +375,7 @@ export const CustomizerTab: React.FC = () => {
                   type="text"
                   value={currentTheme.accentDark || ''}
                   onChange={(e) => handleColorChange('accentDark', e.target.value)}
-                  className="flex-1 min-h-[42px] bg-bg-secondary border border-border-color rounded-xl px-3 py-2 text-sm text-text-primary font-mono focus:border-rose-500 focus:outline-none transition-colors"
+                  className="flex-1 min-h-[42px] bg-bg-secondary border border-border-color rounded-xl px-3 py-2 text-sm text-text-primary font-mono focus:border-accent-primary focus:outline-none transition-colors"
                 />
               </div>
             </div>
@@ -385,7 +385,7 @@ export const CustomizerTab: React.FC = () => {
               <div className="flex items-center gap-2.5">
                 <input
                   type="color"
-                  value={currentTheme.bgPrimary || '#F8F5F2'}
+                  value={currentTheme.bgPrimary || '#FFFFFF'}
                   onChange={(e) => handleColorChange('bgPrimary', e.target.value)}
                   className="w-10 h-10 rounded-lg cursor-pointer bg-transparent border border-border-color flex-shrink-0"
                 />
@@ -393,7 +393,7 @@ export const CustomizerTab: React.FC = () => {
                   type="text"
                   value={currentTheme.bgPrimary || ''}
                   onChange={(e) => handleColorChange('bgPrimary', e.target.value)}
-                  className="flex-1 min-h-[42px] bg-bg-secondary border border-border-color rounded-xl px-3 py-2 text-sm text-text-primary font-mono focus:border-rose-500 focus:outline-none transition-colors"
+                  className="flex-1 min-h-[42px] bg-bg-secondary border border-border-color rounded-xl px-3 py-2 text-sm text-text-primary font-mono focus:border-accent-primary focus:outline-none transition-colors"
                 />
               </div>
             </div>
@@ -411,7 +411,7 @@ export const CustomizerTab: React.FC = () => {
                   type="text"
                   value={currentTheme.bgCard || ''}
                   onChange={(e) => handleColorChange('bgCard', e.target.value)}
-                  className="flex-1 min-h-[42px] bg-bg-secondary border border-border-color rounded-xl px-3 py-2 text-sm text-text-primary font-mono focus:border-rose-500 focus:outline-none transition-colors"
+                  className="flex-1 min-h-[42px] bg-bg-secondary border border-border-color rounded-xl px-3 py-2 text-sm text-text-primary font-mono focus:border-accent-primary focus:outline-none transition-colors"
                 />
               </div>
             </div>
@@ -421,7 +421,7 @@ export const CustomizerTab: React.FC = () => {
               <div className="flex items-center gap-2.5">
                 <input
                   type="color"
-                  value={currentTheme.textPrimary || '#1A090A'}
+                  value={currentTheme.textPrimary || '#101C38'}
                   onChange={(e) => handleColorChange('textPrimary', e.target.value)}
                   className="w-10 h-10 rounded-lg cursor-pointer bg-transparent border border-border-color flex-shrink-0"
                 />
@@ -429,7 +429,7 @@ export const CustomizerTab: React.FC = () => {
                   type="text"
                   value={currentTheme.textPrimary || ''}
                   onChange={(e) => handleColorChange('textPrimary', e.target.value)}
-                  className="flex-1 min-h-[42px] bg-bg-secondary border border-border-color rounded-xl px-3 py-2 text-sm text-text-primary font-mono focus:border-rose-500 focus:outline-none transition-colors"
+                  className="flex-1 min-h-[42px] bg-bg-secondary border border-border-color rounded-xl px-3 py-2 text-sm text-text-primary font-mono focus:border-accent-primary focus:outline-none transition-colors"
                 />
               </div>
             </div>
@@ -446,7 +446,7 @@ export const CustomizerTab: React.FC = () => {
               <select
                 value={currentTheme.fontHeading || 'Manrope'}
                 onChange={(e) => handleColorChange('fontHeading', e.target.value)}
-                className="w-full min-h-[42px] bg-bg-secondary border border-border-color rounded-xl px-3 py-2 text-sm text-text-primary focus:border-rose-500 focus:outline-none transition-colors"
+                className="w-full min-h-[42px] bg-bg-secondary border border-border-color rounded-xl px-3 py-2 text-sm text-text-primary focus:border-accent-primary focus:outline-none transition-colors"
               >
                 {HEADING_FONTS.map((font) => (
                   <option key={font} value={font} className="bg-bg-card text-text-primary">
@@ -462,7 +462,7 @@ export const CustomizerTab: React.FC = () => {
               <select
                 value={currentTheme.fontBody || 'Manrope'}
                 onChange={(e) => handleColorChange('fontBody', e.target.value)}
-                className="w-full min-h-[42px] bg-bg-secondary border border-border-color rounded-xl px-3 py-2 text-sm text-text-primary focus:border-rose-500 focus:outline-none transition-colors"
+                className="w-full min-h-[42px] bg-bg-secondary border border-border-color rounded-xl px-3 py-2 text-sm text-text-primary focus:border-accent-primary focus:outline-none transition-colors"
               >
                 {BODY_FONTS.map((font) => (
                   <option key={font} value={font} className="bg-bg-card text-text-primary">
@@ -485,7 +485,7 @@ export const CustomizerTab: React.FC = () => {
                     onClick={() => handleColorChange('borderRadius', r.value)}
                     className={`min-h-[40px] p-2.5 rounded-xl border text-xs font-semibold transition-all active:scale-98 ${
                       isSelected
-                        ? 'bg-rose-600 text-white border-rose-500 shadow-xs'
+                        ? 'bg-accent-primary text-white border-accent-primary shadow-xs'
                         : 'bg-bg-secondary text-text-muted border-border-color hover:text-text-primary hover:border-border-hover'
                     }`}
                   >
@@ -510,7 +510,7 @@ export const CustomizerTab: React.FC = () => {
                 type="text"
                 value={currentBranding.siteName || ''}
                 onChange={(e) => handleBrandingChange('siteName', e.target.value)}
-                className="w-full min-h-[42px] bg-bg-secondary border border-border-color rounded-xl px-3 py-2 text-sm text-text-primary focus:border-rose-500 focus:outline-none transition-colors"
+                className="w-full min-h-[42px] bg-bg-secondary border border-border-color rounded-xl px-3 py-2 text-sm text-text-primary focus:border-accent-primary focus:outline-none transition-colors"
               />
             </div>
 
@@ -520,7 +520,7 @@ export const CustomizerTab: React.FC = () => {
                 type="text"
                 value={currentBranding.tagline || ''}
                 onChange={(e) => handleBrandingChange('tagline', e.target.value)}
-                className="w-full min-h-[42px] bg-bg-secondary border border-border-color rounded-xl px-3 py-2 text-sm text-text-primary focus:border-rose-500 focus:outline-none transition-colors"
+                className="w-full min-h-[42px] bg-bg-secondary border border-border-color rounded-xl px-3 py-2 text-sm text-text-primary focus:border-accent-primary focus:outline-none transition-colors"
               />
             </div>
 
@@ -530,7 +530,7 @@ export const CustomizerTab: React.FC = () => {
                 rows={3}
                 value={currentBranding.bio || ''}
                 onChange={(e) => handleBrandingChange('bio', e.target.value)}
-                className="w-full bg-bg-secondary border border-border-color rounded-xl p-3 text-sm text-text-primary focus:border-rose-500 focus:outline-none resize-none transition-colors"
+                className="w-full bg-bg-secondary border border-border-color rounded-xl p-3 text-sm text-text-primary focus:border-accent-primary focus:outline-none resize-none transition-colors"
               />
             </div>
 
@@ -540,7 +540,7 @@ export const CustomizerTab: React.FC = () => {
                 type="email"
                 value={currentBranding.email || ''}
                 onChange={(e) => handleBrandingChange('email', e.target.value)}
-                className="w-full min-h-[42px] bg-bg-secondary border border-border-color rounded-xl px-3 py-2 text-sm text-text-primary focus:border-rose-500 focus:outline-none transition-colors"
+                className="w-full min-h-[42px] bg-bg-secondary border border-border-color rounded-xl px-3 py-2 text-sm text-text-primary focus:border-accent-primary focus:outline-none transition-colors"
               />
             </div>
 
@@ -550,7 +550,7 @@ export const CustomizerTab: React.FC = () => {
                 type="text"
                 value={currentBranding.phone || ''}
                 onChange={(e) => handleBrandingChange('phone', e.target.value)}
-                className="w-full min-h-[42px] bg-bg-secondary border border-border-color rounded-xl px-3 py-2 text-sm text-text-primary focus:border-rose-500 focus:outline-none transition-colors"
+                className="w-full min-h-[42px] bg-bg-secondary border border-border-color rounded-xl px-3 py-2 text-sm text-text-primary focus:border-accent-primary focus:outline-none transition-colors"
               />
             </div>
 
@@ -560,7 +560,7 @@ export const CustomizerTab: React.FC = () => {
                 type="text"
                 value={currentBranding.location || ''}
                 onChange={(e) => handleBrandingChange('location', e.target.value)}
-                className="w-full min-h-[42px] bg-bg-secondary border border-border-color rounded-xl px-3 py-2 text-sm text-text-primary focus:border-rose-500 focus:outline-none transition-colors"
+                className="w-full min-h-[42px] bg-bg-secondary border border-border-color rounded-xl px-3 py-2 text-sm text-text-primary focus:border-accent-primary focus:outline-none transition-colors"
               />
             </div>
 
@@ -570,7 +570,7 @@ export const CustomizerTab: React.FC = () => {
                 type="text"
                 value={currentBranding.avatarImage || ''}
                 onChange={(e) => handleBrandingChange('avatarImage', e.target.value)}
-                className="w-full min-h-[42px] bg-bg-secondary border border-border-color rounded-xl px-3 py-2 text-sm text-text-primary focus:border-rose-500 focus:outline-none transition-colors"
+                className="w-full min-h-[42px] bg-bg-secondary border border-border-color rounded-xl px-3 py-2 text-sm text-text-primary focus:border-accent-primary focus:outline-none transition-colors"
               />
             </div>
 
@@ -580,7 +580,7 @@ export const CustomizerTab: React.FC = () => {
                 type="text"
                 value={currentBranding.whatsappUrl || ''}
                 onChange={(e) => handleBrandingChange('whatsappUrl', e.target.value)}
-                className="w-full min-h-[42px] bg-bg-secondary border border-border-color rounded-xl px-3 py-2 text-sm text-text-primary focus:border-rose-500 focus:outline-none transition-colors"
+                className="w-full min-h-[42px] bg-bg-secondary border border-border-color rounded-xl px-3 py-2 text-sm text-text-primary focus:border-accent-primary focus:outline-none transition-colors"
               />
             </div>
 
@@ -590,7 +590,7 @@ export const CustomizerTab: React.FC = () => {
                 type="text"
                 value={currentBranding.resumeUrl || ''}
                 onChange={(e) => handleBrandingChange('resumeUrl', e.target.value)}
-                className="w-full min-h-[42px] bg-bg-secondary border border-border-color rounded-xl px-3 py-2 text-sm text-text-primary focus:border-rose-500 focus:outline-none transition-colors"
+                className="w-full min-h-[42px] bg-bg-secondary border border-border-color rounded-xl px-3 py-2 text-sm text-text-primary focus:border-accent-primary focus:outline-none transition-colors"
               />
             </div>
 
@@ -600,7 +600,7 @@ export const CustomizerTab: React.FC = () => {
                 id="availableForWork"
                 checked={currentBranding.availableForWork}
                 onChange={(e) => handleBrandingChange('availableForWork', e.target.checked)}
-                className="w-4 h-4 text-rose-600 rounded bg-bg-secondary border-border-color focus:ring-rose-500"
+                className="w-4 h-4 text-accent-primary rounded bg-bg-secondary border-border-color focus:ring-accent-primary"
               />
               <label htmlFor="availableForWork" className="text-xs sm:text-sm font-semibold text-text-primary cursor-pointer">
                 Available for New Projects & Freelance Work (Green Status Badge)

@@ -248,20 +248,35 @@ export default function Header({ activeSection, theme: propTheme, toggleTheme: p
                   key={link.id}
                   href={isHome ? '/' : `/${link.id}`}
                   onClick={(e) => (isHome ? handleHomeNavigation(e) : scrollToSection(link.id, e))}
-                  className={`relative inline-flex items-center justify-center font-medium rounded-full whitespace-nowrap transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent-primary cursor-pointer ${
-                    active ? 'active' : ''
+                  className={`relative inline-flex items-center justify-center rounded-full whitespace-nowrap transition-colors duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent-primary cursor-pointer px-4 py-2 ${
+                    active
+                      ? 'active text-white font-bold'
+                      : 'text-[#101C38] dark:text-[#B8C9E8] hover:text-[#0866F5] dark:hover:text-white font-semibold'
                   }`}
+                  style={{
+                    color: active ? '#FFFFFF' : undefined,
+                    zIndex: active ? 2 : 1
+                  }}
                   aria-current={active ? 'page' : undefined}
                   id={`nav-link-${link.id}`}
                 >
                   {active && (
                     <motion.span
                       layoutId="activePillBg"
-                      className="absolute inset-0 rounded-full -z-10 pointer-events-none bg-accent-primary/10"
+                      className="absolute inset-0 rounded-full pointer-events-none bg-[#0866F5] shadow-xs"
+                      style={{ zIndex: 0 }}
                       transition={{ type: 'spring', stiffness: 380, damping: 30 }}
                     />
                   )}
-                  {link.label}
+                  <span
+                    className="relative transition-colors duration-150"
+                    style={{
+                      zIndex: 1,
+                      color: active ? '#FFFFFF' : undefined
+                    }}
+                  >
+                    {link.label}
+                  </span>
                 </a>
               );
             })}
@@ -269,12 +284,12 @@ export default function Header({ activeSection, theme: propTheme, toggleTheme: p
 
           {/* Right: Action Controls Group */}
           <div className="header-actions">
-            {/* WhatsApp Button - Visible on tablet/desktop (>= 640px) */}
+            {/* WhatsApp Button - Visible on tablet/desktop (>= 640px) - Deep Navy */}
             <a
               href={WHATSAPP_BUSINESS_URL}
               target="_blank"
               rel="noopener noreferrer"
-              className="whatsapp-button hidden sm:inline-flex items-center justify-center gap-1.5 h-9 sm:h-[42px] px-3 sm:px-4 rounded-full text-white font-bold text-xs sm:text-sm whitespace-nowrap active:scale-95 transition-all duration-200 shadow-md bg-accent-primary hover:bg-accent-secondary flex-shrink-0"
+              className="whatsapp-button hidden sm:inline-flex items-center justify-center gap-1.5 h-9 sm:h-[42px] px-3.5 sm:px-4 rounded-full text-white font-bold text-xs sm:text-sm whitespace-nowrap active:scale-95 transition-all duration-200 shadow-sm bg-[#071B49] hover:bg-[#0c286d] flex-shrink-0"
               id="header-whatsapp-btn"
               aria-label="Contact Rohit Verma on WhatsApp Business"
             >
@@ -290,12 +305,12 @@ export default function Header({ activeSection, theme: propTheme, toggleTheme: p
               aria-label="Toggle dark mode"
             />
 
-            {/* View Resume Button - Visible on desktop (>= 1024px) */}
+            {/* View Resume Button - Visible on desktop (>= 1024px) - Deep Navy */}
             <a
               href={resumeUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="resume-button hidden lg:inline-flex items-center justify-center gap-2 h-[42px] min-h-[42px] px-5 rounded-full text-white font-bold text-xs sm:text-sm whitespace-nowrap active:scale-95 transition-all duration-200 shadow-md bg-accent-primary hover:bg-accent-secondary flex-shrink-0"
+              className="resume-button hidden lg:inline-flex items-center justify-center gap-2 h-[42px] min-h-[42px] px-5 rounded-full text-white font-bold text-xs sm:text-sm whitespace-nowrap active:scale-95 transition-all duration-200 shadow-sm bg-[#071B49] hover:bg-[#0c286d] flex-shrink-0"
               id="download-resume-btn"
               aria-label="Open Rohit Verma Resume PDF"
             >
@@ -303,12 +318,12 @@ export default function Header({ activeSection, theme: propTheme, toggleTheme: p
               <span className="text-white font-bold">Resume</span>
             </a>
 
-            {/* Let's Work Together Button - Homepage wide desktop (>= 1440px only, avoiding any crowded spacing below 1440px) */}
+            {/* Let's Work Together Button - Homepage wide desktop (>= 1440px only, avoiding any crowded spacing below 1440px) - Royal Blue */}
             {isHomeRoute && (
               <a
                 href="#contact"
                 onClick={(e) => scrollToSection('contact', e)}
-                className="hidden min-[1440px]:inline-flex items-center justify-center gap-2 h-[42px] min-h-[42px] px-5 rounded-full !text-white font-bold text-xs sm:text-sm whitespace-nowrap active:scale-95 transition-all duration-200 shadow-md bg-gradient-to-r from-accent-primary via-[#C40812] to-accent-secondary hover:brightness-110 flex-shrink-0"
+                className="hidden min-[1440px]:inline-flex items-center justify-center gap-2 h-[42px] min-h-[42px] px-5 rounded-full !text-white font-bold text-xs sm:text-sm whitespace-nowrap active:scale-95 transition-all duration-200 shadow-md bg-accent-primary hover:bg-accent-secondary shadow-accent-primary/25 flex-shrink-0"
                 id="header-work-together-btn"
                 aria-label="Let's Work Together - Contact Rohit Verma"
               >

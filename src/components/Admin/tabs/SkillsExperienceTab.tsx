@@ -259,7 +259,7 @@ export const SkillsExperienceTab: React.FC = () => {
                   </button>
                   <button
                     onClick={() => handleDeleteSkill(s.id)}
-                    className="min-w-[34px] min-h-[34px] p-1.5 rounded-lg bg-bg-secondary hover:bg-rose-500/10 text-text-muted hover:text-rose-600 dark:hover:text-rose-400 border border-border-color flex items-center justify-center active:scale-95"
+                    className="min-w-[34px] min-h-[34px] p-1.5 rounded-lg bg-bg-secondary hover:bg-red-500/10 text-text-muted hover:text-red-500 dark:hover:text-red-400 border border-border-color flex items-center justify-center active:scale-95"
                     title="Delete skill"
                   >
                     <Trash2 className="w-3.5 h-3.5" />
@@ -329,7 +329,7 @@ export const SkillsExperienceTab: React.FC = () => {
                   </button>
                   <button
                     onClick={() => handleDeleteExp(ex.id)}
-                    className="min-w-[36px] min-h-[36px] p-2 rounded-xl bg-bg-secondary hover:bg-rose-500/10 text-text-muted hover:text-rose-600 dark:hover:text-rose-400 border border-border-color flex items-center justify-center active:scale-95"
+                    className="min-w-[36px] min-h-[36px] p-2 rounded-xl bg-bg-secondary hover:bg-red-500/10 text-text-muted hover:text-red-500 dark:hover:text-red-400 border border-border-color flex items-center justify-center active:scale-95"
                     title="Delete milestone"
                   >
                     <Trash2 className="w-3.5 h-3.5" />

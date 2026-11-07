@@ -188,7 +188,7 @@ export const InquiriesInboxTab: React.FC<InquiriesInboxTabProps> = ({
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4">
           <div>
             <h2 className="text-lg sm:text-2xl font-bold text-text-primary flex items-center gap-2 sm:gap-2.5">
-              <Inbox className="w-5 sm:w-6 h-5 sm:h-6 text-rose-600 dark:text-rose-400" />
+              <Inbox className="w-5 sm:w-6 h-5 sm:h-6 text-accent-primary" />
               <span>Lead Inquiries & CRM Suite</span>
             </h2>
             <p className="text-xs sm:text-sm text-text-muted mt-0.5 sm:mt-1">
@@ -212,7 +212,7 @@ export const InquiriesInboxTab: React.FC<InquiriesInboxTabProps> = ({
             onClick={() => setMainView('inbox')}
             className={`flex-shrink-0 whitespace-nowrap min-h-[40px] px-3.5 sm:px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 active:scale-98 ${
               mainView === 'inbox'
-                ? 'bg-rose-600 text-white shadow-xs'
+                ? 'bg-accent-primary text-white shadow-xs'
                 : 'bg-bg-secondary text-text-muted hover:text-text-primary border border-border-color'
             }`}
           >
@@ -225,7 +225,7 @@ export const InquiriesInboxTab: React.FC<InquiriesInboxTabProps> = ({
             onClick={() => setMainView('followups')}
             className={`flex-shrink-0 whitespace-nowrap min-h-[40px] px-3.5 sm:px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 active:scale-98 ${
               mainView === 'followups'
-                ? 'bg-rose-600 text-white shadow-xs'
+                ? 'bg-accent-primary text-white shadow-xs'
                 : 'bg-bg-secondary text-text-muted hover:text-text-primary border border-border-color'
             }`}
           >
@@ -242,14 +242,14 @@ export const InquiriesInboxTab: React.FC<InquiriesInboxTabProps> = ({
             onClick={() => setMainView('hot_leads')}
             className={`flex-shrink-0 whitespace-nowrap min-h-[40px] px-3.5 sm:px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 active:scale-98 ${
               mainView === 'hot_leads'
-                ? 'bg-rose-600 text-white shadow-xs'
+                ? 'bg-accent-primary text-white shadow-xs'
                 : 'bg-bg-secondary text-text-muted hover:text-text-primary border border-border-color'
             }`}
           >
             <Flame className="w-3.5 h-3.5 fill-current" />
             <span>Hot Leads</span>
             {hotCount > 0 && (
-              <span className="px-1.5 py-0.2 rounded-full bg-rose-500 text-white text-[10px] font-bold">
+              <span className="px-1.5 py-0.2 rounded-full bg-accent-primary text-white text-[10px] font-bold">
                 {hotCount}
               </span>
             )}
@@ -284,7 +284,7 @@ export const InquiriesInboxTab: React.FC<InquiriesInboxTabProps> = ({
                 onClick={() => setHotFilter('all')}
                 className={`flex-shrink-0 whitespace-nowrap min-h-[38px] px-3.5 py-1.5 rounded-xl text-xs font-semibold ${
                   hotFilter === 'all'
-                    ? 'bg-rose-600 text-white shadow-xs'
+                    ? 'bg-accent-primary text-white shadow-xs'
                     : 'bg-bg-secondary text-text-muted hover:text-text-primary border border-border-color'
                 }`}
               >
@@ -294,7 +294,7 @@ export const InquiriesInboxTab: React.FC<InquiriesInboxTabProps> = ({
                 onClick={() => setHotFilter('manual')}
                 className={`flex-shrink-0 whitespace-nowrap min-h-[38px] px-3.5 py-1.5 rounded-xl text-xs font-semibold ${
                   hotFilter === 'manual'
-                    ? 'bg-rose-600 text-white shadow-xs'
+                    ? 'bg-accent-primary text-white shadow-xs'
                     : 'bg-bg-secondary text-text-muted hover:text-text-primary border border-border-color'
                 }`}
               >
@@ -304,7 +304,7 @@ export const InquiriesInboxTab: React.FC<InquiriesInboxTabProps> = ({
                 onClick={() => setHotFilter('suggested')}
                 className={`flex-shrink-0 whitespace-nowrap min-h-[38px] px-3.5 py-1.5 rounded-xl text-xs font-semibold ${
                   hotFilter === 'suggested'
-                    ? 'bg-rose-600 text-white shadow-xs'
+                    ? 'bg-accent-primary text-white shadow-xs'
                     : 'bg-bg-secondary text-text-muted hover:text-text-primary border border-border-color'
                 }`}
               >
@@ -319,7 +319,7 @@ export const InquiriesInboxTab: React.FC<InquiriesInboxTabProps> = ({
                 placeholder="Search hot leads..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full min-h-[40px] bg-bg-secondary border border-border-color rounded-xl pl-9 pr-3 py-1.5 text-xs text-text-primary focus:border-rose-500 focus:outline-none"
+                className="w-full min-h-[40px] bg-bg-secondary border border-border-color rounded-xl pl-9 pr-3 py-1.5 text-xs text-text-primary focus:border-accent-primary focus:outline-none"
               />
             </div>
           </div>
@@ -346,12 +346,12 @@ export const InquiriesInboxTab: React.FC<InquiriesInboxTabProps> = ({
                   <div
                     key={lead.id}
                     onClick={() => setSelectedInquiry(lead)}
-                    className="p-4 sm:p-5 rounded-xl sm:rounded-2xl bg-bg-card hover:bg-bg-card-hover border border-border-color hover:border-rose-500/40 transition-all cursor-pointer group flex flex-col justify-between space-y-3.5 shadow-xs select-none active:scale-99"
+                    className="p-4 sm:p-5 rounded-xl sm:rounded-2xl bg-bg-card hover:bg-bg-card-hover border border-border-color hover:border-accent-primary/40 transition-all cursor-pointer group flex flex-col justify-between space-y-3.5 shadow-xs select-none active:scale-99"
                   >
                     <div className="flex items-center justify-between gap-2">
                       <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold ${
                         hotInfo.isManual
-                          ? 'bg-rose-500/20 text-rose-600 dark:text-rose-400 border border-rose-500/30'
+                          ? 'bg-red-500/15 text-red-600 dark:text-red-400 border border-red-500/30'
                           : 'bg-amber-500/15 text-amber-600 dark:text-amber-400 border border-amber-500/30'
                       }`}>
                         <Flame className="w-3 h-3 fill-current" />
@@ -364,7 +364,7 @@ export const InquiriesInboxTab: React.FC<InquiriesInboxTabProps> = ({
                     </div>
 
                     <div className="space-y-1">
-                      <h4 className="text-sm sm:text-base font-bold text-text-primary group-hover:text-rose-600 dark:group-hover:text-rose-400 transition-colors truncate">
+                      <h4 className="text-sm sm:text-base font-bold text-text-primary group-hover:text-accent-primary transition-colors truncate">
                         {lead.name}
                       </h4>
                       {lead.businessName && (
@@ -425,7 +425,7 @@ export const InquiriesInboxTab: React.FC<InquiriesInboxTabProps> = ({
                         )}
                         <a
                           href={`mailto:${lead.email}`}
-                          className="w-9 h-9 rounded-xl bg-bg-secondary hover:bg-rose-500/20 text-rose-600 dark:text-rose-400 border border-border-color transition-colors flex items-center justify-center active:scale-95"
+                          className="w-9 h-9 rounded-xl bg-bg-secondary hover:bg-accent-primary/20 text-accent-primary border border-border-color transition-colors flex items-center justify-center active:scale-95"
                           title="Email"
                           aria-label="Email Client"
                         >

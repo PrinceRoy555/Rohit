@@ -31,7 +31,7 @@ const defaultPackages: PricingPackage[] = [
       'Watermarked Preview Before Final Files',
       '50% Advance to Begin; Balance Before Final Files'
     ],
-    accentColor: '#D31322',
+    accentColor: '#0866F5',
     whatsappMessage: 'Hi Rohit, I visited your portfolio and would like to discuss a Logo Design project (Starting at ₹2,999).'
   },
   {
@@ -50,7 +50,7 @@ const defaultPackages: PricingPackage[] = [
       '50% Advance to Begin; Balance Before Final Files'
     ],
     isPopular: true,
-    accentColor: '#D31322',
+    accentColor: '#0866F5',
     whatsappMessage: 'Hi Rohit, I visited your portfolio and would like to discuss the Brand Identity Starter Package (Starting at ₹7,999).'
   },
   {
@@ -68,7 +68,7 @@ const defaultPackages: PricingPackage[] = [
       'Dedicated WhatsApp & Email Project Support',
       '50% Advance to Begin; Balance Before Final Files'
     ],
-    accentColor: '#D31322',
+    accentColor: '#0866F5',
     whatsappMessage: 'Hi Rohit, I visited your portfolio and would like to discuss the Complete Brand Identity Package (Starting at ₹12,999 / Custom Quote).'
   }
 ];
@@ -122,7 +122,7 @@ export default function PricingSection() {
         description: t.description,
         features: t.features,
         isPopular: t.isPopular,
-        accentColor: '#D31322',
+        accentColor: '#0866F5',
         whatsappMessage: `Hello Rohit, I am interested in your ${t.name} Package starting at ${t.price}.`
       }))
     : defaultPackages;
@@ -347,7 +347,7 @@ export default function PricingSection() {
                       price: service.startingRate + (service.unit ? ` ${service.unit}` : ''),
                       description: service.description,
                       features: ['Custom Scope Discussion', 'Professional Execution', '2 Rounds of Revisions', 'Timeline Confirmed After Scope Review'],
-                      accentColor: '#D31322',
+                      accentColor: '#0866F5',
                       whatsappMessage: `Hi Rohit, I would like to enquire about ${service.name} (${service.startingRate}).`
                     })}
                     className="text-xs font-semibold text-accent-primary hover:text-accent-secondary flex items-center gap-1 cursor-pointer transition-colors"

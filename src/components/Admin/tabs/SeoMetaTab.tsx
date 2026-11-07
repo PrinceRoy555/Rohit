@@ -115,7 +115,7 @@ export const SeoMetaTab: React.FC = () => {
               type="text"
               value={seo.metaTitle || ''}
               onChange={(e) => handleUpdate('metaTitle', e.target.value)}
-              className="w-full min-h-[42px] bg-bg-secondary border border-border-color rounded-xl px-3 py-2 text-sm text-text-primary focus:border-rose-500 focus:outline-none"
+              className="w-full min-h-[42px] bg-bg-secondary border border-border-color rounded-xl px-3 py-2 text-sm text-text-primary focus:border-accent-primary focus:outline-none"
             />
           </div>
 
@@ -127,7 +127,7 @@ export const SeoMetaTab: React.FC = () => {
               rows={3}
               value={seo.metaDescription || ''}
               onChange={(e) => handleUpdate('metaDescription', e.target.value)}
-              className="w-full bg-bg-secondary border border-border-color rounded-xl px-3 py-2 text-sm text-text-primary focus:border-rose-500 focus:outline-none resize-none"
+              className="w-full bg-bg-secondary border border-border-color rounded-xl px-3 py-2 text-sm text-text-primary focus:border-accent-primary focus:outline-none resize-none"
             />
           </div>
 
@@ -137,7 +137,7 @@ export const SeoMetaTab: React.FC = () => {
               type="text"
               value={seo.keywords || ''}
               onChange={(e) => handleUpdate('keywords', e.target.value)}
-              className="w-full min-h-[42px] bg-bg-secondary border border-border-color rounded-xl px-3 py-2 text-sm text-text-primary focus:border-rose-500 focus:outline-none"
+              className="w-full min-h-[42px] bg-bg-secondary border border-border-color rounded-xl px-3 py-2 text-sm text-text-primary focus:border-accent-primary focus:outline-none"
             />
           </div>
 
@@ -147,7 +147,7 @@ export const SeoMetaTab: React.FC = () => {
               type="text"
               value={seo.author || ''}
               onChange={(e) => handleUpdate('author', e.target.value)}
-              className="w-full min-h-[42px] bg-bg-secondary border border-border-color rounded-xl px-3 py-2 text-sm text-text-primary focus:border-rose-500 focus:outline-none"
+              className="w-full min-h-[42px] bg-bg-secondary border border-border-color rounded-xl px-3 py-2 text-sm text-text-primary focus:border-accent-primary focus:outline-none"
             />
           </div>
 
@@ -157,7 +157,7 @@ export const SeoMetaTab: React.FC = () => {
               type="text"
               value={seo.ogImage || ''}
               onChange={(e) => handleUpdate('ogImage', e.target.value)}
-              className="w-full min-h-[42px] bg-bg-secondary border border-border-color rounded-xl px-3 py-2 text-sm text-text-primary focus:border-rose-500 focus:outline-none"
+              className="w-full min-h-[42px] bg-bg-secondary border border-border-color rounded-xl px-3 py-2 text-sm text-text-primary focus:border-accent-primary focus:outline-none"
             />
           </div>
 
@@ -168,7 +168,7 @@ export const SeoMetaTab: React.FC = () => {
               placeholder="G-..."
               value={seo.googleAnalyticsId || ''}
               onChange={(e) => handleUpdate('googleAnalyticsId', e.target.value)}
-              className="w-full min-h-[42px] bg-bg-secondary border border-border-color rounded-xl px-3 py-2 text-sm text-text-primary focus:border-rose-500 focus:outline-none font-mono"
+              className="w-full min-h-[42px] bg-bg-secondary border border-border-color rounded-xl px-3 py-2 text-sm text-text-primary focus:border-accent-primary focus:outline-none font-mono"
             />
           </div>
 
@@ -179,7 +179,7 @@ export const SeoMetaTab: React.FC = () => {
               placeholder="@rohitverma"
               value={seo.twitterHandle || ''}
               onChange={(e) => handleUpdate('twitterHandle', e.target.value)}
-              className="w-full min-h-[42px] bg-bg-secondary border border-border-color rounded-xl px-3 py-2 text-sm text-text-primary focus:border-rose-500 focus:outline-none"
+              className="w-full min-h-[42px] bg-bg-secondary border border-border-color rounded-xl px-3 py-2 text-sm text-text-primary focus:border-accent-primary focus:outline-none"
             />
           </div>
         </div>
