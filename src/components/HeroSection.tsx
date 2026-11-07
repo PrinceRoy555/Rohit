@@ -108,7 +108,7 @@ export default function HeroSection() {
   return (
     <section
       id="home"
-      className="relative w-full pt-4 sm:pt-6 lg:pt-8 pb-10 sm:pb-14 overflow-hidden transition-colors duration-300 bg-[#F7F9FF] dark:bg-[#030B1E]"
+      className="relative w-full pt-4 sm:pt-6 lg:pt-8 pb-10 sm:pb-14 transition-colors duration-300 bg-[#F7F9FF] dark:bg-[#030B1E]"
     >
       {/* Background Soft Organic Lights & Grid */}
       <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden" aria-hidden="true">
@@ -301,7 +301,7 @@ export default function HeroSection() {
               RIGHT COLUMN (48% width on desktop): Prominent Portrait & Floating Cards
              ========================================================================= */}
           <div 
-            className="w-full lg:w-[48%] relative flex items-center justify-center my-4 lg:my-0 min-h-[460px] sm:min-h-[520px] lg:min-h-[580px] xl:min-h-[620px]"
+            className="w-full lg:w-[48%] relative flex items-end justify-center my-4 lg:my-0"
             id="hero-right-content"
           >
             {/* 1. Dot Matrix Grid Pattern (Top-Right) */}
@@ -368,12 +368,12 @@ export default function HeroSection() {
               </svg>
             </div>
 
-            {/* 4. Rohit's Prominent Portrait (object-fit: contain, no cropping, scaled up) */}
+            {/* 4. Rohit's Complete Original Portrait (No bottom cropping, full waist/belt visible) */}
             <motion.div
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.5, delay: 0.15 }}
-              className="relative z-10 w-[320px] sm:w-[400px] md:w-[450px] lg:w-[480px] xl:w-[530px] flex items-center justify-center pointer-events-none select-none"
+              className="relative z-10 w-full max-w-[320px] sm:max-w-[390px] md:max-w-[440px] lg:max-w-[480px] xl:max-w-[520px] flex items-end justify-center pointer-events-none select-none"
               id="hero-portrait-container"
             >
               <img
@@ -382,7 +382,14 @@ export default function HeroSection() {
                 width="617"
                 height="1024"
                 fetchPriority="high"
-                className="w-full h-auto max-h-[500px] sm:max-h-[560px] md:max-h-[600px] lg:max-h-[630px] xl:max-h-[670px] object-contain object-center drop-shadow-[0_20px_35px_rgba(7,27,73,0.28)]"
+                className="w-full h-auto block drop-shadow-[0_20px_35px_rgba(7,27,73,0.28)]"
+                style={{
+                  objectFit: 'contain',
+                  objectPosition: 'center bottom',
+                  maxHeight: 'none',
+                  height: 'auto',
+                  display: 'block'
+                }}
                 onError={(e) => {
                   if (e.currentTarget.src !== portrait) {
                     e.currentTarget.src = portrait;
@@ -476,7 +483,7 @@ export default function HeroSection() {
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.45, delay: 0.35 }}
-          className="mt-8 sm:mt-10 lg:mt-12 w-full rounded-2xl sm:rounded-3xl bg-white dark:bg-[#071B49] border border-[#E2E8F0] dark:border-[#1E3A8A]/50 shadow-[0_12px_35px_rgba(7,27,73,0.06)] dark:shadow-[0_20px_50px_rgba(3,11,30,0.6)] p-5 sm:p-6 lg:p-7 relative z-20"
+          className="mt-10 sm:mt-14 lg:mt-16 w-full rounded-2xl sm:rounded-3xl bg-white dark:bg-[#071B49] border border-[#E2E8F0] dark:border-[#1E3A8A]/50 shadow-[0_12px_35px_rgba(7,27,73,0.06)] dark:shadow-[0_20px_50px_rgba(3,11,30,0.6)] p-5 sm:p-6 lg:p-7 relative z-20"
           id="hero-stats-card"
         >
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6 divide-y sm:divide-y-0 sm:divide-x divide-[#E2E8F0] dark:divide-[#1E3A8A]/40">
