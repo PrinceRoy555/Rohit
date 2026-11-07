@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Menu, X, FileText, MessageCircle, ArrowRight } from 'lucide-react';
+import { Menu, X, FileText, MessageCircle, ArrowRight, ChevronDown } from 'lucide-react';
 import { WHATSAPP_BUSINESS_URL, contactConfig, ROHIT_PROFILE_IMAGE_URL, getAuthoritativeProfileImage } from '../data';
 import { useSiteConfig } from '../context/SiteConfigContext';
 import { useTheme } from '../context/ThemeContext';
@@ -238,6 +238,9 @@ export default function Header({ activeSection, theme: propTheme, toggleTheme: p
             </div>
           </a>
 
+          {/* Subtle Vertical Divider from Reference Mockup */}
+          <div className="hidden lg:block h-6 w-[1px] bg-[#E2E8F0] dark:bg-[#1E3A8A]/50 mx-2" aria-hidden="true" />
+
           {/* Centre: Navigation Capsule */}
           <nav className="header-navigation main-navigation desktop-navigation" aria-label="Primary navigation">
             {navItems.map((link) => {
@@ -276,6 +279,9 @@ export default function Header({ activeSection, theme: propTheme, toggleTheme: p
                     }}
                   >
                     {link.label}
+                    {link.id === 'services' && (
+                      <ChevronDown className="w-3.5 h-3.5 ml-1 inline-block opacity-75 stroke-[2.2]" />
+                    )}
                   </span>
                 </a>
               );
@@ -323,7 +329,7 @@ export default function Header({ activeSection, theme: propTheme, toggleTheme: p
               <a
                 href="#contact"
                 onClick={(e) => scrollToSection('contact', e)}
-                className="hidden min-[1440px]:inline-flex items-center justify-center gap-2 h-[42px] min-h-[42px] px-5 rounded-full !text-white font-bold text-xs sm:text-sm whitespace-nowrap active:scale-95 transition-all duration-200 shadow-md bg-accent-primary hover:bg-accent-secondary shadow-accent-primary/25 flex-shrink-0"
+                className="hidden xl:inline-flex items-center justify-center gap-2 h-[42px] min-h-[42px] px-5 rounded-full !text-white font-bold text-xs sm:text-sm whitespace-nowrap active:scale-95 transition-all duration-200 shadow-md bg-[#0866F5] hover:bg-[#155EEF] shadow-[#0866F5]/25 flex-shrink-0"
                 id="header-work-together-btn"
                 aria-label="Let's Work Together - Contact Rohit Verma"
               >
