@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { motion, useReducedMotion } from 'motion/react';
 import { 
   ArrowRight, 
@@ -17,6 +17,46 @@ import {
 import { WHATSAPP_BUSINESS_URL, contactConfig, ROHIT_PROFILE_IMAGE_URL, getAuthoritativeProfileImage } from '../data';
 import { useSiteConfig } from '../context/SiteConfigContext';
 import { useTheme } from '../context/ThemeContext';
+
+/**
+ * Custom hook to count up from 0 to target over durationMs using easeOutCubic.
+ * Runs only once when triggered by IntersectionObserver.
+ */
+function useCountUp(target: number, durationMs: number = 2000, trigger: boolean = false, shouldReduceMotion: boolean = false): number {
+  const [count, setCount] = useState<number>(shouldReduceMotion ? target : 0);
+
+  useEffect(() => {
+    if (shouldReduceMotion) {
+      setCount(target);
+      return;
+    }
+    if (!trigger) return;
+
+    let startTimestamp: number | null = null;
+    let animId: number;
+
+    const step = (timestamp: number) => {
+      if (!startTimestamp) startTimestamp = timestamp;
+      const elapsed = timestamp - startTimestamp;
+      const progress = Math.min(elapsed / durationMs, 1);
+
+      // easeOutCubic easing formula: 1 - Math.pow(1 - progress, 3)
+      const easeProgress = 1 - Math.pow(1 - progress, 3);
+      setCount(Math.round(easeProgress * target));
+
+      if (progress < 1) {
+        animId = requestAnimationFrame(step);
+      } else {
+        setCount(target);
+      }
+    };
+
+    animId = requestAnimationFrame(step);
+    return () => cancelAnimationFrame(animId);
+  }, [trigger, target, durationMs, shouldReduceMotion]);
+
+  return count;
+}
 
 export default function HeroSection() {
   const { resolvedTheme } = useTheme();
@@ -48,6 +88,75 @@ export default function HeroSection() {
   const projectsCompleted = branding?.projectsCompleted ? parseInt(branding.projectsCompleted, 10) || 100 : 100;
 
   const shouldReduceMotion = useReducedMotion();
+
+  // Stats bar viewport observer & count-up states
+  const statsRef = useRef<HTMLDivElement>(null);
+  const [hasEnteredViewport, setHasEnteredViewport] = useState<boolean>(false);
+
+  useEffect(() => {
+    if (shouldReduceMotion) {
+      setHasEnteredViewport(true);
+      return;
+    }
+
+    const node = statsRef.current;
+    if (!node || typeof IntersectionObserver === 'undefined') {
+      setHasEnteredViewport(true);
+      return;
+    }
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setHasEnteredViewport(true);
+          observer.disconnect();
+        }
+      },
+      { threshold: 0.3 }
+    );
+
+    observer.observe(node);
+    return () => observer.disconnect();
+  }, [shouldReduceMotion]);
+
+  // Eased count-up for statistics numbers (0 -> target over 2s with easeOutCubic)
+  const countProjects = useCountUp(projectsCompleted, 2800, hasEnteredViewport, !!shouldReduceMotion);
+  const countYears = useCountUp(yearsExperience, 2800, hasEnteredViewport, !!shouldReduceMotion);
+  const countSatisfaction = useCountUp(98, 2800, hasEnteredViewport, !!shouldReduceMotion);
+
+  // Framer Motion animation variants for Entrance & Stagger
+  const statsCardVariants = {
+    hidden: {
+      opacity: 0,
+      y: shouldReduceMotion ? 0 : 40,
+    },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: {
+        duration: shouldReduceMotion ? 0.01 : 1.1,
+        ease: 'easeOut',
+        staggerChildren: shouldReduceMotion ? 0 : 0.22,
+        delayChildren: shouldReduceMotion ? 0 : 0.1,
+      },
+    },
+  };
+
+  const statItemVariants = {
+    hidden: {
+      opacity: 0,
+      y: shouldReduceMotion ? 0 : 20,
+    },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: {
+        duration: shouldReduceMotion ? 0.01 : 0.8,
+        ease: 'easeOut',
+      },
+    },
+  };
+
 
   const scrollToContact = () => {
     const element = document.getElementById('contact');
@@ -478,66 +587,262 @@ export default function HeroSection() {
 
         {/* =========================================================================
             STATISTICS SECTION: Large White Rounded Horizontal Card (4 Equal Columns)
+            With Entrance, Stagger, Count-Up, Floating Icons, Hover Lift, Dividers, Shimmer & Pulse
            ========================================================================= */}
         <motion.div
-          initial={{ opacity: 0, y: 16 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.45, delay: 0.35 }}
-          className="relative z-20 -mt-14 sm:-mt-18 lg:-mt-24 w-full rounded-2xl sm:rounded-3xl bg-white dark:bg-[#071B49] border border-[#E2E8F0] dark:border-[#1E3A8A]/50 shadow-[0_12px_35px_rgba(7,27,73,0.06)] dark:shadow-[0_20px_50px_rgba(3,11,30,0.6)] p-5 sm:p-6 lg:p-7"
+          ref={statsRef}
+          initial="hidden"
+          animate={hasEnteredViewport ? 'visible' : 'hidden'}
+          variants={statsCardVariants}
+          className="relative z-20 -mt-14 sm:-mt-18 lg:-mt-24 w-full rounded-2xl sm:rounded-3xl bg-white dark:bg-[#071B49] border border-[#E2E8F0] dark:border-[#1E3A8A]/50 shadow-[0_12px_35px_rgba(7,27,73,0.06)] dark:shadow-[0_20px_50px_rgba(3,11,30,0.6)] p-5 sm:p-6 lg:p-7 overflow-hidden"
           id="hero-stats-card"
         >
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6 divide-y sm:divide-y-0 sm:divide-x divide-[#E2E8F0] dark:divide-[#1E3A8A]/40">
+          {/* 7. Shimmer: One-time left-to-right light sweep across the bar */}
+          {!shouldReduceMotion && (
+            <motion.div
+              initial={{ x: '-120%', opacity: 0 }}
+              animate={hasEnteredViewport ? { x: '240%', opacity: [0, 0.8, 0.8, 0] } : { x: '-120%', opacity: 0 }}
+              transition={{
+                duration: 2.2,
+                delay: 0.9,
+                ease: [0.25, 0.1, 0.25, 1],
+              }}
+              className="absolute inset-y-0 w-1/2 pointer-events-none bg-gradient-to-r from-transparent via-white/50 dark:via-[#0866F5]/20 to-transparent skew-x-[-20deg] z-10"
+              aria-hidden="true"
+            />
+          )}
+
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6 relative z-10">
             
             {/* Stat 1: 100+ Projects Completed */}
-            <div className="flex items-center gap-3.5 sm:gap-4 px-2 sm:px-4 pt-3 sm:pt-0">
-              <div className="w-11 h-11 sm:w-12 sm:h-12 rounded-2xl bg-[#EAF2FF] dark:bg-[#0866F5]/20 flex items-center justify-center text-[#0866F5] shrink-0 shadow-inner">
+            <motion.div
+              variants={statItemVariants}
+              whileHover={shouldReduceMotion ? undefined : { y: -4 }}
+              transition={{ duration: 0.3, ease: 'easeOut' }}
+              className="group relative flex items-center gap-3.5 sm:gap-4 px-2 sm:px-4 py-2 sm:py-2.5 rounded-2xl transition-shadow duration-300 hover:shadow-[0_8px_24px_rgba(8,102,245,0.12)] dark:hover:shadow-[0_8px_24px_rgba(8,102,245,0.25)] hover:bg-[#F7F9FF]/60 dark:hover:bg-[#0866F5]/5 cursor-default"
+            >
+              {/* 4. Icon: subtle floating animation + scale & rotate on hover */}
+              <motion.div
+                animate={shouldReduceMotion ? undefined : { y: [0, -4, 0] }}
+                transition={
+                  shouldReduceMotion
+                    ? undefined
+                    : {
+                        duration: 4.5,
+                        repeat: Infinity,
+                        ease: 'easeInOut',
+                        delay: 0,
+                      }
+                }
+                whileHover={shouldReduceMotion ? undefined : { scale: 1.1, rotate: 5 }}
+                className="w-11 h-11 sm:w-12 sm:h-12 rounded-2xl bg-[#EAF2FF] dark:bg-[#0866F5]/20 flex items-center justify-center text-[#0866F5] shrink-0 shadow-inner cursor-pointer"
+              >
                 <Award className="w-5 h-5 sm:w-6 sm:h-6 text-[#0866F5]" />
-              </div>
+              </motion.div>
               <div>
+                {/* 3. Count-up: 0 -> 100+ over 2s with easeOutCubic */}
                 <div className="text-2xl sm:text-3xl lg:text-[32px] font-black text-[#071B49] dark:text-white leading-none tracking-tight">
-                  {projectsCompleted}+
+                  {countProjects}+
                 </div>
                 <div className="text-xs sm:text-sm font-semibold text-[#64748B] dark:text-[#94A3B8] mt-1">
                   Projects Completed
                 </div>
               </div>
-            </div>
+
+              {/* 6. Divider: Desktop vertical line animating scaleY 0 -> 1 from top to bottom */}
+              <motion.div
+                initial={{ scaleY: 0 }}
+                animate={hasEnteredViewport ? { scaleY: 1 } : { scaleY: 0 }}
+                transition={{
+                  duration: shouldReduceMotion ? 0.01 : 0.95,
+                  delay: shouldReduceMotion ? 0 : 0.35,
+                  ease: 'easeOut',
+                }}
+                style={{ originY: 0 }}
+                className="hidden md:block absolute right-0 top-3 bottom-3 w-[1px] bg-[#E2E8F0] dark:bg-[#1E3A8A]/40 pointer-events-none"
+                aria-hidden="true"
+              />
+              {/* Mobile column divider */}
+              <motion.div
+                initial={{ scaleY: 0 }}
+                animate={hasEnteredViewport ? { scaleY: 1 } : { scaleY: 0 }}
+                transition={{
+                  duration: shouldReduceMotion ? 0.01 : 0.95,
+                  delay: shouldReduceMotion ? 0 : 0.35,
+                  ease: 'easeOut',
+                }}
+                style={{ originY: 0 }}
+                className="md:hidden block absolute right-0 top-3 bottom-3 w-[1px] bg-[#E2E8F0] dark:bg-[#1E3A8A]/40 pointer-events-none"
+                aria-hidden="true"
+              />
+            </motion.div>
 
             {/* Stat 2: 3+ Years Experience */}
-            <div className="flex items-center gap-3.5 sm:gap-4 px-2 sm:px-4 pt-3 sm:pt-0">
-              <div className="w-11 h-11 sm:w-12 sm:h-12 rounded-2xl bg-[#EAF2FF] dark:bg-[#0866F5]/20 flex items-center justify-center text-[#0866F5] shrink-0 shadow-inner">
+            <motion.div
+              variants={statItemVariants}
+              whileHover={shouldReduceMotion ? undefined : { y: -4 }}
+              transition={{ duration: 0.3, ease: 'easeOut' }}
+              className="group relative flex items-center gap-3.5 sm:gap-4 px-2 sm:px-4 py-2 sm:py-2.5 rounded-2xl transition-shadow duration-300 hover:shadow-[0_8px_24px_rgba(8,102,245,0.12)] dark:hover:shadow-[0_8px_24px_rgba(8,102,245,0.25)] hover:bg-[#F7F9FF]/60 dark:hover:bg-[#0866F5]/5 cursor-default"
+            >
+              {/* 4. Icon: subtle floating animation + scale & rotate on hover */}
+              <motion.div
+                animate={shouldReduceMotion ? undefined : { y: [0, -4, 0] }}
+                transition={
+                  shouldReduceMotion
+                    ? undefined
+                    : {
+                        duration: 4.5,
+                        repeat: Infinity,
+                        ease: 'easeInOut',
+                        delay: 0.25,
+                      }
+                }
+                whileHover={shouldReduceMotion ? undefined : { scale: 1.1, rotate: 5 }}
+                className="w-11 h-11 sm:w-12 sm:h-12 rounded-2xl bg-[#EAF2FF] dark:bg-[#0866F5]/20 flex items-center justify-center text-[#0866F5] shrink-0 shadow-inner cursor-pointer"
+              >
                 <Users className="w-5 h-5 sm:w-6 sm:h-6 text-[#0866F5]" />
-              </div>
+              </motion.div>
               <div>
+                {/* 3. Count-up: 0 -> 3+ over 2s with easeOutCubic */}
                 <div className="text-2xl sm:text-3xl lg:text-[32px] font-black text-[#071B49] dark:text-white leading-none tracking-tight">
-                  {yearsExperience}+
+                  {countYears}+
                 </div>
                 <div className="text-xs sm:text-sm font-semibold text-[#64748B] dark:text-[#94A3B8] mt-1">
                   Years Experience
                 </div>
               </div>
-            </div>
+
+              {/* 6. Divider: Desktop vertical line animating scaleY 0 -> 1 from top to bottom */}
+              <motion.div
+                initial={{ scaleY: 0 }}
+                animate={hasEnteredViewport ? { scaleY: 1 } : { scaleY: 0 }}
+                transition={{
+                  duration: shouldReduceMotion ? 0.01 : 0.95,
+                  delay: shouldReduceMotion ? 0 : 0.45,
+                  ease: 'easeOut',
+                }}
+                style={{ originY: 0 }}
+                className="hidden md:block absolute right-0 top-3 bottom-3 w-[1px] bg-[#E2E8F0] dark:bg-[#1E3A8A]/40 pointer-events-none"
+                aria-hidden="true"
+              />
+            </motion.div>
 
             {/* Stat 3: 98% Client Satisfaction */}
-            <div className="flex items-center gap-3.5 sm:gap-4 px-2 sm:px-4 pt-3 sm:pt-0">
-              <div className="w-11 h-11 sm:w-12 sm:h-12 rounded-2xl bg-[#EAF2FF] dark:bg-[#0866F5]/20 flex items-center justify-center text-[#0866F5] shrink-0 shadow-inner">
+            <motion.div
+              variants={statItemVariants}
+              whileHover={shouldReduceMotion ? undefined : { y: -4 }}
+              transition={{ duration: 0.3, ease: 'easeOut' }}
+              className="group relative flex items-center gap-3.5 sm:gap-4 px-2 sm:px-4 py-2 sm:py-2.5 rounded-2xl transition-shadow duration-300 hover:shadow-[0_8px_24px_rgba(8,102,245,0.12)] dark:hover:shadow-[0_8px_24px_rgba(8,102,245,0.25)] hover:bg-[#F7F9FF]/60 dark:hover:bg-[#0866F5]/5 cursor-default"
+            >
+              {/* 4. Icon: subtle floating animation + scale & rotate on hover */}
+              <motion.div
+                animate={shouldReduceMotion ? undefined : { y: [0, -4, 0] }}
+                transition={
+                  shouldReduceMotion
+                    ? undefined
+                    : {
+                        duration: 4.5,
+                        repeat: Infinity,
+                        ease: 'easeInOut',
+                        delay: 0.5,
+                      }
+                }
+                whileHover={shouldReduceMotion ? undefined : { scale: 1.1, rotate: 5 }}
+                className="w-11 h-11 sm:w-12 sm:h-12 rounded-2xl bg-[#EAF2FF] dark:bg-[#0866F5]/20 flex items-center justify-center text-[#0866F5] shrink-0 shadow-inner cursor-pointer"
+              >
                 <Smile className="w-5 h-5 sm:w-6 sm:h-6 text-[#0866F5]" />
-              </div>
+              </motion.div>
               <div>
+                {/* 3. Count-up: 0 -> 98% over 2s with easeOutCubic */}
                 <div className="text-2xl sm:text-3xl lg:text-[32px] font-black text-[#071B49] dark:text-white leading-none tracking-tight">
-                  98%
+                  {countSatisfaction}%
                 </div>
                 <div className="text-xs sm:text-sm font-semibold text-[#64748B] dark:text-[#94A3B8] mt-1">
                   Client Satisfaction
                 </div>
               </div>
-            </div>
+
+              {/* 6. Divider: Desktop vertical line animating scaleY 0 -> 1 from top to bottom */}
+              <motion.div
+                initial={{ scaleY: 0 }}
+                animate={hasEnteredViewport ? { scaleY: 1 } : { scaleY: 0 }}
+                transition={{
+                  duration: shouldReduceMotion ? 0.01 : 0.95,
+                  delay: shouldReduceMotion ? 0 : 0.55,
+                  ease: 'easeOut',
+                }}
+                style={{ originY: 0 }}
+                className="hidden md:block absolute right-0 top-3 bottom-3 w-[1px] bg-[#E2E8F0] dark:bg-[#1E3A8A]/40 pointer-events-none"
+                aria-hidden="true"
+              />
+              {/* Mobile column divider */}
+              <motion.div
+                initial={{ scaleY: 0 }}
+                animate={hasEnteredViewport ? { scaleY: 1 } : { scaleY: 0 }}
+                transition={{
+                  duration: shouldReduceMotion ? 0.01 : 0.95,
+                  delay: shouldReduceMotion ? 0 : 0.55,
+                  ease: 'easeOut',
+                }}
+                style={{ originY: 0 }}
+                className="md:hidden block absolute right-0 top-3 bottom-3 w-[1px] bg-[#E2E8F0] dark:bg-[#1E3A8A]/40 pointer-events-none"
+                aria-hidden="true"
+              />
+            </motion.div>
 
             {/* Stat 4: Trusted by Growing Businesses */}
-            <div className="flex items-center gap-3.5 sm:gap-4 px-2 sm:px-4 pt-3 sm:pt-0">
-              <div className="w-11 h-11 sm:w-12 sm:h-12 rounded-2xl bg-[#EAF2FF] dark:bg-[#0866F5]/20 flex items-center justify-center text-[#0866F5] shrink-0 shadow-inner">
-                <Handshake className="w-5 h-5 sm:w-6 sm:h-6 text-[#0866F5]" />
-              </div>
+            <motion.div
+              variants={statItemVariants}
+              whileHover={shouldReduceMotion ? undefined : { y: -4 }}
+              transition={{ duration: 0.3, ease: 'easeOut' }}
+              className="group relative flex items-center gap-3.5 sm:gap-4 px-2 sm:px-4 py-2 sm:py-2.5 rounded-2xl transition-shadow duration-300 hover:shadow-[0_8px_24px_rgba(8,102,245,0.12)] dark:hover:shadow-[0_8px_24px_rgba(8,102,245,0.25)] hover:bg-[#F7F9FF]/60 dark:hover:bg-[#0866F5]/5 cursor-default"
+            >
+              {/* 4. Icon: subtle floating animation + scale & rotate on hover */}
+              <motion.div
+                animate={shouldReduceMotion ? undefined : { y: [0, -4, 0] }}
+                transition={
+                  shouldReduceMotion
+                    ? undefined
+                    : {
+                        duration: 4.5,
+                        repeat: Infinity,
+                        ease: 'easeInOut',
+                        delay: 0.75,
+                      }
+                }
+                whileHover={shouldReduceMotion ? undefined : { scale: 1.1, rotate: 5 }}
+                className="w-11 h-11 sm:w-12 sm:h-12 rounded-2xl bg-[#EAF2FF] dark:bg-[#0866F5]/20 flex items-center justify-center text-[#0866F5] shrink-0 shadow-inner cursor-pointer"
+              >
+                {/* 8. Handshake Icon: Gentle pulse/glow that plays once on entry */}
+                <motion.div
+                  animate={
+                    shouldReduceMotion
+                      ? undefined
+                      : hasEnteredViewport
+                      ? {
+                          scale: [1, 1.22, 1],
+                          filter: [
+                            'drop-shadow(0 0 0px rgba(8,102,245,0))',
+                            'drop-shadow(0 0 10px rgba(8,102,245,0.8))',
+                            'drop-shadow(0 0 0px rgba(8,102,245,0))',
+                          ],
+                        }
+                      : undefined
+                  }
+                  transition={
+                    shouldReduceMotion
+                      ? undefined
+                      : {
+                          duration: 1.8,
+                          delay: 2.2,
+                          ease: 'easeInOut',
+                        }
+                  }
+                  className="flex items-center justify-center"
+                >
+                  <Handshake className="w-5 h-5 sm:w-6 sm:h-6 text-[#0866F5]" />
+                </motion.div>
+              </motion.div>
               <div>
                 <div className="text-xl sm:text-2xl lg:text-[24px] font-black text-[#071B49] dark:text-white leading-none tracking-tight">
                   Trusted by
@@ -546,7 +851,7 @@ export default function HeroSection() {
                   Growing Businesses
                 </div>
               </div>
-            </div>
+            </motion.div>
 
           </div>
         </motion.div>
