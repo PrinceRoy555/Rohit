@@ -655,7 +655,7 @@ export const ACHIEVEMENT_CARDS: AchievementCard[] = [
   { title: 'Jaipur-Based Professional', subtitle: 'Based in Rajasthan, India', icon: 'MapPin' }
 ];
 
-export const WHATSAPP_BUSINESS_URL = "https://wa.me/message/E53AXF7SH5OMI1";
+export const WHATSAPP_BUSINESS_URL = "https://wa.me/919376569027";
 export const RESUME_PDF_URL = "https://ik.imagekit.io/auhuory9w/website%20work/resume/Rohit%20Verma%20(2)%20(3).pdf";
 export const RESUME_DRIVE_PREVIEW_FALLBACK = "https://ik.imagekit.io/auhuory9w/website%20work/resume/Rohit%20Verma%20(2)%20(3).pdf";
 export const RESUME_FILE_NAME = "Rohit-Verma-Resume.pdf";

@@ -21,7 +21,7 @@ const navLinks = [
   { label: 'Services', id: 'services' },
   { label: 'Portfolio', id: 'portfolio' },
   { label: 'Experience', id: 'experience' },
-  { label: 'Blog', id: 'blog' },
+
   { label: 'Contact', id: 'contact' },
 ];
 
@@ -39,7 +39,7 @@ export default function Header({ activeSection, theme: propTheme, toggleTheme: p
   const navItems = React.useMemo(() => {
     if (activeConfig?.navigation?.items && activeConfig.navigation.items.length > 0) {
       return activeConfig.navigation.items
-        .filter((item) => item.isVisible !== false)
+        .filter((item) => item.isVisible !== false && item.id !== 'nav-blog' && item.route !== 'blog')
         .map((item) => ({
           label: item.label,
           id: item.route || item.id.replace(/^nav-/, ''),
@@ -109,9 +109,6 @@ export default function Header({ activeSection, theme: propTheme, toggleTheme: p
     }
     if (linkId === 'experience') {
       return activeSection === 'experience';
-    }
-    if (linkId === 'blog') {
-      return activeSection === 'blog' || activeSection.startsWith('blog');
     }
     if (linkId === 'contact') {
       return activeSection === 'contact';

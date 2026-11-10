@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { motion, useReducedMotion } from 'motion/react';
+import { motion, useReducedMotion, type Variants } from 'motion/react';
 import { 
   ArrowRight, 
   Play, 
@@ -125,7 +125,7 @@ export default function HeroSection() {
   const countSatisfaction = useCountUp(98, 2800, hasEnteredViewport, !!shouldReduceMotion);
 
   // Framer Motion animation variants for Entrance & Stagger
-  const statsCardVariants = {
+  const statsCardVariants: Variants = {
     hidden: {
       opacity: 0,
       y: shouldReduceMotion ? 0 : 40,
@@ -142,7 +142,7 @@ export default function HeroSection() {
     },
   };
 
-  const statItemVariants = {
+  const statItemVariants: Variants = {
     hidden: {
       opacity: 0,
       y: shouldReduceMotion ? 0 : 20,

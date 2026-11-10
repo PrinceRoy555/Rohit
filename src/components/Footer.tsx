@@ -205,10 +205,10 @@ export default function Footer({ onNavigate }: FooterProps = {}) {
         <div className="lg:col-span-2" id="footer-col-2">
           <h4 className="text-text-primary text-sm font-bold uppercase tracking-wider mb-6">Navigation</h4>
           <ul className="space-y-3 text-sm">
-            {['About', 'Services', 'Portfolio', 'Experience', 'Insights', 'Contact'].map((item) => (
+            {['About', 'Services', 'Portfolio', 'Experience', 'Contact'].map((item) => (
               <li key={item}>
                 <button
-                  onClick={() => scrollToSection(item.toLowerCase() === 'insights' ? 'blog' : item.toLowerCase())}
+                  onClick={() => scrollToSection(item.toLowerCase())}
                   className="hover:text-accent-primary transition-colors text-left cursor-pointer text-text-secondary"
                 >
                   {item}

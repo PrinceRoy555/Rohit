@@ -147,7 +147,7 @@ export const DEFAULT_SITE_CONFIG: SiteConfig = {
       { id: 'nav-services', label: 'Services', route: 'services', isVisible: true },
       { id: 'nav-portfolio', label: 'Portfolio', route: 'portfolio', isVisible: true },
       { id: 'nav-experience', label: 'Experience', route: 'experience', isVisible: true },
-      { id: 'nav-blog', label: 'Blog', route: 'blog', isVisible: true },
+
       { id: 'nav-contact', label: 'Contact', route: 'contact', isVisible: true }
     ],
     ctaButton: {

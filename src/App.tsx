@@ -29,6 +29,10 @@ const AboutRohitPage = lazy(() => import('./components/AboutRohitPage'));
 const InsightDetailPage = lazy(() => import('./components/InsightDetailPage'));
 const PrivacyPolicyContent = lazy(() => import('./components/PrivacyPolicyContent'));
 const TermsAndConditionsContent = lazy(() => import('./components/TermsAndConditionsContent'));
+const PortfolioPage = lazy(() => import('./components/PortfolioPage'));
+const AboutPage = lazy(() => import('./components/AboutPage'));
+const ServicesPage = lazy(() => import('./components/ServicesPage'));
+const ContactPage = lazy(() => import('./components/ContactPage'));
 const AdminPanel = lazy(() => import('./components/Admin/AdminPanel').then(m => ({ default: m.AdminPanel })));
 
 interface AnimatedSectionProps {
@@ -81,7 +85,7 @@ export default function App() {
 
     let ticking = false;
     let currentActive = 'home';
-    const sections = ['home', 'about', 'services', 'portfolio', 'experience', 'blog', 'contact'];
+    const sections = ['home', 'about', 'services', 'portfolio', 'experience', 'contact'];
 
     const updateActiveSection = () => {
       const scrollPosition = window.scrollY + 160;
@@ -172,6 +176,15 @@ export default function App() {
         }
       }
 
+            // Redirect /blog and /insights to home
+      if (topPath === 'blog' || topPath === 'insights' || topHash === 'blog' || topHash === 'insights') {
+        setCurrentRoute('home');
+        if (window.history && window.history.replaceState) {
+          window.history.replaceState(null, '', '/');
+        }
+        return;
+      }
+
       // Route lookup map
       const ROUTE_MAP: Record<string, string> = {
         'home': 'home',
@@ -183,8 +196,6 @@ export default function App() {
         'experience': 'experience',
         'unicivix': 'about-rohit',
         'unicivix-solutions': 'about-rohit',
-        'blog': 'blog',
-        'insights': 'blog',
         'contact': 'contact',
         'pricing': 'services',
         'privacy': 'privacy',
@@ -369,7 +380,7 @@ export default function App() {
       <Header activeSection={activeSection} currentRoute={currentRoute} theme={theme} toggleTheme={toggleTheme} onNavigate={handleNavigate} />
 
       {/* Standalone Page Banner and Info */}
-      {currentRoute !== 'home' && currentRoute !== 'about-rohit' && currentRoute !== 'rohit-verma' && (
+      {currentRoute !== 'home' && currentRoute !== 'about-rohit' && currentRoute !== 'rohit-verma' && currentRoute !== 'portfolio' && currentRoute !== 'about' && currentRoute !== 'services' && currentRoute !== 'contact' && (
         <div className="pt-28 pb-10 bg-gradient-to-b from-bg-secondary to-bg-primary border-b border-border-color relative overflow-hidden">
           {/* Ambient light glow */}
           <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[300px] bg-accent-primary/10 rounded-full blur-[120px] pointer-events-none" />
@@ -389,14 +400,13 @@ export default function App() {
                   Separate Page View
                 </span>
                 <h1 className="text-4xl md:text-5xl font-extrabold text-text-primary tracking-tight capitalize">
-                  {currentRoute === 'about' ? 'About Me & Expertise' : currentRoute === 'services' ? 'My Creative Services' : currentRoute === 'portfolio' ? 'Featured Masterpieces' : currentRoute === 'experience' ? 'Professional Career' : currentRoute === 'blog' ? 'Latest Thoughts & News' : currentRoute === 'privacy' ? 'Privacy Policy' : currentRoute === 'terms' ? 'Terms & Conditions' : 'Get In Touch'}
+                  {currentRoute === 'about' ? 'About Me & Expertise' : currentRoute === 'services' ? 'My Creative Services' : currentRoute === 'portfolio' ? 'Featured Masterpieces' : currentRoute === 'experience' ? 'Professional Career' : currentRoute === 'privacy' ? 'Privacy Policy' : currentRoute === 'terms' ? 'Terms & Conditions' : 'Get In Touch'}
                 </h1>
                 <p className="text-text-secondary text-sm md:text-base mt-2 max-w-2xl">
                   {currentRoute === 'about' && "Discover my creative background, technical skill matrix, and professional journey."}
                   {currentRoute === 'services' && "Explore premium creative design, motion graphics packages, and tailor-made pricing."}
                   {currentRoute === 'portfolio' && "A handpicked selection of premium graphic designs, video edits, and branding campaigns."}
                   {currentRoute === 'experience' && "A detailed look at my agency work experience, visual director roles, and key career milestones."}
-                  {currentRoute === 'blog' && "Insightful design tips, video editing guides, and industry wisdom straight from my desk."}
                   {currentRoute === 'contact' && "Let's bring your creative vision to life. Fill out the project intake brief below to get started."}
                   {currentRoute === 'privacy' && "Our official privacy policy outlining data collection, usage, client confidentiality, and security standards."}
                   {currentRoute === 'terms' && "Standard terms, service scopes, advance payment policies, and intellectual property ownership guidelines."}
@@ -459,16 +469,7 @@ export default function App() {
             <PricingSection />
           </AnimatedSection>
 
-          {/* 9. Blog & Creative Insights Section */}
-          <AnimatedSection>
-            <BlogSection
-              onSelectInsight={handleSelectInsight}
-              onOpenAdmin={() => setIsAdminOpen(true)}
-              onViewAll={() => handleNavigate('blog')}
-            />
-          </AnimatedSection>
-
-          {/* 10. Contact Section */}
+          {/* 9. Contact Section */}
           <AnimatedSection>
             <ContactSection />
           </AnimatedSection>
@@ -486,34 +487,16 @@ export default function App() {
             )}
             {(currentRoute === 'about-rohit' || currentRoute === 'rohit-verma') && <AboutRohitPage />}
             {currentRoute === 'about' && (
-              <div className="py-6">
-                <AboutSection onNavigate={handleNavigate} />
-                <SkillsSection />
-              </div>
+              <AboutPage onNavigate={handleNavigate} />
             )}
             {currentRoute === 'services' && (
-              <div className="py-6">
-                <ServicesSection />
-                <PricingSection />
-              </div>
+              <ServicesPage onNavigate={handleNavigate} />
             )}
             {currentRoute === 'portfolio' && (
-              <div className="py-6">
-                <PortfolioSection />
-                <TestimonialSection />
-              </div>
+              <PortfolioPage onNavigate={handleNavigate} />
             )}
             {currentRoute === 'experience' && <div className="py-6"><ExperienceSection /></div>}
-            {currentRoute === 'blog' && (
-              <div className="py-6">
-                <BlogSection
-                  isFullPage={true}
-                  onSelectInsight={handleSelectInsight}
-                  onOpenAdmin={() => setIsAdminOpen(true)}
-                />
-              </div>
-            )}
-            {currentRoute === 'contact' && <div className="py-6"><ContactSection /></div>}
+            {currentRoute === 'contact' && <ContactPage />}
             {currentRoute === 'privacy' && <div className="py-10 px-6"><PrivacyPolicyContent /></div>}
             {currentRoute === 'terms' && <div className="py-10 px-6"><TermsAndConditionsContent /></div>}
           </Suspense>

@@ -21,7 +21,7 @@ export const FIREBASE_CONFIG = {
 
 // Central contact fallbacks when Firebase is unavailable
 export const FIREBASE_FALLBACK_CONTACT = {
-  whatsapp: 'https://wa.me/message/E53AXF7SH5OMI1',
+  whatsapp: 'https://wa.me/919376569027',
   email: 'mailto:workall724038@gmail.com',
   phone: 'tel:+919376569027',
   phoneDisplay: '+91 9376569027',
