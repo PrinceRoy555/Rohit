@@ -133,8 +133,8 @@ export const RemindersModule: React.FC<RemindersModuleProps> = ({ onNavigateToMo
 
   const handleDelete = async (id: string) => {
     const res = await deleteReminderWithCloud(id);
-    if (!res.success && res.errorCode === 'permission-denied') {
-      alert('Permission Denied: You do not have permission to delete reminders.');
+    if (!res.success) {
+      alert(res.error || 'Failed to delete reminder.');
       return;
     }
     handleRefresh();
@@ -152,8 +152,8 @@ export const RemindersModule: React.FC<RemindersModuleProps> = ({ onNavigateToMo
       notes: newNotes.trim() || undefined
     });
 
-    if (!res.success && res.cloudResult?.errorCode === 'permission-denied') {
-      alert('Permission Denied: You do not have permission to create reminders.');
+    if (!res.success) {
+      alert(res.error || 'Failed to create reminder.');
       return;
     }
 

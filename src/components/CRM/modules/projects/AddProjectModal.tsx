@@ -178,8 +178,8 @@ export const AddProjectModal: React.FC<AddProjectModalProps> = ({
         notes: notes.trim() || undefined
       });
 
-      if (!result.success && result.cloudResult?.errorCode === 'permission-denied') {
-        setErrors({ form: 'Permission Denied: You do not have permission to modify projects.' });
+      if (!result.success) {
+        setErrors({ form: result.cloudResult?.error || 'Failed to save project to cloud database. Please verify your administrator session.' });
         setIsSubmitting(false);
         return;
       }

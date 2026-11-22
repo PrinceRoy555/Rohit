@@ -5345,19 +5345,31 @@ export function resetAllCrmStorageToDefaults(): void {
 
 export async function saveLeadWithCloud(
   leadData: Partial<CrmLead> & { name: string; phone: string }
-): Promise<{ success: boolean; lead: CrmLead; cloudResult?: CrmCloudOperationResult<CrmLead> }> {
+): Promise<{ success: boolean; lead: CrmLead; error?: string; cloudResult?: CrmCloudOperationResult<CrmLead> }> {
+  const isUpdate = Boolean(leadData.id);
+  const previous = isUpdate ? leads.find(l => l.id === leadData.id) : null;
+  const previousClone = previous ? { ...previous } : null;
+
   const lead = saveStoredLead(leadData);
   if ((lead as any).isDemo) return { success: true, lead };
+
   const cloudResult = await saveLeadToFirestore(lead);
-  if (!cloudResult.success && cloudResult.errorCode === 'permission-denied') {
-    deleteStoredLead(lead.id);
+  if (!cloudResult.success) {
+    if (isUpdate && previousClone) {
+      const idx = leads.findIndex(l => l.id === lead.id);
+      if (idx >= 0) leads[idx] = previousClone;
+      safeSetLocal(STORAGE_KEYS.LEADS, leads);
+      notifyListeners();
+    } else {
+      deleteStoredLead(lead.id);
+    }
   }
-  return { success: cloudResult.success, lead, cloudResult };
+  return { success: cloudResult.success, lead, error: cloudResult.error, cloudResult };
 }
 
 export async function deleteLeadWithCloud(id: string): Promise<CrmCloudOperationResult> {
   const cloudResult = await deleteLeadFromCloud(id);
-  if (cloudResult.success || cloudResult.errorCode === 'offline' || cloudResult.errorCode === 'unconfigured') {
+  if (cloudResult.success) {
     deleteStoredLead(id);
   }
   return cloudResult;
@@ -5365,19 +5377,31 @@ export async function deleteLeadWithCloud(id: string): Promise<CrmCloudOperation
 
 export async function saveClientWithCloud(
   clientData: Partial<CrmClient> & { name: string; email?: string }
-): Promise<{ success: boolean; client: CrmClient; cloudResult?: CrmCloudOperationResult<CrmClient> }> {
+): Promise<{ success: boolean; client: CrmClient; error?: string; cloudResult?: CrmCloudOperationResult<CrmClient> }> {
+  const isUpdate = Boolean(clientData.id);
+  const previous = isUpdate ? clients.find(c => c.id === clientData.id) : null;
+  const previousClone = previous ? { ...previous } : null;
+
   const client = saveStoredClient(clientData);
   if ((client as any).isDemo) return { success: true, client };
+
   const cloudResult = await saveClientToFirestore(client);
-  if (!cloudResult.success && cloudResult.errorCode === 'permission-denied') {
-    deleteStoredClient(client.id);
+  if (!cloudResult.success) {
+    if (isUpdate && previousClone) {
+      const idx = clients.findIndex(c => c.id === client.id);
+      if (idx >= 0) clients[idx] = previousClone;
+      safeSetLocal(STORAGE_KEYS.CLIENTS, clients);
+      notifyListeners();
+    } else {
+      deleteStoredClient(client.id);
+    }
   }
-  return { success: cloudResult.success, client, cloudResult };
+  return { success: cloudResult.success, client, error: cloudResult.error, cloudResult };
 }
 
 export async function deleteClientWithCloud(id: string): Promise<CrmCloudOperationResult> {
   const cloudResult = await deleteClientFromCloud(id);
-  if (cloudResult.success || cloudResult.errorCode === 'offline' || cloudResult.errorCode === 'unconfigured') {
+  if (cloudResult.success) {
     deleteStoredClient(id);
   }
   return cloudResult;
@@ -5385,19 +5409,31 @@ export async function deleteClientWithCloud(id: string): Promise<CrmCloudOperati
 
 export async function saveProjectWithCloud(
   projectData: Partial<CrmProject> & { title: string; clientId: string }
-): Promise<{ success: boolean; project: CrmProject; cloudResult?: CrmCloudOperationResult<CrmProject> }> {
+): Promise<{ success: boolean; project: CrmProject; error?: string; cloudResult?: CrmCloudOperationResult<CrmProject> }> {
+  const isUpdate = Boolean(projectData.id);
+  const previous = isUpdate ? projects.find(p => p.id === projectData.id) : null;
+  const previousClone = previous ? { ...previous } : null;
+
   const project = saveStoredProject(projectData);
   if ((project as any).isDemo) return { success: true, project };
+
   const cloudResult = await saveProjectToFirestore(project);
-  if (!cloudResult.success && cloudResult.errorCode === 'permission-denied') {
-    deleteStoredProject(project.id);
+  if (!cloudResult.success) {
+    if (isUpdate && previousClone) {
+      const idx = projects.findIndex(p => p.id === project.id);
+      if (idx >= 0) projects[idx] = previousClone;
+      safeSetLocal(STORAGE_KEYS.PROJECTS, projects);
+      notifyListeners();
+    } else {
+      deleteStoredProject(project.id);
+    }
   }
-  return { success: cloudResult.success, project, cloudResult };
+  return { success: cloudResult.success, project, error: cloudResult.error, cloudResult };
 }
 
 export async function deleteProjectWithCloud(id: string): Promise<CrmCloudOperationResult> {
   const cloudResult = await deleteProjectFromCloud(id);
-  if (cloudResult.success || cloudResult.errorCode === 'offline' || cloudResult.errorCode === 'unconfigured') {
+  if (cloudResult.success) {
     deleteStoredProject(id);
   }
   return cloudResult;
@@ -5405,19 +5441,31 @@ export async function deleteProjectWithCloud(id: string): Promise<CrmCloudOperat
 
 export async function saveFreelancerWithCloud(
   freelancerData: Partial<CrmFreelancer> & { name: string; phone: string }
-): Promise<{ success: boolean; freelancer: CrmFreelancer; cloudResult?: CrmCloudOperationResult<CrmFreelancer> }> {
+): Promise<{ success: boolean; freelancer: CrmFreelancer; error?: string; cloudResult?: CrmCloudOperationResult<CrmFreelancer> }> {
+  const isUpdate = Boolean(freelancerData.id);
+  const previous = isUpdate ? freelancers.find(f => f.id === freelancerData.id) : null;
+  const previousClone = previous ? { ...previous } : null;
+
   const freelancer = saveStoredFreelancer(freelancerData);
   if ((freelancer as any).isDemo) return { success: true, freelancer };
+
   const cloudResult = await saveFreelancerToFirestore(freelancer);
-  if (!cloudResult.success && cloudResult.errorCode === 'permission-denied') {
-    deleteStoredFreelancer(freelancer.id);
+  if (!cloudResult.success) {
+    if (isUpdate && previousClone) {
+      const idx = freelancers.findIndex(f => f.id === freelancer.id);
+      if (idx >= 0) freelancers[idx] = previousClone;
+      safeSetLocal(STORAGE_KEYS.FREELANCERS, freelancers);
+      notifyListeners();
+    } else {
+      deleteStoredFreelancer(freelancer.id);
+    }
   }
-  return { success: cloudResult.success, freelancer, cloudResult };
+  return { success: cloudResult.success, freelancer, error: cloudResult.error, cloudResult };
 }
 
 export async function deleteFreelancerWithCloud(id: string): Promise<CrmCloudOperationResult> {
   const cloudResult = await deleteFreelancerFromCloud(id);
-  if (cloudResult.success || cloudResult.errorCode === 'offline' || cloudResult.errorCode === 'unconfigured') {
+  if (cloudResult.success) {
     deleteStoredFreelancer(id);
   }
   return cloudResult;
@@ -5425,19 +5473,31 @@ export async function deleteFreelancerWithCloud(id: string): Promise<CrmCloudOpe
 
 export async function saveTaskWithCloud(
   taskData: Partial<CrmTask> & { title: string }
-): Promise<{ success: boolean; task: CrmTask; cloudResult?: CrmCloudOperationResult<CrmTask> }> {
+): Promise<{ success: boolean; task: CrmTask; error?: string; cloudResult?: CrmCloudOperationResult<CrmTask> }> {
+  const isUpdate = Boolean(taskData.id);
+  const previous = isUpdate ? tasks.find(t => t.id === taskData.id) : null;
+  const previousClone = previous ? { ...previous } : null;
+
   const task = saveStoredTask(taskData);
   if ((task as any).isDemo) return { success: true, task };
+
   const cloudResult = await saveTaskToFirestore(task);
-  if (!cloudResult.success && cloudResult.errorCode === 'permission-denied') {
-    deleteStoredTask(task.id);
+  if (!cloudResult.success) {
+    if (isUpdate && previousClone) {
+      const idx = tasks.findIndex(t => t.id === task.id);
+      if (idx >= 0) tasks[idx] = previousClone;
+      safeSetLocal(STORAGE_KEYS.TASKS, tasks);
+      notifyListeners();
+    } else {
+      deleteStoredTask(task.id);
+    }
   }
-  return { success: cloudResult.success, task, cloudResult };
+  return { success: cloudResult.success, task, error: cloudResult.error, cloudResult };
 }
 
 export async function deleteTaskWithCloud(id: string): Promise<CrmCloudOperationResult> {
   const cloudResult = await deleteTaskFromCloud(id);
-  if (cloudResult.success || cloudResult.errorCode === 'offline' || cloudResult.errorCode === 'unconfigured') {
+  if (cloudResult.success) {
     deleteStoredTask(id);
   }
   return cloudResult;
@@ -5445,19 +5505,31 @@ export async function deleteTaskWithCloud(id: string): Promise<CrmCloudOperation
 
 export async function saveQuotationWithCloud(
   quotationData: Partial<CrmQuotation> & { clientName: string }
-): Promise<{ success: boolean; quotation: CrmQuotation; cloudResult?: CrmCloudOperationResult<CrmQuotation> }> {
+): Promise<{ success: boolean; quotation: CrmQuotation; error?: string; cloudResult?: CrmCloudOperationResult<CrmQuotation> }> {
+  const isUpdate = Boolean(quotationData.id);
+  const previous = isUpdate ? quotations.find(q => q.id === quotationData.id) : null;
+  const previousClone = previous ? { ...previous } : null;
+
   const quotation = saveStoredQuotation(quotationData);
   if ((quotation as any).isDemo) return { success: true, quotation };
+
   const cloudResult = await saveQuotationToFirestore(quotation);
-  if (!cloudResult.success && cloudResult.errorCode === 'permission-denied') {
-    deleteStoredQuotation(quotation.id);
+  if (!cloudResult.success) {
+    if (isUpdate && previousClone) {
+      const idx = quotations.findIndex(q => q.id === quotation.id);
+      if (idx >= 0) quotations[idx] = previousClone;
+      safeSetLocal(STORAGE_KEYS.QUOTATIONS, quotations);
+      notifyListeners();
+    } else {
+      deleteStoredQuotation(quotation.id);
+    }
   }
-  return { success: cloudResult.success, quotation, cloudResult };
+  return { success: cloudResult.success, quotation, error: cloudResult.error, cloudResult };
 }
 
 export async function deleteQuotationWithCloud(id: string): Promise<CrmCloudOperationResult> {
   const cloudResult = await deleteQuotationFromCloud(id);
-  if (cloudResult.success || cloudResult.errorCode === 'offline' || cloudResult.errorCode === 'unconfigured') {
+  if (cloudResult.success) {
     deleteStoredQuotation(id);
   }
   return cloudResult;
@@ -5465,19 +5537,31 @@ export async function deleteQuotationWithCloud(id: string): Promise<CrmCloudOper
 
 export async function saveInvoiceWithCloud(
   invoiceData: Partial<CrmInvoice> & { clientName: string; clientEmail: string }
-): Promise<{ success: boolean; invoice: CrmInvoice; cloudResult?: CrmCloudOperationResult<CrmInvoice> }> {
+): Promise<{ success: boolean; invoice: CrmInvoice; error?: string; cloudResult?: CrmCloudOperationResult<CrmInvoice> }> {
+  const isUpdate = Boolean(invoiceData.id);
+  const previous = isUpdate ? invoices.find(inv => inv.id === invoiceData.id) : null;
+  const previousClone = previous ? { ...previous } : null;
+
   const invoice = saveStoredInvoice(invoiceData);
   if ((invoice as any).isDemo) return { success: true, invoice };
+
   const cloudResult = await saveInvoiceToFirestore(invoice);
-  if (!cloudResult.success && cloudResult.errorCode === 'permission-denied') {
-    deleteStoredInvoice(invoice.id);
+  if (!cloudResult.success) {
+    if (isUpdate && previousClone) {
+      const idx = invoices.findIndex(inv => inv.id === invoice.id);
+      if (idx >= 0) invoices[idx] = previousClone;
+      safeSetLocal(STORAGE_KEYS.INVOICES, invoices);
+      notifyListeners();
+    } else {
+      deleteStoredInvoice(invoice.id);
+    }
   }
-  return { success: cloudResult.success, invoice, cloudResult };
+  return { success: cloudResult.success, invoice, error: cloudResult.error, cloudResult };
 }
 
 export async function deleteInvoiceWithCloud(id: string): Promise<CrmCloudOperationResult> {
   const cloudResult = await deleteInvoiceFromCloud(id);
-  if (cloudResult.success || cloudResult.errorCode === 'offline' || cloudResult.errorCode === 'unconfigured') {
+  if (cloudResult.success) {
     deleteStoredInvoice(id);
   }
   return cloudResult;
@@ -5485,19 +5569,31 @@ export async function deleteInvoiceWithCloud(id: string): Promise<CrmCloudOperat
 
 export async function savePaymentWithCloud(
   paymentData: Partial<CrmPayment> & { amount: number }
-): Promise<{ success: boolean; payment: CrmPayment; cloudResult?: CrmCloudOperationResult<CrmPayment> }> {
+): Promise<{ success: boolean; payment: CrmPayment; error?: string; cloudResult?: CrmCloudOperationResult<CrmPayment> }> {
+  const isUpdate = Boolean(paymentData.id);
+  const previous = isUpdate ? payments.find(p => p.id === paymentData.id) : null;
+  const previousClone = previous ? { ...previous } : null;
+
   const payment = recordPayment(paymentData);
   if ((payment as any).isDemo) return { success: true, payment };
+
   const cloudResult = await savePaymentToFirestore(payment);
-  if (!cloudResult.success && cloudResult.errorCode === 'permission-denied') {
-    deleteStoredPayment(payment.id);
+  if (!cloudResult.success) {
+    if (isUpdate && previousClone) {
+      const idx = payments.findIndex(p => p.id === payment.id);
+      if (idx >= 0) payments[idx] = previousClone;
+      safeSetLocal(STORAGE_KEYS.PAYMENTS, payments);
+      notifyListeners();
+    } else {
+      deleteStoredPayment(payment.id);
+    }
   }
-  return { success: cloudResult.success, payment, cloudResult };
+  return { success: cloudResult.success, payment, error: cloudResult.error, cloudResult };
 }
 
 export async function deletePaymentWithCloud(id: string): Promise<CrmCloudOperationResult> {
   const cloudResult = await deletePaymentFromCloud(id);
-  if (cloudResult.success || cloudResult.errorCode === 'offline' || cloudResult.errorCode === 'unconfigured') {
+  if (cloudResult.success) {
     deleteStoredPayment(id);
   }
   return cloudResult;
@@ -5505,19 +5601,31 @@ export async function deletePaymentWithCloud(id: string): Promise<CrmCloudOperat
 
 export async function saveExpenseWithCloud(
   expenseData: Partial<CrmExpense> & { title: string; amount: number; category: CrmExpense['category'] }
-): Promise<{ success: boolean; expense: CrmExpense; cloudResult?: CrmCloudOperationResult<CrmExpense> }> {
+): Promise<{ success: boolean; expense: CrmExpense; error?: string; cloudResult?: CrmCloudOperationResult<CrmExpense> }> {
+  const isUpdate = Boolean(expenseData.id);
+  const previous = isUpdate ? expenses.find(e => e.id === expenseData.id) : null;
+  const previousClone = previous ? { ...previous } : null;
+
   const expense = saveStoredExpense(expenseData);
   if ((expense as any).isDemo) return { success: true, expense };
+
   const cloudResult = await saveExpenseToFirestore(expense);
-  if (!cloudResult.success && cloudResult.errorCode === 'permission-denied') {
-    deleteStoredExpense(expense.id);
+  if (!cloudResult.success) {
+    if (isUpdate && previousClone) {
+      const idx = expenses.findIndex(e => e.id === expense.id);
+      if (idx >= 0) expenses[idx] = previousClone;
+      safeSetLocal(STORAGE_KEYS.EXPENSES, expenses);
+      notifyListeners();
+    } else {
+      deleteStoredExpense(expense.id);
+    }
   }
-  return { success: cloudResult.success, expense, cloudResult };
+  return { success: cloudResult.success, expense, error: cloudResult.error, cloudResult };
 }
 
 export async function deleteExpenseWithCloud(id: string): Promise<CrmCloudOperationResult> {
   const cloudResult = await deleteExpenseFromCloud(id);
-  if (cloudResult.success || cloudResult.errorCode === 'offline' || cloudResult.errorCode === 'unconfigured') {
+  if (cloudResult.success) {
     deleteStoredExpense(id);
   }
   return cloudResult;
@@ -5525,19 +5633,31 @@ export async function deleteExpenseWithCloud(id: string): Promise<CrmCloudOperat
 
 export async function saveReminderWithCloud(
   reminderData: Partial<CrmReminder> & { title: string }
-): Promise<{ success: boolean; reminder: CrmReminder; cloudResult?: CrmCloudOperationResult<CrmReminder> }> {
+): Promise<{ success: boolean; reminder: CrmReminder; error?: string; cloudResult?: CrmCloudOperationResult<CrmReminder> }> {
+  const isUpdate = Boolean(reminderData.id);
+  const previous = isUpdate ? reminders.find(r => r.id === reminderData.id) : null;
+  const previousClone = previous ? { ...previous } : null;
+
   const reminder = saveStoredReminder(reminderData);
   if ((reminder as any).isDemo) return { success: true, reminder };
+
   const cloudResult = await saveReminderToFirestore(reminder);
-  if (!cloudResult.success && cloudResult.errorCode === 'permission-denied') {
-    deleteStoredReminder(reminder.id);
+  if (!cloudResult.success) {
+    if (isUpdate && previousClone) {
+      const idx = reminders.findIndex(r => r.id === reminder.id);
+      if (idx >= 0) reminders[idx] = previousClone;
+      safeSetLocal(STORAGE_KEYS.REMINDERS, reminders);
+      notifyListeners();
+    } else {
+      deleteStoredReminder(reminder.id);
+    }
   }
-  return { success: cloudResult.success, reminder, cloudResult };
+  return { success: cloudResult.success, reminder, error: cloudResult.error, cloudResult };
 }
 
 export async function deleteReminderWithCloud(id: string): Promise<CrmCloudOperationResult> {
   const cloudResult = await deleteReminderFromCloud(id);
-  if (cloudResult.success || cloudResult.errorCode === 'offline' || cloudResult.errorCode === 'unconfigured') {
+  if (cloudResult.success) {
     deleteStoredReminder(id);
   }
   return cloudResult;
@@ -5545,10 +5665,16 @@ export async function deleteReminderWithCloud(id: string): Promise<CrmCloudOpera
 
 export async function updateSettingsWithCloud(
   updated: Partial<CrmAgencySettings>
-): Promise<{ success: boolean; settings: CrmAgencySettings; cloudResult?: CrmCloudOperationResult<CrmAgencySettings> }> {
+): Promise<{ success: boolean; settings: CrmAgencySettings; error?: string; cloudResult?: CrmCloudOperationResult<CrmAgencySettings> }> {
+  const previousClone = { ...settings };
   const newSettings = updateStoredSettings(updated);
   const cloudResult = await saveCrmSettingsToFirestore(newSettings);
-  return { success: cloudResult.success, settings: newSettings, cloudResult };
+  if (!cloudResult.success) {
+    settings = previousClone;
+    safeSetLocal(STORAGE_KEYS.SETTINGS, settings);
+    notifyListeners();
+  }
+  return { success: cloudResult.success, settings: newSettings, error: cloudResult.error, cloudResult };
 }
 
 /**

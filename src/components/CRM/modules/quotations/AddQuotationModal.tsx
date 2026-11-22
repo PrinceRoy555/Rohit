@@ -340,8 +340,8 @@ export const AddQuotationModal: React.FC<AddQuotationModalProps> = ({
         notes: notes.trim() || undefined
       });
 
-      if (!result.success && result.cloudResult?.errorCode === 'permission-denied') {
-        setErrors({ form: 'Permission Denied: You do not have permission to modify quotations.' });
+      if (!result.success) {
+        setErrors({ form: result.error || 'Failed to save quotation. Please verify permissions and connection.' });
         setIsSubmitting(false);
         return;
       }

@@ -121,8 +121,8 @@ export const QuotationPreviewDrawer: React.FC<QuotationPreviewDrawerProps> = ({
     );
     if (confirmDelete) {
       const res = await deleteQuotationWithCloud(currentQuote.id);
-      if (!res.success && res.errorCode === 'permission-denied') {
-        alert('Permission Denied: You do not have permission to delete quotation records.');
+      if (!res.success) {
+        alert(res.error || 'Failed to delete quotation record.');
         return;
       }
       onClose();

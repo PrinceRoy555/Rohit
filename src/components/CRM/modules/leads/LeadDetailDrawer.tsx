@@ -150,8 +150,8 @@ export const LeadDetailDrawer: React.FC<LeadDetailDrawerProps> = ({
   const handleDelete = async () => {
     if (window.confirm(`Are you sure you want to remove lead "${currentLead.name}"?`)) {
       const res = await deleteLeadWithCloud(currentLead.id);
-      if (!res.success && res.errorCode === 'permission-denied') {
-        alert('Permission Denied: You do not have permission to delete lead records.');
+      if (!res.success) {
+        alert(res.error || 'Failed to delete lead record.');
         return;
       }
       onClose();

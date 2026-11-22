@@ -211,8 +211,8 @@ export const ProjectProfileDrawer: React.FC<ProjectProfileDrawerProps> = ({
   const handleDelete = async () => {
     if (window.confirm(`Are you sure you want to delete "${currentProject.title}"?`)) {
       const res = await deleteProjectWithCloud(currentProject.id);
-      if (!res.success && res.errorCode === 'permission-denied') {
-        alert('Permission Denied: You do not have permission to delete project records.');
+      if (!res.success) {
+        alert(res.error || 'Permission Denied: Failed to delete project record.');
         return;
       }
       onClose();

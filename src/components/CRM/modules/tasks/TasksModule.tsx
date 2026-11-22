@@ -233,8 +233,8 @@ export const TasksModule: React.FC<TasksModuleProps> = ({ onNavigateToModule }) 
   const handleDeleteTask = async (taskId: string) => {
     if (window.confirm('Are you sure you want to delete this task?')) {
       const res = await deleteTaskWithCloud(taskId);
-      if (!res.success && res.errorCode === 'permission-denied') {
-        alert('Permission Denied: You do not have permission to delete task records.');
+      if (!res.success) {
+        alert(res.error || 'Failed to delete task record.');
         return;
       }
       setTasks(getStoredTasks());

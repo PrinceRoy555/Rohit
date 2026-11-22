@@ -150,8 +150,8 @@ export const AddClientModal: React.FC<AddClientModalProps> = ({
         notes: notes.trim()
       });
 
-      if (!result.success && result.cloudResult?.errorCode === 'permission-denied') {
-        setErrorMessage('Permission Denied: You do not have permission to modify clients.');
+      if (!result.success) {
+        setErrorMessage(result.cloudResult?.error || 'Failed to save client to cloud database. Please verify your administrator session.');
         setIsSubmitting(false);
         return;
       }

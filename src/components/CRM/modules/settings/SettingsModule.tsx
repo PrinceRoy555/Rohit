@@ -117,8 +117,8 @@ export const SettingsModule: React.FC<SettingsModuleProps> = ({ onNavigateToModu
     setSaveError(null);
     try {
       const res = await updateSettingsWithCloud(settings);
-      if (!res.success && res.cloudResult?.errorCode === 'permission-denied') {
-        setSaveError('Permission Denied: Only Super Admins can update agency settings.');
+      if (!res.success) {
+        setSaveError(res.error || 'Failed to update agency settings to cloud.');
         return;
       }
       setIsSaved(true);

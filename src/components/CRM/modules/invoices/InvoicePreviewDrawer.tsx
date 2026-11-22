@@ -93,8 +93,8 @@ export const InvoicePreviewDrawer: React.FC<InvoicePreviewDrawerProps> = ({
     );
     if (confirmDel) {
       const res = await deleteInvoiceWithCloud(currentInv.id);
-      if (!res.success && res.errorCode === 'permission-denied') {
-        alert('Permission Denied: You do not have permission to delete invoice records.');
+      if (!res.success) {
+        alert(res.error || 'Failed to delete invoice record.');
         return;
       }
       onClose();

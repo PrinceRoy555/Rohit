@@ -271,8 +271,8 @@ export const FreelancerProfileDrawer: React.FC<FreelancerProfileDrawerProps> = (
   const handleDelete = async () => {
     if (window.confirm(`Are you sure you want to delete ${currentFreelancer.name}? This will remove payment history and assignments.`)) {
       const res = await deleteFreelancerWithCloud(currentFreelancer.id);
-      if (!res.success && res.errorCode === 'permission-denied') {
-        alert('Permission Denied: Only Super Admins can delete freelancer compensation records.');
+      if (!res.success) {
+        alert(res.error || 'Failed to delete freelancer record.');
         return;
       }
       onClose();

@@ -3,8 +3,10 @@ import {
   signInAdmin,
   verifyAdminRole,
   signOutAdmin,
-  sendAdminPasswordReset
+  sendAdminPasswordReset,
+  syncAdminFirestoreProfile
 } from '../../../services/firebase/auth';
+import { isFirebaseConfigured } from '../../../lib/firebase';
 import { loginAdmin } from '../../../services/adminApi';
 import { Lock, Mail, Eye, EyeOff, Shield, ArrowLeft, AlertCircle, CheckCircle2 } from 'lucide-react';
 import { AnimatedMonkeyAvatar, MonkeyState } from './AnimatedMonkeyAvatar';
@@ -66,12 +68,14 @@ export const CrmLoginView: React.FC<CrmLoginViewProps> = ({
     setDiagnosticCode(null);
 
     try {
-      // 1. Try Firebase Auth with normalized email
+      // 1. Primary: Authenticate via Firebase Auth with normalized email
       const res = await signInAdmin(cleanEmail, password);
       if (res.success && res.user) {
         // Enforce server/Firestore verified role before granting access
         const roleRes = await verifyAdminRole(res.user);
         if (roleRes.authorized) {
+          // Keep Firestore profile collections in sync with authenticated user
+          await syncAdminFirestoreProfile(res.user);
           onSuccess(roleRes.email || res.user.email || cleanEmail, roleRes.role);
           return;
         } else {
@@ -85,7 +89,15 @@ export const CrmLoginView: React.FC<CrmLoginViewProps> = ({
         setDiagnosticCode(res.errorCode);
       }
 
-      // 2. Fallback to API Session Login
+      // If Firebase is configured, do not allow unauthenticated API-only session bypass
+      if (isFirebaseConfigured()) {
+        setErrorMessage(
+          res.error || 'Authentication failed: Invalid administrator credentials.'
+        );
+        return;
+      }
+
+      // 2. Fallback to API Session Login ONLY when Firebase is completely unconfigured
       const apiRes = await loginAdmin(cleanEmail, password);
       if (apiRes.success && apiRes.adminEmail) {
         onSuccess(apiRes.adminEmail, 'admin');

@@ -216,8 +216,8 @@ export const RecordPaymentModal: React.FC<RecordPaymentModalProps> = ({
         projectTitle: proj?.title || selectedInvoice?.projectTitle || undefined
       });
 
-      if (!result.success && result.cloudResult?.errorCode === 'permission-denied') {
-        setCloudError('Permission Denied: Only Super Admins can record financial payments.');
+      if (!result.success) {
+        setCloudError(result.error || 'Failed to record transaction to cloud. Please check permissions and connection.');
         setIsSubmitting(false);
         return;
       }

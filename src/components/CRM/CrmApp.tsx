@@ -22,8 +22,10 @@ import { CrmLoadingState } from './shared/CrmLoadingState';
 import {
   observeAuthState,
   verifyAdminRole,
-  signOutAdmin
+  signOutAdmin,
+  syncAdminFirestoreProfile
 } from '../../services/firebase/auth';
+import { isFirebaseConfigured, auth } from '../../lib/firebase';
 import {
   checkAdminSession,
   logoutAdmin,
@@ -34,7 +36,6 @@ import { useTheme } from '../../context/ThemeContext';
 import { getCrmDashboardMetrics } from '../../services/crmService';
 import { startLiveCloudSync } from '../../services/crmStorageService';
 import { syncProfileWithFirestore } from '../../services/crmProfileService';
-import { auth } from '../../lib/firebase';
 
 interface CrmAppProps {
   onClose: () => void;
@@ -59,8 +60,8 @@ export const CrmApp: React.FC<CrmAppProps> = ({
 
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(() => !isForceLogin && isDirectPreview);
   const [isAuthChecking, setIsAuthChecking] = useState<boolean>(() => !isForceLogin && !isDirectPreview);
-  const [adminEmail, setAdminEmail] = useState<string>('workall724038@gmail.com');
-  const [adminRole, setAdminRole] = useState<'super_admin' | 'admin' | 'editor'>('super_admin');
+  const [adminEmail, setAdminEmail] = useState<string>('');
+  const [adminRole, setAdminRole] = useState<'super_admin' | 'admin' | 'editor'>('editor');
 
   // Live Leads stream for Notification Badge & Search
   const [cachedLeads, setCachedLeads] = useState<CrmLead[]>([]);
@@ -76,19 +77,7 @@ export const CrmApp: React.FC<CrmAppProps> = ({
       return;
     }
 
-    // Check fallback API session first
-    checkAdminSession().then((session) => {
-      if (!isMounted) return;
-      if (session.authenticated || isDirectPreview) {
-        setIsAuthenticated(true);
-        if (session.adminEmail) setAdminEmail(session.adminEmail);
-        setIsAuthChecking(false);
-      }
-    }).catch(() => {
-      // ignore
-    });
-
-    // Subscribe to Firebase Auth
+    // Subscribe to Firebase Auth (authoritative state for CRM cloud access)
     const unsubscribe = observeAuthState(async (user) => {
       if (!isMounted) return;
       if (isDirectPreview) {
@@ -99,8 +88,10 @@ export const CrmApp: React.FC<CrmAppProps> = ({
       if (user) {
         const roleRes = await verifyAdminRole(user);
         if (roleRes.authorized) {
+          // Keep Firestore profile docs in sync with authenticated user
+          await syncAdminFirestoreProfile(user);
           setIsAuthenticated(true);
-          setAdminEmail(roleRes.email || user.email || 'workall724038@gmail.com');
+          setAdminEmail(roleRes.email || user.email || '');
           setAdminRole(roleRes.role);
           try {
             const idToken = await user.getIdToken();
@@ -109,16 +100,28 @@ export const CrmApp: React.FC<CrmAppProps> = ({
             // offline fallback
           }
         } else {
+          await signOutAdmin();
           setIsAuthenticated(false);
+          setAdminEmail('');
+          setAdminRole('editor');
         }
       } else {
-        // If no Firebase user, verify if session is authenticated
-        const sess: AdminSessionInfo = await checkAdminSession().catch((): AdminSessionInfo => ({ authenticated: false }));
-        if (sess.authenticated) {
-          setIsAuthenticated(true);
-          if (sess.adminEmail) setAdminEmail(sess.adminEmail);
-        } else {
+        // If no Firebase user: when Firebase is configured, user is unauthenticated
+        if (isFirebaseConfigured()) {
           setIsAuthenticated(false);
+          setAdminEmail('');
+          setAdminRole('editor');
+        } else {
+          // Only fallback to API session if Firebase is completely unconfigured
+          const sess: AdminSessionInfo = await checkAdminSession().catch((): AdminSessionInfo => ({ authenticated: false }));
+          if (sess.authenticated && sess.adminEmail) {
+            setIsAuthenticated(true);
+            setAdminEmail(sess.adminEmail);
+          } else {
+            setIsAuthenticated(false);
+            setAdminEmail('');
+            setAdminRole('editor');
+          }
         }
       }
       setIsAuthChecking(false);

@@ -94,11 +94,15 @@ export function translateFirestoreError(err: any, collectionName: string, operat
   const msg = err?.message || String(err);
 
   switch (code) {
-    case 'permission-denied':
+    case 'permission-denied': {
+      const userEmail = auth?.currentUser?.email;
       return {
         errorCode: 'permission-denied',
-        error: `Permission Denied on /${collectionName} [${operation}]: Your authenticated role lacks write authority. Financial modules (payments, expenses, freelancers, settings) require verified Super Admin privileges.`
+        error: userEmail
+          ? `Permission Denied on /${collectionName} [${operation}]: Authenticated account '${userEmail}' is not recognized as an authorized Super Admin in Firestore Security Rules. Authorized Super Admin is 'workall724038@gmail.com'.`
+          : `Permission Denied on /${collectionName} [${operation}]: No active Firebase administrator session found. Please sign in with 'workall724038@gmail.com'.`
       };
+    }
     case 'unavailable':
     case 'deadline-exceeded':
       return {
@@ -108,7 +112,7 @@ export function translateFirestoreError(err: any, collectionName: string, operat
     case 'unauthenticated':
       return {
         errorCode: 'unauthenticated',
-        error: `Authentication Required: Cannot perform ${operation} on /${collectionName} without an active Firebase Admin session.`
+        error: `Authentication Required: Cannot perform ${operation} on /${collectionName} without an active Firebase Admin session. Please sign in with 'workall724038@gmail.com'.`
       };
     case 'not-found':
       return {
@@ -121,6 +125,37 @@ export function translateFirestoreError(err: any, collectionName: string, operat
         error: `Firestore error on /${collectionName} [${operation}]: ${msg}`
       };
   }
+}
+
+/**
+ * Preflight verification before performing any cloud write or delete.
+ * Verifies that Firebase is configured, the database is active, and an active Firebase user session exists.
+ * Fails fast before attempting database writes if unauthenticated.
+ */
+export function checkCloudWritePreflight(collectionName: string, operation: 'write' | 'delete'): { ok: boolean; result?: CrmCloudOperationResult<any> } {
+  if (!isFirebaseConfigured() || !db) {
+    return {
+      ok: false,
+      result: {
+        success: false,
+        error: `Firebase is unconfigured or database is inactive. Cannot perform ${operation} on /${collectionName}.`,
+        errorCode: 'unconfigured'
+      }
+    };
+  }
+
+  if (!auth?.currentUser) {
+    return {
+      ok: false,
+      result: {
+        success: false,
+        error: `Authentication Required: You do not have an active Firebase administrator session. Please sign in with your administrator account (workall724038@gmail.com).`,
+        errorCode: 'unauthenticated'
+      }
+    };
+  }
+
+  return { ok: true };
 }
 
 import { KNOWN_SEED_RECORD_IDS } from './crmBackupService';
@@ -214,9 +249,8 @@ export async function fetchLeadsFromFirestore(): Promise<CrmLead[]> {
 
 export async function saveLeadToFirestore(lead: CrmLead): Promise<CrmCloudOperationResult<CrmLead>> {
   assertEligibleForCloud(lead, 'leads');
-  if (!isFirebaseConfigured() || !db) {
-    return { success: false, error: 'Firebase is unconfigured or database is null', errorCode: 'unconfigured' };
-  }
+  const preflight = checkCloudWritePreflight('leads', 'write');
+  if (!preflight.ok) return preflight.result!;
 
   const docId = lead.id || `lead_${Date.now()}`;
   const nowIso = new Date().toISOString();
@@ -239,7 +273,8 @@ export async function saveLeadToFirestore(lead: CrmLead): Promise<CrmCloudOperat
 }
 
 export async function deleteLeadFromFirestore(id: string): Promise<CrmCloudOperationResult> {
-  if (!isFirebaseConfigured() || !db) return { success: false, error: 'Firebase is unconfigured' };
+  const preflight = checkCloudWritePreflight('leads', 'delete');
+  if (!preflight.ok) return preflight.result!;
   try {
     await deleteDoc(doc(db, 'leads', id));
     return { success: true, id };
@@ -294,9 +329,8 @@ export async function fetchClientsFromFirestore(): Promise<CrmClient[]> {
 
 export async function saveClientToFirestore(client: CrmClient): Promise<CrmCloudOperationResult<CrmClient>> {
   assertEligibleForCloud(client, 'clients');
-  if (!isFirebaseConfigured() || !db) {
-    return { success: false, error: 'Firebase is unconfigured or database is null', errorCode: 'unconfigured' };
-  }
+  const preflight = checkCloudWritePreflight('clients', 'write');
+  if (!preflight.ok) return preflight.result!;
 
   const docId = client.id || `cli_${Date.now()}`;
   const nowIso = new Date().toISOString();
@@ -318,7 +352,8 @@ export async function saveClientToFirestore(client: CrmClient): Promise<CrmCloud
 }
 
 export async function deleteClientFromFirestore(id: string): Promise<CrmCloudOperationResult> {
-  if (!isFirebaseConfigured() || !db) return { success: false, error: 'Firebase is unconfigured' };
+  const preflight = checkCloudWritePreflight('clients', 'delete');
+  if (!preflight.ok) return preflight.result!;
   try {
     await deleteDoc(doc(db, 'clients', id));
     return { success: true, id };
@@ -374,9 +409,8 @@ export async function fetchProjectsFromFirestore(): Promise<CrmProject[]> {
 
 export async function saveProjectToFirestore(project: CrmProject): Promise<CrmCloudOperationResult<CrmProject>> {
   assertEligibleForCloud(project, 'projects');
-  if (!isFirebaseConfigured() || !db) {
-    return { success: false, error: 'Firebase is unconfigured or database is null', errorCode: 'unconfigured' };
-  }
+  const preflight = checkCloudWritePreflight('projects', 'write');
+  if (!preflight.ok) return preflight.result!;
 
   const docId = project.id || `proj_${Date.now()}`;
   const nowIso = new Date().toISOString();
@@ -398,7 +432,8 @@ export async function saveProjectToFirestore(project: CrmProject): Promise<CrmCl
 }
 
 export async function deleteProjectFromFirestore(id: string): Promise<CrmCloudOperationResult> {
-  if (!isFirebaseConfigured() || !db) return { success: false, error: 'Firebase is unconfigured' };
+  const preflight = checkCloudWritePreflight('projects', 'delete');
+  if (!preflight.ok) return preflight.result!;
   try {
     await deleteDoc(doc(db, 'projects', id));
     return { success: true, id };
@@ -461,9 +496,8 @@ export async function fetchFreelancersFromFirestore(): Promise<CrmFreelancer[]> 
 
 export async function saveFreelancerToFirestore(freelancer: CrmFreelancer): Promise<CrmCloudOperationResult<CrmFreelancer>> {
   assertEligibleForCloud(freelancer, 'freelancers');
-  if (!isFirebaseConfigured() || !db) {
-    return { success: false, error: 'Firebase is unconfigured or database is null', errorCode: 'unconfigured' };
-  }
+  const preflight = checkCloudWritePreflight('freelancers', 'write');
+  if (!preflight.ok) return preflight.result!;
 
   const docId = freelancer.id || `fr_${Date.now()}`;
   const nowIso = new Date().toISOString();
@@ -485,7 +519,8 @@ export async function saveFreelancerToFirestore(freelancer: CrmFreelancer): Prom
 }
 
 export async function deleteFreelancerFromFirestore(id: string): Promise<CrmCloudOperationResult> {
-  if (!isFirebaseConfigured() || !db) return { success: false, error: 'Firebase is unconfigured' };
+  const preflight = checkCloudWritePreflight('freelancers', 'delete');
+  if (!preflight.ok) return preflight.result!;
   try {
     await deleteDoc(doc(db, 'freelancers', id));
     return { success: true, id };
@@ -544,9 +579,8 @@ export async function fetchTasksFromFirestore(): Promise<CrmTask[]> {
 
 export async function saveTaskToFirestore(task: CrmTask): Promise<CrmCloudOperationResult<CrmTask>> {
   assertEligibleForCloud(task, 'tasks');
-  if (!isFirebaseConfigured() || !db) {
-    return { success: false, error: 'Firebase is unconfigured or database is null', errorCode: 'unconfigured' };
-  }
+  const preflight = checkCloudWritePreflight('tasks', 'write');
+  if (!preflight.ok) return preflight.result!;
 
   const docId = task.id || `tsk_${Date.now()}`;
   const nowIso = new Date().toISOString();
@@ -568,7 +602,8 @@ export async function saveTaskToFirestore(task: CrmTask): Promise<CrmCloudOperat
 }
 
 export async function deleteTaskFromFirestore(id: string): Promise<CrmCloudOperationResult> {
-  if (!isFirebaseConfigured() || !db) return { success: false, error: 'Firebase is unconfigured' };
+  const preflight = checkCloudWritePreflight('tasks', 'delete');
+  if (!preflight.ok) return preflight.result!;
   try {
     await deleteDoc(doc(db, 'tasks', id));
     return { success: true, id };
@@ -641,9 +676,8 @@ export async function fetchQuotationsFromFirestore(): Promise<CrmQuotation[]> {
 
 export async function saveQuotationToFirestore(quotation: CrmQuotation): Promise<CrmCloudOperationResult<CrmQuotation>> {
   assertEligibleForCloud(quotation, 'quotations');
-  if (!isFirebaseConfigured() || !db) {
-    return { success: false, error: 'Firebase is unconfigured or database is null', errorCode: 'unconfigured' };
-  }
+  const preflight = checkCloudWritePreflight('quotations', 'write');
+  if (!preflight.ok) return preflight.result!;
 
   const docId = quotation.id || `qt_${Date.now()}`;
   const nowIso = new Date().toISOString();
@@ -665,7 +699,8 @@ export async function saveQuotationToFirestore(quotation: CrmQuotation): Promise
 }
 
 export async function deleteQuotationFromFirestore(id: string): Promise<CrmCloudOperationResult> {
-  if (!isFirebaseConfigured() || !db) return { success: false, error: 'Firebase is unconfigured' };
+  const preflight = checkCloudWritePreflight('quotations', 'delete');
+  if (!preflight.ok) return preflight.result!;
   try {
     await deleteDoc(doc(db, 'quotations', id));
     return { success: true, id };
@@ -735,9 +770,8 @@ export async function fetchInvoicesFromFirestore(): Promise<CrmInvoice[]> {
 
 export async function saveInvoiceToFirestore(invoice: CrmInvoice): Promise<CrmCloudOperationResult<CrmInvoice>> {
   assertEligibleForCloud(invoice, 'invoices');
-  if (!isFirebaseConfigured() || !db) {
-    return { success: false, error: 'Firebase is unconfigured or database is null', errorCode: 'unconfigured' };
-  }
+  const preflight = checkCloudWritePreflight('invoices', 'write');
+  if (!preflight.ok) return preflight.result!;
 
   const docId = invoice.id || `inv_${Date.now()}`;
   const nowIso = new Date().toISOString();
@@ -760,7 +794,8 @@ export async function saveInvoiceToFirestore(invoice: CrmInvoice): Promise<CrmCl
 }
 
 export async function deleteInvoiceFromFirestore(id: string): Promise<CrmCloudOperationResult> {
-  if (!isFirebaseConfigured() || !db) return { success: false, error: 'Firebase is unconfigured' };
+  const preflight = checkCloudWritePreflight('invoices', 'delete');
+  if (!preflight.ok) return preflight.result!;
   try {
     await deleteDoc(doc(db, 'invoices', id));
     return { success: true, id };
@@ -815,9 +850,8 @@ export async function fetchPaymentsFromFirestore(): Promise<CrmPayment[]> {
 
 export async function savePaymentToFirestore(payment: CrmPayment): Promise<CrmCloudOperationResult<CrmPayment>> {
   assertEligibleForCloud(payment, 'payments');
-  if (!isFirebaseConfigured() || !db) {
-    return { success: false, error: 'Firebase is unconfigured or database is null', errorCode: 'unconfigured' };
-  }
+  const preflight = checkCloudWritePreflight('payments', 'write');
+  if (!preflight.ok) return preflight.result!;
 
   const docId = payment.id || `pay_${Date.now()}`;
   const nowIso = new Date().toISOString();
@@ -840,7 +874,8 @@ export async function savePaymentToFirestore(payment: CrmPayment): Promise<CrmCl
 }
 
 export async function deletePaymentFromFirestore(id: string): Promise<CrmCloudOperationResult> {
-  if (!isFirebaseConfigured() || !db) return { success: false, error: 'Firebase is unconfigured' };
+  const preflight = checkCloudWritePreflight('payments', 'delete');
+  if (!preflight.ok) return preflight.result!;
   try {
     await deleteDoc(doc(db, 'payments', id));
     return { success: true, id };
@@ -896,9 +931,8 @@ export async function fetchExpensesFromFirestore(): Promise<CrmExpense[]> {
 
 export async function saveExpenseToFirestore(expense: CrmExpense): Promise<CrmCloudOperationResult<CrmExpense>> {
   assertEligibleForCloud(expense, 'expenses');
-  if (!isFirebaseConfigured() || !db) {
-    return { success: false, error: 'Firebase is unconfigured or database is null', errorCode: 'unconfigured' };
-  }
+  const preflight = checkCloudWritePreflight('expenses', 'write');
+  if (!preflight.ok) return preflight.result!;
 
   const docId = expense.id || `exp_${Date.now()}`;
   const nowIso = new Date().toISOString();
@@ -921,7 +955,8 @@ export async function saveExpenseToFirestore(expense: CrmExpense): Promise<CrmCl
 }
 
 export async function deleteExpenseFromFirestore(id: string): Promise<CrmCloudOperationResult> {
-  if (!isFirebaseConfigured() || !db) return { success: false, error: 'Firebase is unconfigured' };
+  const preflight = checkCloudWritePreflight('expenses', 'delete');
+  if (!preflight.ok) return preflight.result!;
   try {
     await deleteDoc(doc(db, 'expenses', id));
     return { success: true, id };
@@ -968,9 +1003,8 @@ export async function fetchRemindersFromFirestore(): Promise<CrmReminder[]> {
 
 export async function saveReminderToFirestore(reminder: CrmReminder): Promise<CrmCloudOperationResult<CrmReminder>> {
   assertEligibleForCloud(reminder, 'reminders');
-  if (!isFirebaseConfigured() || !db) {
-    return { success: false, error: 'Firebase is unconfigured or database is null', errorCode: 'unconfigured' };
-  }
+  const preflight = checkCloudWritePreflight('reminders', 'write');
+  if (!preflight.ok) return preflight.result!;
 
   const docId = reminder.id || `rem_${Date.now()}`;
   const nowIso = new Date().toISOString();
@@ -992,7 +1026,8 @@ export async function saveReminderToFirestore(reminder: CrmReminder): Promise<Cr
 }
 
 export async function deleteReminderFromFirestore(id: string): Promise<CrmCloudOperationResult> {
-  if (!isFirebaseConfigured() || !db) return { success: false, error: 'Firebase is unconfigured' };
+  const preflight = checkCloudWritePreflight('reminders', 'delete');
+  if (!preflight.ok) return preflight.result!;
   try {
     await deleteDoc(doc(db, 'reminders', id));
     return { success: true, id };
@@ -1002,8 +1037,6 @@ export async function deleteReminderFromFirestore(id: string): Promise<CrmCloudO
   }
 }
 
-// =========================================================================
-// 11. CRM SETTINGS (/crmSettings/agency_settings) [RBAC: Super Admin write, Admin read]
 // =========================================================================
 // 11. CRM SETTINGS (/crmSettings/agency_settings & /crmSettings/agency) [RBAC: Super Admin write, Admin read]
 // Supports dual-path compatibility to resolve document path discrepancy without deleting data.
@@ -1035,9 +1068,8 @@ export async function fetchCrmSettingsFromFirestore(): Promise<CrmAgencySettings
 }
 
 export async function saveCrmSettingsToFirestore(settings: CrmAgencySettings): Promise<CrmCloudOperationResult<CrmAgencySettings>> {
-  if (!isFirebaseConfigured() || !db) {
-    return { success: false, error: 'Firebase is unconfigured or database is null', errorCode: 'unconfigured' };
-  }
+  const preflight = checkCloudWritePreflight('crmSettings', 'write');
+  if (!preflight.ok) return preflight.result!;
 
   const nowIso = new Date().toISOString();
   const cleanData = removeUndefinedValues({

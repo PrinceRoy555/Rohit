@@ -45,8 +45,8 @@ interface CrmHeaderProps {
 export const CrmHeader: React.FC<CrmHeaderProps> = ({
   activeModule,
   onOpenMobileSidebar,
-  adminEmail = 'workall724038@gmail.com',
-  adminRole = 'super_admin',
+  adminEmail = '',
+  adminRole = 'editor',
   theme,
   onToggleTheme,
   onLogout,
@@ -329,10 +329,10 @@ export const CrmHeader: React.FC<CrmHeaderProps> = ({
             />
             <div className="hidden md:flex flex-col text-left">
               <span className="font-extrabold text-xs text-slate-900 dark:text-white leading-tight">
-                {profile.displayName || profile.name || 'Rohit Verma'}
+                {profile.displayName || profile.name || 'Administrator'}
               </span>
               <span className="text-[10px] font-semibold text-slate-400 leading-tight capitalize">
-                {profile.role ? profile.role.replace('_', ' ') : 'Super Admin'}
+                {(adminRole || profile.role || 'editor').replace('_', ' ')}
               </span>
             </div>
           </button>
@@ -351,14 +351,14 @@ export const CrmHeader: React.FC<CrmHeaderProps> = ({
                   />
                   <div className="overflow-hidden">
                     <div className="text-xs font-black text-white truncate">
-                      {profile.displayName || profile.name || 'Rohit Verma'}
+                      {profile.displayName || profile.name || 'Administrator'}
                     </div>
                     <div className="text-[10px] text-purple-200/80 font-mono truncate">
-                      {profile.email || adminEmail}
+                      {adminEmail || profile.email || 'Administrator'}
                     </div>
                     <div className="mt-1 flex items-center gap-1.5">
                       <span className="text-[9px] font-extrabold uppercase tracking-wider px-1.5 py-0.2 rounded-full bg-purple-500/30 text-purple-200 border border-purple-400/30">
-                        {profile.role ? profile.role.replace('_', ' ') : 'Super Admin'}
+                        {(adminRole || profile.role || 'editor').replace('_', ' ')}
                       </span>
                     </div>
                   </div>

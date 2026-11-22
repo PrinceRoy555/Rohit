@@ -211,8 +211,8 @@ export const AddFreelancerModal: React.FC<AddFreelancerModalProps> = ({
         notes: notes.trim() || undefined
       });
 
-      if (!result.success && result.cloudResult?.errorCode === 'permission-denied') {
-        setErrors({ form: 'Permission Denied: Only Super Admins can add or edit freelancer compensation records.' });
+      if (!result.success) {
+        setErrors({ form: result.error || 'Failed to save freelancer. Please check permissions and connection.' });
         setIsSubmitting(false);
         return;
       }

@@ -186,8 +186,8 @@ export const AddLeadModal: React.FC<AddLeadModalProps> = ({
         followUpAt: followUpDate ? new Date(followUpDate).toISOString() : null
       });
 
-      if (!result.success && result.cloudResult?.errorCode === 'permission-denied') {
-        setErrorMessage('Permission Denied: You do not have permission to modify leads.');
+      if (!result.success) {
+        setErrorMessage(result.error || 'Failed to save lead. Please check permissions and connection.');
         setIsSubmitting(false);
         return;
       }

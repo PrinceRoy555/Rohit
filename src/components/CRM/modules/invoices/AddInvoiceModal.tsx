@@ -321,8 +321,8 @@ export const AddInvoiceModal: React.FC<AddInvoiceModalProps> = ({
       notes: notes.trim()
     });
 
-    if (!result.success && result.cloudResult?.errorCode === 'permission-denied') {
-      alert('Permission Denied: You do not have permission to modify invoices.');
+    if (!result.success) {
+      alert(result.error || 'Failed to save invoice to cloud. Please check permissions and connection.');
       return;
     }
 

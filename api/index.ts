@@ -1,30 +1,9 @@
 // Vercel Serverless Function entry point
-// Connects Vercel edge/serverless requests to the production backend bundle
+// Connects Vercel serverless requests to the production backend Express application
+import app from '../server';
 
-let cachedApp: any = null;
-
-async function getApp() {
-  if (!cachedApp) {
-    try {
-      // Load the bundled, production-compiled CommonJS server
-      // @ts-ignore - dist/server.cjs is bundled during build
-      const serverModule: any = await import('../dist/server.cjs');
-      const raw = serverModule?.app || serverModule?.default;
-      cachedApp = typeof raw === 'function' ? raw : (raw?.app || raw?.default);
-    } catch (bundleErr: any) {
-      console.warn('[Vercel Serverless] dist/server.cjs not available, falling back to server.ts:', bundleErr?.message);
-      const serverModule: any = await import('../server.ts');
-      const raw = serverModule?.app || serverModule?.default;
-      cachedApp = typeof raw === 'function' ? raw : (raw?.app || raw?.default);
-    }
-  }
-  return cachedApp;
-}
-
-export default async function handler(req: any, res: any) {
+export default function handler(req: any, res: any) {
   try {
-    const app = await getApp();
-
     // Normalize incoming URLs if Vercel serverless rewrites altered or stripped the /api prefix
     if (req.url && !req.url.startsWith('/api') && !req.url.startsWith('/_')) {
       const cleanUrl = req.url.startsWith('/') ? req.url : `/${req.url}`;
@@ -43,3 +22,4 @@ export default async function handler(req: any, res: any) {
     }));
   }
 }
+

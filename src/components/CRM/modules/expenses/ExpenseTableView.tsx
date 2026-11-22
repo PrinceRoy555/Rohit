@@ -38,8 +38,8 @@ export const ExpenseTableView: React.FC<ExpenseTableViewProps> = ({
     if (!confirmDel) return;
 
     const res = await deleteExpenseWithCloud(exp.id);
-    if (!res.success && res.errorCode === 'permission-denied') {
-      alert('Permission Denied: Only Super Admins can delete business expenses.');
+    if (!res.success) {
+      alert(res.error || 'Failed to delete business expense.');
       return;
     }
     if (onRefresh) onRefresh();

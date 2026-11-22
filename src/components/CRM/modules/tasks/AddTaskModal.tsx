@@ -196,8 +196,8 @@ export const AddTaskModal: React.FC<AddTaskModalProps> = ({
         notes: notes.trim() || undefined
       });
 
-      if (!result.success && result.cloudResult?.errorCode === 'permission-denied') {
-        setErrors({ form: 'Permission Denied: You do not have permission to modify tasks.' });
+      if (!result.success) {
+        setErrors({ form: result.cloudResult?.error || 'Failed to save task to cloud database. Please verify your administrator session.' });
         setIsSubmitting(false);
         return;
       }

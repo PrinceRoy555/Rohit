@@ -84,6 +84,11 @@ export const ClientProfileDrawer: React.FC<ClientProfileDrawerProps> = ({
         name: currentClient.name,
         status: newStatus
       });
+      if (!res.success) {
+        alert(res.cloudResult?.error || 'Failed to update client status in cloud database.');
+        setCurrentClient((prev) => ({ ...prev, status: currentClient.status }));
+        return;
+      }
       if (res && res.client) {
         setCurrentClient(res.client);
       }
@@ -125,8 +130,8 @@ export const ClientProfileDrawer: React.FC<ClientProfileDrawerProps> = ({
   const handleDelete = async () => {
     if (window.confirm(`Are you sure you want to delete client profile "${currentClient.name}"?`)) {
       const res = await deleteClientWithCloud(currentClient.id);
-      if (!res.success && res.errorCode === 'permission-denied') {
-        alert('Permission Denied: You do not have permission to delete client records.');
+      if (!res.success) {
+        alert(res.error || 'Permission Denied: Failed to delete client record.');
         return;
       }
       onClose();

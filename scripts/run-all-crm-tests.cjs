@@ -12,7 +12,8 @@ const testScripts = [
   'scripts/test-phase6c-dashboard-integrity.ts',
   'scripts/test-phase7-functional-audit.ts',
   'scripts/test-phase2-phase3-fasttrack.ts',
-  'scripts/verify-rollback-rules.ts'
+  'scripts/verify-rollback-rules.ts',
+  'scripts/test-phase10-full-e2e.ts'
 ];
 
 console.log('==================================================================');

@@ -130,8 +130,8 @@ export const AddExpenseModal: React.FC<AddExpenseModalProps> = ({
         notes: notes.trim() || undefined
       });
 
-      if (!result.success && result.cloudResult?.errorCode === 'permission-denied') {
-        setCloudError('Permission Denied: Only Super Admins can record or edit business expenses.');
+      if (!result.success) {
+        setCloudError(result.error || 'Failed to record expense. Please check permissions and connection.');
         setIsSubmitting(false);
         return;
       }

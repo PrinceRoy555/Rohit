@@ -44,8 +44,8 @@ export const PaymentTableView: React.FC<PaymentTableViewProps> = ({
     if (!confirmDel) return;
 
     const res = await deletePaymentWithCloud(payment.id);
-    if (!res.success && res.errorCode === 'permission-denied') {
-      alert('Permission Denied: Only Super Admins can delete transaction records.');
+    if (!res.success) {
+      alert(res.error || 'Failed to delete transaction record.');
       return;
     }
     if (onRefresh) onRefresh();

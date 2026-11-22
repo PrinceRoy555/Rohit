@@ -134,8 +134,8 @@ export const TaskProfileDrawer: React.FC<TaskProfileDrawerProps> = ({
   const handleDelete = async () => {
     if (window.confirm(`Are you sure you want to delete task "${task.title}"?`)) {
       const res = await deleteTaskWithCloud(task.id);
-      if (!res.success && res.errorCode === 'permission-denied') {
-        alert('Permission Denied: You do not have permission to delete task records.');
+      if (!res.success) {
+        alert(res.error || 'Permission Denied: Failed to delete task record.');
         return;
       }
       onTaskDeleted(task.id);
