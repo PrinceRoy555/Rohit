@@ -4,13 +4,6 @@ import fs from 'fs';
 import crypto from 'crypto';
 import cookieParser from 'cookie-parser';
 import multer from 'multer';
-import {
-  initializeApp as initAdminApp,
-  getApps as getAdminApps,
-  cert as adminCert,
-  type App as AdminApp
-} from 'firebase-admin/app';
-import { getAuth as getAdminAuth } from 'firebase-admin/auth';
 import { initializeApp as initFirebaseApp, getApps as getFirebaseApps, getApp as getFirebaseApp } from 'firebase/app';
 import {
   getFirestore as getFirebaseFirestore,
@@ -53,26 +46,26 @@ try {
   console.warn('[Firebase Server] Note: Could not init server Firestore:', fbErr.message);
 }
 
-// Initialize server-side Firebase Admin SDK
-let firebaseAdminApp: AdminApp | null = null;
-try {
-  const existingApps = getAdminApps();
-  if (existingApps.length > 0) {
-    firebaseAdminApp = existingApps[0]!;
-  } else if (process.env.FIREBASE_SERVICE_ACCOUNT) {
-    const sa = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
-    firebaseAdminApp = initAdminApp({
-      credential: adminCert(sa),
-      projectId: FIREBASE_CONFIG.projectId
-    });
-  } else {
-    firebaseAdminApp = initAdminApp({
-      projectId: FIREBASE_CONFIG.projectId
-    });
+// Helper to verify Firebase ID tokens via Google Identity Toolkit
+async function verifyFirebaseIdToken(idToken: string): Promise<{ uid: string; email: string; email_verified: boolean }> {
+  const res = await fetch(`https://identitytoolkit.googleapis.com/v1/accounts:lookup?key=${FIREBASE_CONFIG.apiKey}`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ idToken })
+  });
+  if (!res.ok) {
+    throw new Error(`Token lookup failed: status ${res.status}`);
   }
-  console.log('[Firebase Admin Server] Connected to Firebase Admin project:', FIREBASE_CONFIG.projectId);
-} catch (adminErr: any) {
-  console.warn('[Firebase Admin Server] Note: Could not init Firebase Admin SDK:', adminErr.message);
+  const data = await res.json() as any;
+  const user = data.users?.[0];
+  if (!user || !user.localId) {
+    throw new Error('User record not found for token');
+  }
+  return {
+    uid: user.localId,
+    email: (user.email || '').trim().toLowerCase(),
+    email_verified: Boolean(user.emailVerified)
+  };
 }
 
 export const app = express();
@@ -702,10 +695,10 @@ app.post('/api/admin/firebase-session', async (req, res) => {
 
   // Verify ID Token with Firebase Admin SDK
   try {
-    const decodedToken = await getAdminAuth(firebaseAdminApp || undefined).verifyIdToken(idToken);
+    const decodedToken = await verifyFirebaseIdToken(idToken);
     verifiedUid = decodedToken.uid;
-    verifiedEmail = (decodedToken.email || cleanEmail).trim().toLowerCase();
-    emailVerified = Boolean(decodedToken.email_verified);
+    verifiedEmail = decodedToken.email || cleanEmail;
+    emailVerified = decodedToken.email_verified;
   } catch (tokenErr: any) {
     // In local development or emulator test mode, allow synthetic tokens
     if (process.env.NODE_ENV !== 'production' && idToken.startsWith('test_valid_admin_token_')) {

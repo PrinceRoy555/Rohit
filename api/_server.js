@@ -5,12 +5,6 @@ import fs from "fs";
 import crypto from "crypto";
 import cookieParser from "cookie-parser";
 import multer from "multer";
-import {
-  initializeApp as initAdminApp,
-  getApps as getAdminApps,
-  cert as adminCert
-} from "firebase-admin/app";
-import { getAuth as getAdminAuth } from "firebase-admin/auth";
 import { initializeApp as initFirebaseApp, getApps as getFirebaseApps, getApp as getFirebaseApp } from "firebase/app";
 import {
   getFirestore as getFirebaseFirestore,
@@ -1548,25 +1542,25 @@ try {
 } catch (fbErr) {
   console.warn("[Firebase Server] Note: Could not init server Firestore:", fbErr.message);
 }
-var firebaseAdminApp = null;
-try {
-  const existingApps = getAdminApps();
-  if (existingApps.length > 0) {
-    firebaseAdminApp = existingApps[0];
-  } else if (process.env.FIREBASE_SERVICE_ACCOUNT) {
-    const sa = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
-    firebaseAdminApp = initAdminApp({
-      credential: adminCert(sa),
-      projectId: FIREBASE_CONFIG.projectId
-    });
-  } else {
-    firebaseAdminApp = initAdminApp({
-      projectId: FIREBASE_CONFIG.projectId
-    });
+async function verifyFirebaseIdToken(idToken) {
+  const res = await fetch(`https://identitytoolkit.googleapis.com/v1/accounts:lookup?key=${FIREBASE_CONFIG.apiKey}`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ idToken })
+  });
+  if (!res.ok) {
+    throw new Error(`Token lookup failed: status ${res.status}`);
   }
-  console.log("[Firebase Admin Server] Connected to Firebase Admin project:", FIREBASE_CONFIG.projectId);
-} catch (adminErr) {
-  console.warn("[Firebase Admin Server] Note: Could not init Firebase Admin SDK:", adminErr.message);
+  const data = await res.json();
+  const user = data.users?.[0];
+  if (!user || !user.localId) {
+    throw new Error("User record not found for token");
+  }
+  return {
+    uid: user.localId,
+    email: (user.email || "").trim().toLowerCase(),
+    email_verified: Boolean(user.emailVerified)
+  };
 }
 var app = express();
 app.set("trust proxy", 1);
@@ -2017,10 +2011,10 @@ app.post("/api/admin/firebase-session", async (req, res) => {
   let verifiedEmail = cleanEmail;
   let emailVerified = false;
   try {
-    const decodedToken = await getAdminAuth(firebaseAdminApp || void 0).verifyIdToken(idToken);
+    const decodedToken = await verifyFirebaseIdToken(idToken);
     verifiedUid = decodedToken.uid;
-    verifiedEmail = (decodedToken.email || cleanEmail).trim().toLowerCase();
-    emailVerified = Boolean(decodedToken.email_verified);
+    verifiedEmail = decodedToken.email || cleanEmail;
+    emailVerified = decodedToken.email_verified;
   } catch (tokenErr) {
     if (process.env.NODE_ENV !== "production" && idToken.startsWith("test_valid_admin_token_")) {
       verifiedUid = cleanUid || SUPER_ADMIN_UID;
