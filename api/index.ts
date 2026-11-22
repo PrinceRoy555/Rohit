@@ -1,6 +1,9 @@
 // Vercel Serverless Function entry point
 // Connects Vercel serverless requests to the production backend Express application
-import app from '../server';
+// @ts-ignore - api/_server.js is bundled for serverless runtime resolution
+import serverApp from './_server.js';
+
+const app = typeof serverApp === 'function' ? serverApp : ((serverApp as any)?.default || (serverApp as any)?.app);
 
 export default function handler(req: any, res: any) {
   try {
