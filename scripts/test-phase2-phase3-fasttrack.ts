@@ -529,6 +529,7 @@ async function runFastTrackTests() {
   if (testFailCount > 0) {
     process.exit(1);
   }
+  process.exit(0);
 }
 
 runFastTrackTests().catch((err) => {

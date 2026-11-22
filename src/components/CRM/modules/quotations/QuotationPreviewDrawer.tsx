@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import {
   X,
   Printer,
+  Download,
   Share2,
   Receipt,
   Edit,
@@ -21,7 +22,8 @@ import {
   AlertTriangle,
   FileText,
   IndianRupee,
-  ExternalLink
+  ExternalLink,
+  Loader2
 } from 'lucide-react';
 import {
   CrmQuotation,
@@ -30,13 +32,14 @@ import {
   CrmProject
 } from '../../../../types/crm';
 import {
-  updateQuotationStatus,
-  convertQuotationToInvoice,
-  duplicateStoredQuotation,
-  deleteStoredQuotation,
+  updateQuotationStatusWithCloud,
+  convertQuotationToInvoiceWithCloud,
+  duplicateQuotationWithCloud,
   deleteQuotationWithCloud,
+  getStoredSettings,
   normalizePhoneNumber
 } from '../../../../services/crmStorageService';
+import { printDocument } from '../../../../utils/printDocument';
 import { QuotationStatusBadge, QuotationExpiryBadge } from './QuotationStatusBadge';
 
 interface QuotationPreviewDrawerProps {
@@ -62,25 +65,51 @@ export const QuotationPreviewDrawer: React.FC<QuotationPreviewDrawerProps> = ({
 
   const [currentQuote, setCurrentQuote] = useState<CrmQuotation>(quotation);
   const [conversionMessage, setConversionMessage] = useState<string | null>(null);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [isProcessing, setIsProcessing] = useState(false);
+  const settings = getStoredSettings();
 
   useEffect(() => {
     setCurrentQuote(quotation);
     setConversionMessage(null);
+    setErrorMessage(null);
   }, [quotation]);
 
-  const handlePrint = () => {
-    window.print();
+  const handlePrint = async () => {
+    await printDocument(
+      'quotation-printable-document',
+      `Quotation-${currentQuote.quotationNumber}-Rohitwork-Creative-Studio`,
+      { action: 'print' }
+    );
   };
 
-  const handleStatusUpdate = (status: CrmQuotationStatus) => {
-    const updated = updateQuotationStatus(currentQuote.id, status);
-    if (updated) {
-      setCurrentQuote(updated);
-      if (onStatusChanged) onStatusChanged(updated);
+  const handleDownloadPdf = async () => {
+    await printDocument(
+      'quotation-printable-document',
+      `Quotation-${currentQuote.quotationNumber}-Rohitwork-Creative-Studio`,
+      { action: 'pdf' }
+    );
+  };
+
+  const handleStatusUpdate = async (status: CrmQuotationStatus) => {
+    setIsProcessing(true);
+    setErrorMessage(null);
+    try {
+      const res = await updateQuotationStatusWithCloud(currentQuote.id, status);
+      if (!res.success) {
+        setErrorMessage(res.error || 'Failed to update quotation status.');
+        return;
+      }
+      if (res.quotation) {
+        setCurrentQuote(res.quotation);
+        if (onStatusChanged) onStatusChanged(res.quotation);
+      }
+    } finally {
+      setIsProcessing(false);
     }
   };
 
-  const handleConvertToInvoice = () => {
+  const handleConvertToInvoice = async () => {
     if (currentQuote.convertedToInvoiceId) {
       if (onNavigateToInvoice) {
         onNavigateToInvoice(currentQuote.convertedToInvoiceId);
@@ -93,25 +122,39 @@ export const QuotationPreviewDrawer: React.FC<QuotationPreviewDrawerProps> = ({
     );
     if (!confirmConvert) return;
 
-    const invoice = convertQuotationToInvoice(currentQuote.id);
-    if (invoice) {
-      setConversionMessage(`Successfully created invoice ${invoice.invoiceNumber}!`);
-      const updatedQuote = {
-        ...currentQuote,
-        status: 'accepted' as CrmQuotationStatus,
-        convertedToInvoiceId: invoice.id,
-        convertedAt: new Date().toISOString()
-      };
-      setCurrentQuote(updatedQuote);
-      if (onStatusChanged) onStatusChanged(updatedQuote);
+    setIsProcessing(true);
+    setErrorMessage(null);
+    try {
+      const res = await convertQuotationToInvoiceWithCloud(currentQuote.id);
+      if (!res.success) {
+        setErrorMessage(res.error || 'Failed to convert quotation to invoice.');
+        return;
+      }
+      if (res.invoice && res.quotation) {
+        setConversionMessage(`Successfully created invoice ${res.invoice.invoiceNumber}!`);
+        setCurrentQuote(res.quotation);
+        if (onStatusChanged) onStatusChanged(res.quotation);
+      }
+    } finally {
+      setIsProcessing(false);
     }
   };
 
-  const handleDuplicate = () => {
-    const duplicated = duplicateStoredQuotation(currentQuote.id);
-    if (duplicated) {
-      alert(`Quotation duplicated as ${duplicated.quotationNumber}`);
-      if (onDuplicateQuotation) onDuplicateQuotation(duplicated);
+  const handleDuplicate = async () => {
+    setIsProcessing(true);
+    setErrorMessage(null);
+    try {
+      const res = await duplicateQuotationWithCloud(currentQuote.id);
+      if (!res.success) {
+        setErrorMessage(res.error || 'Failed to duplicate quotation.');
+        return;
+      }
+      if (res.quotation) {
+        alert(`Quotation duplicated successfully as ${res.quotation.quotationNumber}`);
+        if (onDuplicateQuotation) onDuplicateQuotation(res.quotation);
+      }
+    } finally {
+      setIsProcessing(false);
     }
   };
 
@@ -119,21 +162,27 @@ export const QuotationPreviewDrawer: React.FC<QuotationPreviewDrawerProps> = ({
     const confirmDelete = window.confirm(
       `Are you sure you want to delete quotation ${currentQuote.quotationNumber}?`
     );
-    if (confirmDelete) {
+    if (!confirmDelete) return;
+
+    setIsProcessing(true);
+    setErrorMessage(null);
+    try {
       const res = await deleteQuotationWithCloud(currentQuote.id);
       if (!res.success) {
-        alert(res.error || 'Failed to delete quotation record.');
+        setErrorMessage(res.error || 'Failed to delete quotation record.');
         return;
       }
       onClose();
       if (onStatusChanged) onStatusChanged({ ...currentQuote, archived: true });
+    } finally {
+      setIsProcessing(false);
     }
   };
 
   // Build pre-filled WhatsApp message
   const digits = normalizePhoneNumber(currentQuote.clientPhone || '');
   const whatsAppShareText = encodeURIComponent(
-    `*Rohitwork Creative Studios — Scope Proposal*\n` +
+    `*Rohitwork Creative Studio — Scope Proposal*\n` +
       `Proposal Ref: *${currentQuote.quotationNumber}*\n` +
       `Client: ${currentQuote.clientName}\n` +
       `Project / Scope: ${currentQuote.projectTitle || 'Creative Production'}\n` +
@@ -141,9 +190,10 @@ export const QuotationPreviewDrawer: React.FC<QuotationPreviewDrawerProps> = ({
       (currentQuote.advanceAmount
         ? `Advance Required: ₹${currentQuote.advanceAmount.toLocaleString('en-IN')} (${currentQuote.advancePercentage || 50}%)\n`
         : '') +
-      `Validity: Valid until ${new Date(currentQuote.validUntil).toLocaleDateString('en-IN', { month: 'short', day: 'numeric', year: 'numeric' })}\n\n` +
-      `Please review the complete scope proposal and let us know if you'd like to proceed!\n` +
-      `Rohit Verma | Rohitwork Agency`
+      `Validity: Valid until ${new Date(currentQuote.validUntil).toLocaleDateString('en-IN', { month: 'short', day: 'numeric', year: 'numeric' })}\n` +
+      `Official Portal: https://rohitwork.in\n\n` +
+      `Please review the complete scope proposal and let us know if you would like to proceed!\n` +
+      `Rohit Verma | Rohitwork Creative Studio`
   );
 
   const whatsAppDirectUrl = digits ? `https://wa.me/91${digits}?text=${whatsAppShareText}` : null;
@@ -154,37 +204,59 @@ export const QuotationPreviewDrawer: React.FC<QuotationPreviewDrawerProps> = ({
       {/* Print Specific CSS */}
       <style>{`
         @media print {
-          body * {
-            visibility: hidden;
+          .no-print, .print\\:hidden {
+            display: none !important;
           }
-          #quotation-printable-document, #quotation-printable-document * {
-            visibility: visible;
+          body {
+            background: white !important;
+            color: black !important;
+          }
+          .fixed.inset-0 {
+            position: static !important;
+            overflow: visible !important;
+            background: transparent !important;
+            backdrop-filter: none !important;
+            height: auto !important;
+            width: 100% !important;
+          }
+          div[role="dialog"] {
+            width: 100% !important;
+            max-width: 100% !important;
+            height: auto !important;
+            overflow: visible !important;
+            border: none !important;
+            box-shadow: none !important;
+            transform: none !important;
+            background: white !important;
+          }
+          .overflow-y-auto {
+            overflow: visible !important;
+            height: auto !important;
+            padding: 0 !important;
           }
           #quotation-printable-document {
-            position: absolute;
-            left: 0;
-            top: 0;
-            width: 100%;
-            margin: 0;
-            padding: 24px;
+            display: block !important;
+            position: static !important;
+            width: 100% !important;
+            max-width: 100% !important;
+            margin: 0 auto !important;
+            padding: 12mm !important;
             background: white !important;
             color: black !important;
             box-shadow: none !important;
             border: none !important;
-          }
-          .no-print {
-            display: none !important;
+            border-radius: 0 !important;
           }
         }
       `}</style>
 
-      <div className="fixed inset-0 z-50 overflow-hidden bg-slate-950/70 backdrop-blur-sm flex justify-end no-print">
+      <div className="fixed inset-0 z-50 overflow-hidden bg-slate-950/70 backdrop-blur-sm flex justify-end">
         <div
           className="w-full max-w-4xl bg-slate-100 dark:bg-slate-950 h-full shadow-2xl border-l border-slate-200 dark:border-slate-800 flex flex-col overflow-hidden animate-in slide-in-from-right duration-200"
           role="dialog"
         >
           {/* Top Control Bar (Screen Only) */}
-          <div className="p-4 px-6 border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 flex items-center justify-between gap-4">
+          <div className="p-4 px-6 border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 flex items-center justify-between gap-4 no-print print:hidden">
             <div className="flex items-center gap-3">
               <span className="font-mono text-sm font-bold text-slate-800 dark:text-slate-100 px-3 py-1 bg-slate-100 dark:bg-slate-800 rounded-lg">
                 {currentQuote.quotationNumber}
@@ -222,21 +294,35 @@ export const QuotationPreviewDrawer: React.FC<QuotationPreviewDrawerProps> = ({
                 </a>
               )}
 
-              {/* Print / Download PDF */}
+              {/* Print Document */}
               <button
                 type="button"
                 onClick={handlePrint}
-                className="flex items-center gap-1.5 px-3 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-semibold shadow-sm transition"
-                title="Print or Save as PDF"
+                disabled={isProcessing}
+                className="flex items-center gap-1.5 px-3 py-1.5 bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 text-white rounded-xl text-xs font-semibold shadow-sm transition"
+                title="Print quotation document"
               >
                 <Printer className="w-3.5 h-3.5" />
-                <span className="hidden sm:inline">Print / PDF</span>
+                <span className="hidden sm:inline">Print</span>
+              </button>
+
+              {/* Download / Save PDF */}
+              <button
+                type="button"
+                onClick={handleDownloadPdf}
+                disabled={isProcessing}
+                className="flex items-center gap-1.5 px-3 py-1.5 bg-slate-800 hover:bg-slate-900 dark:bg-slate-700 dark:hover:bg-slate-600 disabled:opacity-50 text-white rounded-xl text-xs font-semibold shadow-sm transition"
+                title="Save Quotation as PDF (Select 'Save as PDF' destination)"
+              >
+                <Download className="w-3.5 h-3.5" />
+                <span className="hidden sm:inline">Save PDF</span>
               </button>
 
               {/* Convert to Invoice */}
               <button
                 type="button"
                 onClick={handleConvertToInvoice}
+                disabled={isProcessing}
                 className="flex items-center gap-1.5 px-3 py-1.5 bg-amber-500/10 hover:bg-amber-500/20 text-amber-700 dark:text-amber-300 border border-amber-500/30 rounded-xl text-xs font-semibold transition"
                 title={
                   currentQuote.convertedToInvoiceId
@@ -244,7 +330,11 @@ export const QuotationPreviewDrawer: React.FC<QuotationPreviewDrawerProps> = ({
                     : 'Convert this quotation into a formal tax invoice'
                 }
               >
-                <Receipt className="w-3.5 h-3.5" />
+                {isProcessing ? (
+                  <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                ) : (
+                  <Receipt className="w-3.5 h-3.5" />
+                )}
                 <span className="hidden sm:inline">
                   {currentQuote.convertedToInvoiceId ? 'View Invoice' : 'Convert Invoice'}
                 </span>
@@ -253,6 +343,7 @@ export const QuotationPreviewDrawer: React.FC<QuotationPreviewDrawerProps> = ({
               {/* Status Switcher Dropdown */}
               <select
                 value={currentQuote.status}
+                disabled={isProcessing}
                 onChange={(e) => handleStatusUpdate(e.target.value as CrmQuotationStatus)}
                 className="text-xs px-2.5 py-1.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 font-medium focus:ring-2 focus:ring-indigo-500"
               >
@@ -268,6 +359,7 @@ export const QuotationPreviewDrawer: React.FC<QuotationPreviewDrawerProps> = ({
                 <button
                   type="button"
                   onClick={() => onEditQuotation(currentQuote)}
+                  disabled={isProcessing}
                   title="Edit Quotation"
                   className="p-1.5 rounded-lg text-slate-500 hover:text-indigo-600 hover:bg-slate-100 dark:hover:bg-slate-800 transition"
                 >
@@ -278,6 +370,7 @@ export const QuotationPreviewDrawer: React.FC<QuotationPreviewDrawerProps> = ({
               <button
                 type="button"
                 onClick={handleDuplicate}
+                disabled={isProcessing}
                 title="Duplicate Quotation"
                 className="p-1.5 rounded-lg text-slate-500 hover:text-indigo-600 hover:bg-slate-100 dark:hover:bg-slate-800 transition"
               >
@@ -287,6 +380,7 @@ export const QuotationPreviewDrawer: React.FC<QuotationPreviewDrawerProps> = ({
               <button
                 type="button"
                 onClick={handleDelete}
+                disabled={isProcessing}
                 title="Delete Quotation"
                 className="p-1.5 rounded-lg text-slate-500 hover:text-rose-600 hover:bg-slate-100 dark:hover:bg-slate-800 transition"
               >
@@ -303,11 +397,28 @@ export const QuotationPreviewDrawer: React.FC<QuotationPreviewDrawerProps> = ({
             </div>
           </div>
 
+          {/* Error Alert Banner */}
+          {errorMessage && (
+            <div className="bg-rose-50 dark:bg-rose-950/40 border-b border-rose-200 dark:border-rose-800/60 p-3 px-6 text-xs text-rose-800 dark:text-rose-200 flex items-center justify-between no-print print:hidden">
+              <span className="flex items-center gap-2">
+                <AlertTriangle className="w-4 h-4 text-rose-600 shrink-0" />
+                <span>{errorMessage}</span>
+              </span>
+              <button
+                type="button"
+                onClick={() => setErrorMessage(null)}
+                className="text-rose-600 hover:text-rose-800 text-xs font-bold"
+              >
+                Dismiss
+              </button>
+            </div>
+          )}
+
           {/* Conversion Notification Banner */}
           {conversionMessage && (
-            <div className="bg-emerald-50 dark:bg-emerald-950/40 border-b border-emerald-200 dark:border-emerald-800/60 p-3 px-6 text-xs text-emerald-800 dark:text-emerald-200 flex items-center justify-between">
+            <div className="bg-emerald-50 dark:bg-emerald-950/40 border-b border-emerald-200 dark:border-emerald-800/60 p-3 px-6 text-xs text-emerald-800 dark:text-emerald-200 flex items-center justify-between no-print print:hidden">
               <span className="flex items-center gap-2">
-                <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+                <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
                 <span>{conversionMessage}</span>
               </span>
               {currentQuote.convertedToInvoiceId && onNavigateToInvoice && (
@@ -342,7 +453,7 @@ export const QuotationPreviewDrawer: React.FC<QuotationPreviewDrawerProps> = ({
                         ROHITWORK
                       </h1>
                       <p className="text-[11px] font-semibold text-indigo-600 uppercase tracking-widest mt-0.5">
-                        Creative & Tech Studios
+                        Creative Studio
                       </p>
                     </div>
                   </div>
@@ -351,14 +462,19 @@ export const QuotationPreviewDrawer: React.FC<QuotationPreviewDrawerProps> = ({
                   </p>
                   <div className="mt-3 text-xs text-slate-500 space-y-0.5">
                     <p>
-                      <strong>Email:</strong> workall724038@gmail.com
+                      <strong>Email:</strong> {settings.ownerEmail || 'workall724038@gmail.com'}
                     </p>
                     <p>
-                      <strong>Portfolio:</strong> rohitwork.com
+                      <strong>Website:</strong> {settings.websiteUrl ? settings.websiteUrl.replace(/^https?:\/\//, '') : 'rohitwork.in'}
                     </p>
                     <p>
-                      <strong>Studio:</strong> Indore, MP, India
+                      <strong>Phone:</strong> {settings.phone || '+91 7732869027'}
                     </p>
+                    {Boolean(settings.isAddressVerified && settings.address?.trim()) && (
+                      <p>
+                        <strong>Studio:</strong> {settings.address.trim()}
+                      </p>
+                    )}
                   </div>
                 </div>
 
@@ -663,7 +779,7 @@ export const QuotationPreviewDrawer: React.FC<QuotationPreviewDrawerProps> = ({
                       Rohit Verma
                     </div>
                     <div className="text-[11px] text-slate-500">
-                      Founder & Creative Director | Rohitwork
+                      Founder & Creative Director | Rohitwork Creative Studio
                     </div>
                   </div>
                 </div>

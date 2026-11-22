@@ -9,7 +9,7 @@
  * 5. getFinancialSummary strictly excludes demo records by default
  */
 
-import { initCrmStorage, getFinancialSummary, getStoredClients, getStoredProjects, getStoredTasks, getStoredFreelancers } from '../src/services/crmStorageService';
+import { initCrmStorage, resetAllCrmStorageToDefaults, getFinancialSummary, getStoredClients, getStoredProjects, getStoredTasks, getStoredFreelancers } from '../src/services/crmStorageService';
 import { getCrmDashboardMetrics } from '../src/services/crmService';
 import { isRecordDemo, KNOWN_SEED_RECORD_IDS } from '../src/services/crmBackupService';
 
@@ -18,7 +18,8 @@ async function runDashboardIntegrityTests() {
   console.log('   ROHITWORK CRM — DASHBOARD DATA INTEGRITY VERIFICATION SUITE    ');
   console.log('==================================================================\n');
 
-  // Initialize CRM store (seeds demo data in memory)
+  // Load defaults in memory for testing demo preservation
+  resetAllCrmStorageToDefaults();
   await initCrmStorage();
 
   // Test 1: Verify all 36 seed records are tagged with isDemo: true
@@ -96,10 +97,10 @@ async function runDashboardIntegrityTests() {
 
   // Test 4: Preservation of local demo data (no destructive deletion)
   console.log('\n[Test 4] Verifying local demo records remain preserved (non-destructive)...');
-  const storedClients = getStoredClients();
-  const storedProjects = getStoredProjects();
-  const storedTasks = getStoredTasks();
-  const storedFreelancers = getStoredFreelancers();
+  const storedClients = getStoredClients({ includeDemo: true });
+  const storedProjects = getStoredProjects({ includeDemo: true });
+  const storedTasks = getStoredTasks({ includeDemo: true });
+  const storedFreelancers = getStoredFreelancers({ includeDemo: true });
 
   if (storedClients.length === 0 || storedProjects.length === 0 || storedTasks.length === 0 || storedFreelancers.length === 0) {
     throw new Error('Local demo data was destructively deleted!');

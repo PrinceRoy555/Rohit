@@ -188,6 +188,7 @@ async function testCrossBrowserSync() {
   if (failed > 0) {
     process.exit(1);
   }
+  process.exit(0);
 }
 
 testCrossBrowserSync().catch((err) => {

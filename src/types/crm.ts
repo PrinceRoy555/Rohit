@@ -487,6 +487,8 @@ export interface CrmAgencySettings {
     ifsc: string;
     bankName: string;
   };
+  isPaymentDetailsVerified?: boolean;
+  isAddressVerified?: boolean;
   defaultPaymentTerms: string;
   invoiceNotesTemplate: string;
   quotationTermsTemplate: string;

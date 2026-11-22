@@ -13,7 +13,9 @@ const testScripts = [
   'scripts/test-phase7-functional-audit.ts',
   'scripts/test-phase2-phase3-fasttrack.ts',
   'scripts/verify-rollback-rules.ts',
-  'scripts/test-phase10-full-e2e.ts'
+  'scripts/test-phase10-full-e2e.ts',
+  'scripts/test-quotation-pdf-demo-repair.ts',
+  'scripts/test-pdf-visual-inspection.ts'
 ];
 
 console.log('==================================================================');

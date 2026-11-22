@@ -296,16 +296,16 @@ function sanitizeForBackup<T>(obj: T): T {
  */
 export function collectAllCrmStorageData(): CrmBackupDataPayload {
   const settings = getStoredSettings();
-  const clients = getStoredClients();
-  const freelancers = getStoredFreelancers();
-  const projects = getStoredProjects();
-  const tasks = getStoredTasks();
-  const quotations = getStoredQuotations();
-  const invoices = getStoredInvoices();
-  const payments = getStoredPayments();
-  const expenses = getStoredExpenses();
-  const reminders = getStoredReminders();
-  const leads = getStoredLeads();
+  const clients = getStoredClients({ includeDemo: true });
+  const freelancers = getStoredFreelancers({ includeDemo: true });
+  const projects = getStoredProjects({ includeDemo: true });
+  const tasks = getStoredTasks({ includeDemo: true });
+  const quotations = getStoredQuotations({ includeDemo: true });
+  const invoices = getStoredInvoices({ includeDemo: true });
+  const payments = getStoredPayments({ includeDemo: true });
+  const expenses = getStoredExpenses({ includeDemo: true });
+  const reminders = getStoredReminders({ includeDemo: true });
+  const leads = getStoredLeads({ includeDemo: true });
   const reportsSnapshot = getComprehensiveReports('all');
 
   return {

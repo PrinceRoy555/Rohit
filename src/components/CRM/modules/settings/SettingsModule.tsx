@@ -421,10 +421,30 @@ export const SettingsModule: React.FC<SettingsModuleProps> = ({ onNavigateToModu
               </label>
               <input
                 type="text"
-                value={settings.address}
+                value={settings.address || ''}
                 onChange={(e) => setSettings({ ...settings, address: e.target.value })}
+                placeholder="e.g. Registered Business Address"
                 className="w-full px-3 py-2 text-xs rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-violet-500"
               />
+              <div className="mt-2.5 flex items-start gap-2.5 p-3 rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700">
+                <input
+                  type="checkbox"
+                  id="isAddressVerified"
+                  checked={Boolean(settings.isAddressVerified)}
+                  onChange={(e) => setSettings({ ...settings, isAddressVerified: e.target.checked })}
+                  className="mt-0.5 w-4 h-4 text-violet-600 rounded border-slate-300 focus:ring-violet-500 cursor-pointer"
+                />
+                <div className="text-xs">
+                  <label htmlFor="isAddressVerified" className="font-semibold text-slate-800 dark:text-slate-200 cursor-pointer">
+                    Verify Business Address for Client-Facing Documents
+                  </label>
+                  <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">
+                    {settings.isAddressVerified
+                      ? '✓ Address is verified by owner and will appear in quotation and invoice PDF headers.'
+                      : 'Address is currently unverified. Quotations and invoices will omit this address until verified.'}
+                  </p>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -490,6 +510,44 @@ export const SettingsModule: React.FC<SettingsModuleProps> = ({ onNavigateToModu
               <span>Invoice Settings & Bank Remittance</span>
             </h3>
 
+            {/* Owner Payment Verification Toggle & Status */}
+            <div
+              className={`p-4 rounded-2xl border transition-all ${
+                settings.isPaymentDetailsVerified
+                  ? 'bg-emerald-50 dark:bg-emerald-950/40 border-emerald-200 dark:border-emerald-800 text-emerald-900 dark:text-emerald-200'
+                  : 'bg-amber-50 dark:bg-amber-950/40 border-amber-200 dark:border-amber-800 text-amber-900 dark:text-amber-200'
+              }`}
+            >
+              <div className="flex items-start gap-3">
+                <input
+                  type="checkbox"
+                  id="isPaymentDetailsVerified"
+                  checked={Boolean(settings.isPaymentDetailsVerified)}
+                  onChange={(e) => setSettings({ ...settings, isPaymentDetailsVerified: e.target.checked })}
+                  className="mt-1 w-4 h-4 text-emerald-600 rounded border-slate-300 focus:ring-emerald-500 cursor-pointer"
+                />
+                <div className="space-y-1">
+                  <label htmlFor="isPaymentDetailsVerified" className="font-bold text-xs cursor-pointer flex items-center gap-2">
+                    <span>Owner Verification: Authorize Bank & UPI Details on Invoices</span>
+                    {settings.isPaymentDetailsVerified ? (
+                      <span className="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-emerald-200 dark:bg-emerald-800 text-emerald-800 dark:text-emerald-100 uppercase">
+                        Verified
+                      </span>
+                    ) : (
+                      <span className="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-amber-200 dark:bg-amber-800 text-amber-800 dark:text-amber-100 uppercase">
+                        Unverified / Safe Mode
+                      </span>
+                    )}
+                  </label>
+                  <p className="text-[11px] leading-relaxed opacity-90">
+                    {settings.isPaymentDetailsVerified
+                      ? '✓ Banking and UPI coordinates are verified by the owner. These parameters will be printed on official invoices and WhatsApp payment requests.'
+                      : '⚠ Payment details are currently UNVERIFIED. Invoices and PDFs will omit bank account and UPI details until verified by the owner.'}
+                  </p>
+                </div>
+              </div>
+            </div>
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
@@ -499,7 +557,7 @@ export const SettingsModule: React.FC<SettingsModuleProps> = ({ onNavigateToModu
                   type="text"
                   value={settings.upiId || ''}
                   onChange={(e) => setSettings({ ...settings, upiId: e.target.value })}
-                  placeholder="e.g. 7732869027@paytm"
+                  placeholder="e.g. yourname@upi"
                   className="w-full px-3 py-2 text-xs rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-mono focus:outline-none focus:ring-2 focus:ring-violet-500"
                 />
               </div>

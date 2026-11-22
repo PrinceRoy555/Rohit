@@ -18,9 +18,9 @@ import {
 import { CrmQuotation, CrmQuotationStatus } from '../../../../types/crm';
 import { QuotationStatusBadge, QuotationExpiryBadge } from './QuotationStatusBadge';
 import {
-  updateQuotationStatus,
-  convertQuotationToInvoice,
-  duplicateStoredQuotation,
+  updateQuotationStatusWithCloud,
+  convertQuotationToInvoiceWithCloud,
+  duplicateQuotationWithCloud,
   normalizePhoneNumber
 } from '../../../../services/crmStorageService';
 
@@ -41,17 +41,20 @@ export const QuotationTableView: React.FC<QuotationTableViewProps> = ({
   onRefresh,
   onNavigateToInvoice
 }) => {
-  const handleQuickStatus = (
+  const handleQuickStatus = async (
     quoteId: string,
     newStatus: CrmQuotationStatus,
     e: React.ChangeEvent<HTMLSelectElement>
   ) => {
     e.stopPropagation();
-    updateQuotationStatus(quoteId, newStatus);
+    const res = await updateQuotationStatusWithCloud(quoteId, newStatus);
+    if (!res.success) {
+      alert(res.error || 'Failed to update quotation status.');
+    }
     if (onRefresh) onRefresh();
   };
 
-  const handleQuickConvert = (quote: CrmQuotation, e: React.MouseEvent) => {
+  const handleQuickConvert = async (quote: CrmQuotation, e: React.MouseEvent) => {
     e.stopPropagation();
     if (quote.convertedToInvoiceId) {
       if (onNavigateToInvoice) onNavigateToInvoice(quote.convertedToInvoiceId);
@@ -61,18 +64,26 @@ export const QuotationTableView: React.FC<QuotationTableViewProps> = ({
       `Convert quotation ${quote.quotationNumber} into a formal invoice?`
     );
     if (!confirmConvert) return;
-    const inv = convertQuotationToInvoice(quote.id);
-    if (inv) {
-      alert(`Created invoice ${inv.invoiceNumber}!`);
+    const res = await convertQuotationToInvoiceWithCloud(quote.id);
+    if (!res.success) {
+      alert(res.error || 'Failed to convert quotation to invoice.');
+      return;
+    }
+    if (res.invoice) {
+      alert(`Created invoice ${res.invoice.invoiceNumber}!`);
       if (onRefresh) onRefresh();
     }
   };
 
-  const handleQuickDuplicate = (quote: CrmQuotation, e: React.MouseEvent) => {
+  const handleQuickDuplicate = async (quote: CrmQuotation, e: React.MouseEvent) => {
     e.stopPropagation();
-    const dup = duplicateStoredQuotation(quote.id);
-    if (dup) {
-      alert(`Duplicated as ${dup.quotationNumber}`);
+    const res = await duplicateQuotationWithCloud(quote.id);
+    if (!res.success) {
+      alert(res.error || 'Failed to duplicate quotation.');
+      return;
+    }
+    if (res.quotation) {
+      alert(`Duplicated as ${res.quotation.quotationNumber}`);
       if (onRefresh) onRefresh();
     }
   };
@@ -99,7 +110,7 @@ export const QuotationTableView: React.FC<QuotationTableViewProps> = ({
             const rawPhone = q.clientPhone || '';
             const digits = normalizePhoneNumber(rawPhone);
             const whatsAppShareText = encodeURIComponent(
-              `Hi ${q.clientName}, Rohit Verma here from Rohitwork Creative Studios. Please review our formal quotation ${q.quotationNumber} for ₹${q.totalAmount.toLocaleString('en-IN')}. Looking forward to your approval!`
+              `Hi ${q.clientName}, Rohit Verma here from Rohitwork Creative Studio. Please review our formal quotation ${q.quotationNumber} for ₹${q.totalAmount.toLocaleString('en-IN')} (https://rohitwork.in). Looking forward to your approval!`
             );
             const directWhatsAppUrl = digits
               ? `https://wa.me/91${digits}?text=${whatsAppShareText}`

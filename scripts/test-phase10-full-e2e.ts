@@ -346,6 +346,7 @@ async function runSuite() {
   if (failedTests > 0) {
     process.exit(1);
   }
+  process.exit(0);
 }
 
 runSuite().catch((err) => {

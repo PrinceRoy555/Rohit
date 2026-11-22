@@ -64,7 +64,16 @@ async function runEmulatorTests() {
   }
 
   // Clear data and seed test fixtures
-  await testEnv.clearFirestore();
+  try {
+    await testEnv.clearFirestore();
+  } catch {
+    await new Promise((r) => setTimeout(r, 500));
+    try {
+      await testEnv.clearFirestore();
+    } catch {
+      // Ignored
+    }
+  }
 
   await testEnv.withSecurityRulesDisabled(async (context) => {
     const adminDb = context.firestore();
@@ -478,6 +487,7 @@ async function runEmulatorTests() {
     process.exit(1);
   } else {
     console.log('\n>>> ALL REAL FIRESTORE EMULATOR TESTS PASSED WITH ZERO FAILURES! <<<\n');
+    process.exit(0);
   }
 }
 

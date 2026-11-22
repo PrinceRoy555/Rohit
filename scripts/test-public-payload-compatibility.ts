@@ -42,7 +42,16 @@ async function testPublicCompatibility() {
     process.exit(1);
   }
 
-  await testEnv.clearFirestore();
+  try {
+    await testEnv.clearFirestore();
+  } catch (clearErr) {
+    await new Promise((r) => setTimeout(r, 500));
+    try {
+      await testEnv.clearFirestore();
+    } catch {
+      // Ignored
+    }
+  }
 
   // Seed fixtures
   await testEnv.withSecurityRulesDisabled(async (adminContext) => {
@@ -187,6 +196,7 @@ async function testPublicCompatibility() {
   console.log('==================================================================\n');
 
   await testEnv.cleanup();
+  process.exit(0);
 }
 
 testPublicCompatibility().catch((err) => {

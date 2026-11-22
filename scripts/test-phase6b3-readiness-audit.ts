@@ -464,6 +464,7 @@ async function runPhase6B3Audit() {
   console.log('==================================================================\n');
 
   await testEnv.cleanup();
+  process.exit(0);
 }
 
 runPhase6B3Audit().catch((err) => {

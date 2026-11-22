@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import {
   X,
   Printer,
+  Download,
   Share2,
   Receipt,
   Edit,
@@ -21,7 +22,8 @@ import {
   IndianRupee,
   ExternalLink,
   PlusCircle,
-  FileSpreadsheet
+  FileSpreadsheet,
+  Loader2
 } from 'lucide-react';
 import { CrmInvoice, CrmInvoiceStatus, CrmPayment } from '../../../../types/crm';
 import {
@@ -30,8 +32,10 @@ import {
   deleteStoredInvoice,
   deleteInvoiceWithCloud,
   getStoredPayments,
+  getStoredSettings,
   normalizePhoneNumber
 } from '../../../../services/crmStorageService';
+import { printDocument } from '../../../../utils/printDocument';
 import { InvoiceStatusBadge, InvoiceDueBadge } from './InvoiceStatusBadge';
 
 interface InvoicePreviewDrawerProps {
@@ -59,6 +63,7 @@ export const InvoicePreviewDrawer: React.FC<InvoicePreviewDrawerProps> = ({
 
   const [currentInv, setCurrentInv] = useState<CrmInvoice>(invoice);
   const [invoicePayments, setInvoicePayments] = useState<CrmPayment[]>([]);
+  const settings = getStoredSettings();
 
   useEffect(() => {
     setCurrentInv(invoice);
@@ -67,8 +72,20 @@ export const InvoicePreviewDrawer: React.FC<InvoicePreviewDrawerProps> = ({
     setInvoicePayments(related);
   }, [invoice]);
 
-  const handlePrint = () => {
-    window.print();
+  const handlePrint = async () => {
+    await printDocument(
+      'invoice-printable-document',
+      `Invoice-${currentInv.invoiceNumber}-Rohitwork-Creative-Studio`,
+      { action: 'print' }
+    );
+  };
+
+  const handleDownloadPdf = async () => {
+    await printDocument(
+      'invoice-printable-document',
+      `Invoice-${currentInv.invoiceNumber}-Rohitwork-Creative-Studio`,
+      { action: 'pdf' }
+    );
   };
 
   const handleStatusUpdate = (status: CrmInvoiceStatus) => {
@@ -102,22 +119,42 @@ export const InvoicePreviewDrawer: React.FC<InvoicePreviewDrawerProps> = ({
     }
   };
 
+  // Determine verified bank & UPI remittance coordinates
+  const verifiedBankDetails = (
+    currentInv.bankDetails &&
+    Boolean(currentInv.bankDetails.bankName?.trim()) &&
+    Boolean(currentInv.bankDetails.accountNumber?.trim())
+  ) ? currentInv.bankDetails : (
+    (settings.isPaymentDetailsVerified && settings.bankDetails?.bankName?.trim() && settings.bankDetails?.accountNumber?.trim()) ? {
+      bankName: settings.bankDetails.bankName.trim(),
+      accountHolder: settings.bankDetails.accountName?.trim() || settings.ownerName || 'Rohit Verma',
+      accountNumber: settings.bankDetails.accountNumber.trim(),
+      ifsc: settings.bankDetails.ifsc?.trim() || '',
+      upiId: settings.upiId?.trim() || ''
+    } : null
+  );
+
   // Build pre-filled WhatsApp billing message
   const digits = normalizePhoneNumber(currentInv.clientPhone || '');
+  const paymentTransferSnippet = verifiedBankDetails
+    ? `*Payment Transfer Details:*\n` +
+      (verifiedBankDetails.upiId ? `UPI ID: ${verifiedBankDetails.upiId}\n` : '') +
+      `Bank: ${verifiedBankDetails.bankName} | A/C: ${verifiedBankDetails.accountNumber} | IFSC: ${verifiedBankDetails.ifsc}\n\n` +
+      `Kindly share the transaction UTR once the transfer is initiated. Thank you!\n`
+    : `For payment coordinates or invoice queries, please reply directly or email ${settings.ownerEmail || 'workall724038@gmail.com'}.\n\n`;
+
   const whatsAppShareText = encodeURIComponent(
-    `*Rohitwork Creative Studios — Commercial Invoice*\n` +
+    `*Rohitwork Creative Studio — Commercial Invoice*\n` +
       `Invoice Ref: *${currentInv.invoiceNumber}*\n` +
       `Client: ${currentInv.clientName}\n` +
       `Project / Scope: ${currentInv.projectTitle || 'Creative Production'}\n` +
       `Total Invoice Amount: ₹${currentInv.total.toLocaleString('en-IN')}\n` +
       `Amount Received: ₹${currentInv.amountPaid.toLocaleString('en-IN')}\n` +
       `*Balance Outstanding: ₹${currentInv.balanceDue.toLocaleString('en-IN')}*\n` +
-      `Due Date: ${new Date(currentInv.dueDate).toLocaleDateString('en-IN', { month: 'short', day: 'numeric', year: 'numeric' })}\n\n` +
-      `*Payment Transfer Details:*\n` +
-      `UPI ID: 7732869027@paytm\n` +
-      `Bank: HDFC Bank Ltd | A/C: 917732869027 | IFSC: HDFC0001824\n\n` +
-      `Kindly share the transaction UTR once the transfer is initiated. Thank you!\n` +
-      `Rohit Verma | Rohitwork Agency`
+      `Due Date: ${new Date(currentInv.dueDate).toLocaleDateString('en-IN', { month: 'short', day: 'numeric', year: 'numeric' })}\n` +
+      `Official Portal: https://rohitwork.in\n\n` +
+      paymentTransferSnippet +
+      `Rohit Verma | Rohitwork Creative Studio`
   );
 
   const whatsAppDirectUrl = digits ? `https://wa.me/91${digits}?text=${whatsAppShareText}` : null;
@@ -128,37 +165,59 @@ export const InvoicePreviewDrawer: React.FC<InvoicePreviewDrawerProps> = ({
       {/* Print Specific CSS */}
       <style>{`
         @media print {
-          body * {
-            visibility: hidden;
+          .no-print, .print\\:hidden {
+            display: none !important;
           }
-          #invoice-printable-document, #invoice-printable-document * {
-            visibility: visible;
+          body {
+            background: white !important;
+            color: black !important;
+          }
+          .fixed.inset-0 {
+            position: static !important;
+            overflow: visible !important;
+            background: transparent !important;
+            backdrop-filter: none !important;
+            height: auto !important;
+            width: 100% !important;
+          }
+          div[role="dialog"] {
+            width: 100% !important;
+            max-width: 100% !important;
+            height: auto !important;
+            overflow: visible !important;
+            border: none !important;
+            box-shadow: none !important;
+            transform: none !important;
+            background: white !important;
+          }
+          .overflow-y-auto {
+            overflow: visible !important;
+            height: auto !important;
+            padding: 0 !important;
           }
           #invoice-printable-document {
-            position: absolute;
-            left: 0;
-            top: 0;
-            width: 100%;
-            margin: 0;
-            padding: 24px;
+            display: block !important;
+            position: static !important;
+            width: 100% !important;
+            max-width: 100% !important;
+            margin: 0 auto !important;
+            padding: 12mm !important;
             background: white !important;
             color: black !important;
             box-shadow: none !important;
             border: none !important;
-          }
-          .no-print {
-            display: none !important;
+            border-radius: 0 !important;
           }
         }
       `}</style>
 
-      <div className="fixed inset-0 z-50 overflow-hidden bg-slate-950/70 backdrop-blur-sm flex justify-end no-print">
+      <div className="fixed inset-0 z-50 overflow-hidden bg-slate-950/70 backdrop-blur-sm flex justify-end">
         <div
           className="w-full max-w-4xl bg-slate-100 dark:bg-slate-950 h-full shadow-2xl border-l border-slate-200 dark:border-slate-800 flex flex-col overflow-hidden animate-in slide-in-from-right duration-200"
           role="dialog"
         >
           {/* Top Control Bar (Screen Only) */}
-          <div className="p-4 px-6 border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 flex items-center justify-between gap-4">
+          <div className="p-4 px-6 border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 flex items-center justify-between gap-4 no-print print:hidden">
             <div className="flex items-center gap-3">
               <span className="font-mono text-sm font-bold text-slate-800 dark:text-slate-100 px-3 py-1 bg-slate-100 dark:bg-slate-800 rounded-lg">
                 {currentInv.invoiceNumber}
@@ -206,15 +265,26 @@ export const InvoicePreviewDrawer: React.FC<InvoicePreviewDrawerProps> = ({
                 </a>
               )}
 
-              {/* Print / Download PDF */}
+              {/* Print Document */}
               <button
                 type="button"
                 onClick={handlePrint}
                 className="flex items-center gap-1.5 px-3 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-semibold shadow-sm transition"
-                title="Print or Save as PDF"
+                title="Print invoice document"
               >
                 <Printer className="w-3.5 h-3.5" />
-                <span className="hidden sm:inline">Print / PDF</span>
+                <span className="hidden sm:inline">Print</span>
+              </button>
+
+              {/* Download / Save PDF */}
+              <button
+                type="button"
+                onClick={handleDownloadPdf}
+                className="flex items-center gap-1.5 px-3 py-1.5 bg-slate-800 hover:bg-slate-900 dark:bg-slate-700 dark:hover:bg-slate-600 text-white rounded-xl text-xs font-semibold shadow-sm transition"
+                title="Save Invoice as PDF (Select 'Save as PDF' destination)"
+              >
+                <Download className="w-3.5 h-3.5" />
+                <span className="hidden sm:inline">Save PDF</span>
               </button>
 
               {/* Status Switcher Dropdown */}
@@ -292,7 +362,7 @@ export const InvoicePreviewDrawer: React.FC<InvoicePreviewDrawerProps> = ({
                         ROHITWORK
                       </h1>
                       <p className="text-[11px] font-semibold text-indigo-600 uppercase tracking-widest mt-0.5">
-                        Creative & Tech Studios
+                        Creative Studio
                       </p>
                     </div>
                   </div>
@@ -301,14 +371,19 @@ export const InvoicePreviewDrawer: React.FC<InvoicePreviewDrawerProps> = ({
                   </p>
                   <div className="mt-3 text-xs text-slate-500 space-y-0.5">
                     <p>
-                      <strong>Email:</strong> workall724038@gmail.com
+                      <strong>Email:</strong> {settings.ownerEmail || 'workall724038@gmail.com'}
                     </p>
                     <p>
-                      <strong>Website:</strong> rohitwork.com
+                      <strong>Website:</strong> {settings.websiteUrl ? settings.websiteUrl.replace(/^https?:\/\//, '') : 'rohitwork.in'}
                     </p>
                     <p>
-                      <strong>Studio:</strong> Jaipur / Indore, India
+                      <strong>Phone:</strong> {settings.phone || '+91 7732869027'}
                     </p>
+                    {Boolean(settings.isAddressVerified && settings.address?.trim()) && (
+                      <p>
+                        <strong>Studio:</strong> {settings.address.trim()}
+                      </p>
+                    )}
                   </div>
                 </div>
 
@@ -451,32 +526,53 @@ export const InvoicePreviewDrawer: React.FC<InvoicePreviewDrawerProps> = ({
 
               {/* Financial Calculation Box */}
               <div className="flex flex-col sm:flex-row justify-between items-start gap-6 mb-8">
-                {/* Bank Transfer & UPI Details */}
-                <div className="w-full sm:max-w-xs p-4 bg-slate-50 rounded-xl border border-slate-200 text-xs text-slate-700 space-y-1.5">
-                  <h4 className="font-bold text-slate-900 uppercase tracking-wider text-[11px] mb-1">
-                    Bank & Digital Payment Remittance
-                  </h4>
-                  <p>
-                    <strong>Bank Name:</strong> {currentInv.bankDetails?.bankName || 'HDFC Bank Ltd'}
-                  </p>
-                  <p>
-                    <strong>Account Holder:</strong> {currentInv.bankDetails?.accountHolder || 'Rohit Verma'}
-                  </p>
-                  <p>
-                    <strong>Account Number:</strong>{' '}
-                    <span className="font-mono">{currentInv.bankDetails?.accountNumber || '917732869027'}</span>
-                  </p>
-                  <p>
-                    <strong>IFSC Code:</strong>{' '}
-                    <span className="font-mono">{currentInv.bankDetails?.ifsc || 'HDFC0001824'}</span>
-                  </p>
-                  <p className="pt-1 border-t border-slate-200">
-                    <strong>UPI Payment ID:</strong>{' '}
-                    <span className="font-mono text-indigo-700 font-bold">
-                      {currentInv.bankDetails?.upiId || '7732869027@paytm'}
-                    </span>
-                  </p>
-                </div>
+                {/* Bank Transfer & UPI Details (Rendered ONLY if verified) */}
+                {verifiedBankDetails ? (
+                  <div className="w-full sm:max-w-xs p-4 bg-slate-50 rounded-xl border border-slate-200 text-xs text-slate-700 space-y-1.5">
+                    <h4 className="font-bold text-slate-900 uppercase tracking-wider text-[11px] mb-1">
+                      Bank & Digital Payment Remittance
+                    </h4>
+                    <p>
+                      <strong>Bank Name:</strong> {verifiedBankDetails.bankName}
+                    </p>
+                    <p>
+                      <strong>Account Holder:</strong> {verifiedBankDetails.accountHolder}
+                    </p>
+                    <p>
+                      <strong>Account Number:</strong>{' '}
+                      <span className="font-mono">{verifiedBankDetails.accountNumber}</span>
+                    </p>
+                    {verifiedBankDetails.ifsc && (
+                      <p>
+                        <strong>IFSC Code:</strong>{' '}
+                        <span className="font-mono">{verifiedBankDetails.ifsc}</span>
+                      </p>
+                    )}
+                    {verifiedBankDetails.upiId && (
+                      <p className="pt-1 border-t border-slate-200">
+                        <strong>UPI Payment ID:</strong>{' '}
+                        <span className="font-mono text-indigo-700 font-bold">
+                          {verifiedBankDetails.upiId}
+                        </span>
+                      </p>
+                    )}
+                  </div>
+                ) : (
+                  <div className="w-full sm:max-w-xs p-4 bg-slate-50 rounded-xl border border-slate-200 text-xs text-slate-700 space-y-1.5">
+                    <h4 className="font-bold text-slate-900 uppercase tracking-wider text-[11px] mb-1">
+                      Payment Instructions
+                    </h4>
+                    <p className="text-slate-600 leading-relaxed text-[11px]">
+                      Payment coordinates will be provided upon scope and milestone confirmation. For electronic bank transfer or UPI details, please contact:
+                    </p>
+                    <p className="font-semibold text-slate-900 pt-1">
+                      {settings.ownerEmail || 'workall724038@gmail.com'}
+                    </p>
+                    <p className="text-slate-600">
+                      {settings.phone || '+91 7732869027'}
+                    </p>
+                  </div>
+                )}
 
                 {/* Totals Summary */}
                 <div className="w-full sm:w-80 p-5 bg-slate-50 rounded-xl border border-slate-200 space-y-2.5 text-xs">
@@ -621,7 +717,7 @@ export const InvoicePreviewDrawer: React.FC<InvoicePreviewDrawerProps> = ({
                       Rohit Verma
                     </div>
                     <div className="text-[11px] text-slate-500">
-                      Founder & Creative Director | RohitWork Studios
+                      Founder & Creative Director | Rohitwork Creative Studio
                     </div>
                   </div>
                 </div>

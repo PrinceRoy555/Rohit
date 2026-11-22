@@ -100,26 +100,28 @@ const STORAGE_KEYS = {
 };
 
 export const DEFAULT_CRM_SETTINGS: CrmAgencySettings = {
-  agencyName: 'RohitWork Agency',
+  agencyName: 'Rohitwork Creative Studio',
   tagline: 'High-Impact Graphic Design, Video Editing & Web Experience',
   ownerName: 'Rohit Verma',
   ownerEmail: 'workall724038@gmail.com',
   phone: contactConfig.phoneDisplay,
   whatsappUrl: WHATSAPP_BUSINESS_URL,
   websiteUrl: 'https://rohitwork.in',
-  address: 'Jaipur, Rajasthan, India',
+  address: '',
   currency: 'INR',
   currencySymbol: '₹',
   gstNumber: '',
-  upiId: '7732869027@paytm',
+  upiId: '',
   bankDetails: {
-    accountName: 'Rohit Verma',
-    accountNumber: '917732869027',
-    ifsc: 'PYTM0123456',
-    bankName: 'Paytm Payments Bank'
+    accountName: '',
+    accountNumber: '',
+    ifsc: '',
+    bankName: ''
   },
+  isPaymentDetailsVerified: false,
+  isAddressVerified: false,
   defaultPaymentTerms: '50% advance to initiate project, 50% upon final draft approval before final HD file delivery.',
-  invoiceNotesTemplate: 'Thank you for partnering with RohitWork. For any inquiries regarding this invoice, reach out directly at workall724038@gmail.com.',
+  invoiceNotesTemplate: 'Thank you for partnering with Rohitwork Creative Studio. For any inquiries regarding this invoice, reach out directly at workall724038@gmail.com.',
   quotationTermsTemplate: 'This quotation is valid for 15 days from issue date. Deliverables include up to 2 revision rounds unless specified otherwise.'
 };
 
@@ -1646,53 +1648,14 @@ export async function initCrmStorage(): Promise<void> {
 
   leads = safeGetLocal<CrmLead[]>(STORAGE_KEYS.LEADS, []);
   clients = safeGetLocal<CrmClient[]>(STORAGE_KEYS.CLIENTS, []);
-  if (clients.length === 0) {
-    clients = [...DEFAULT_INITIAL_CLIENTS];
-    safeSetLocal(STORAGE_KEYS.CLIENTS, clients);
-  }
-
   projects = safeGetLocal<CrmProject[]>(STORAGE_KEYS.PROJECTS, []);
-  if (projects.length === 0) {
-    projects = [...DEFAULT_INITIAL_PROJECTS];
-    safeSetLocal(STORAGE_KEYS.PROJECTS, projects);
-  }
-
   freelancers = safeGetLocal<CrmFreelancer[]>(STORAGE_KEYS.FREELANCERS, []);
-  if (freelancers.length === 0) {
-    freelancers = [...DEFAULT_INITIAL_FREELANCERS];
-    safeSetLocal(STORAGE_KEYS.FREELANCERS, freelancers);
-  }
-
   tasks = safeGetLocal<CrmTask[]>(STORAGE_KEYS.TASKS, []);
-  if (tasks.length === 0 || !tasks[0]?.subtasks) {
-    tasks = [...DEFAULT_INITIAL_TASKS];
-    safeSetLocal(STORAGE_KEYS.TASKS, tasks);
-  }
   quotations = safeGetLocal<CrmQuotation[]>(STORAGE_KEYS.QUOTATIONS, []);
-  if (quotations.length === 0 || !quotations[0]?.items) {
-    quotations = [...DEFAULT_INITIAL_QUOTATIONS];
-    safeSetLocal(STORAGE_KEYS.QUOTATIONS, quotations);
-  }
   invoices = safeGetLocal<CrmInvoice[]>(STORAGE_KEYS.INVOICES, []);
-  if (invoices.length === 0 || !invoices[0]?.items) {
-    invoices = [...DEFAULT_INITIAL_INVOICES];
-    safeSetLocal(STORAGE_KEYS.INVOICES, invoices);
-  }
   payments = safeGetLocal<CrmPayment[]>(STORAGE_KEYS.PAYMENTS, []);
-  if (payments.length === 0 || !payments[0]?.paymentType) {
-    payments = [...DEFAULT_INITIAL_PAYMENTS];
-    safeSetLocal(STORAGE_KEYS.PAYMENTS, payments);
-  }
   expenses = safeGetLocal<CrmExpense[]>(STORAGE_KEYS.EXPENSES, []);
-  if (expenses.length === 0 || !expenses[0]?.title) {
-    expenses = [...DEFAULT_INITIAL_EXPENSES];
-    safeSetLocal(STORAGE_KEYS.EXPENSES, expenses);
-  }
   reminders = safeGetLocal<CrmReminder[]>(STORAGE_KEYS.REMINDERS, []);
-  if (reminders.length === 0 || !reminders[0]?.title) {
-    reminders = [...DEFAULT_INITIAL_REMINDERS];
-    safeSetLocal(STORAGE_KEYS.REMINDERS, reminders);
-  }
   settings = safeGetLocal<CrmAgencySettings>(STORAGE_KEYS.SETTINGS, DEFAULT_CRM_SETTINGS);
 
   // Guarantee every cached seed record is unambiguously tagged with isDemo: true
@@ -2052,8 +2015,9 @@ export function findDuplicateLead(
 // -------------------------------------------------------------
 // LEADS CRUD
 // -------------------------------------------------------------
-export function getStoredLeads(): CrmLead[] {
-  return [...leads];
+export function getStoredLeads(options?: { includeDemo?: boolean }): CrmLead[] {
+  const includeDemo = options?.includeDemo ?? false;
+  return leads.filter(l => includeDemo || !isRecordDemo(l, 'leads'));
 }
 
 export function saveStoredLead(lead: Partial<CrmLead> & { name: string; phone?: string; email?: string }): CrmLead {
@@ -2256,8 +2220,9 @@ export function updateLeadPipelineStage(id: string, stage: CrmLead['pipelineStag
 // -------------------------------------------------------------
 // CLIENTS CRUD & HELPERS
 // -------------------------------------------------------------
-export function getStoredClients(): CrmClient[] {
-  return [...clients];
+export function getStoredClients(options?: { includeDemo?: boolean }): CrmClient[] {
+  const includeDemo = options?.includeDemo ?? false;
+  return clients.filter(c => includeDemo || !isRecordDemo(c, 'clients'));
 }
 
 export function findDuplicateClient(
@@ -2482,8 +2447,9 @@ export function convertLeadToClient(lead: CrmLead): CrmClient {
 // -------------------------------------------------------------
 // PROJECTS CRUD
 // -------------------------------------------------------------
-export function getStoredProjects(): CrmProject[] {
-  return [...projects];
+export function getStoredProjects(options?: { includeDemo?: boolean }): CrmProject[] {
+  const includeDemo = options?.includeDemo ?? false;
+  return projects.filter(p => includeDemo || !isRecordDemo(p, 'projects'));
 }
 
 export function saveStoredProject(project: Partial<CrmProject> & { title: string; clientId: string }): CrmProject {
@@ -2863,8 +2829,9 @@ export function getProjectRelatedData(projectId: string) {
 // -------------------------------------------------------------
 // FREELANCERS CRUD (ADMIN ONLY - NO LOGIN)
 // -------------------------------------------------------------
-export function getStoredFreelancers(): CrmFreelancer[] {
-  return [...freelancers];
+export function getStoredFreelancers(options?: { includeDemo?: boolean }): CrmFreelancer[] {
+  const includeDemo = options?.includeDemo ?? false;
+  return freelancers.filter(f => includeDemo || !isRecordDemo(f, 'freelancers'));
 }
 
 export function findDuplicateFreelancer(
@@ -3153,8 +3120,9 @@ export function getFreelancerRelatedData(freelancerId: string) {
 // -------------------------------------------------------------
 // TASKS CRUD
 // -------------------------------------------------------------
-export function getStoredTasks(): CrmTask[] {
-  return [...tasks];
+export function getStoredTasks(options?: { includeDemo?: boolean }): CrmTask[] {
+  const includeDemo = options?.includeDemo ?? false;
+  return tasks.filter(t => includeDemo || !isRecordDemo(t, 'tasks'));
 }
 
 export function saveStoredTask(taskData: Partial<CrmTask> & { title: string }): CrmTask {
@@ -3514,8 +3482,9 @@ export function getNextQuotationNumber(): string {
   return `RW-QT-2026-${(maxSeq + 1).toString().padStart(3, '0')}`;
 }
 
-export function getStoredQuotations(): CrmQuotation[] {
-  return [...quotations];
+export function getStoredQuotations(options?: { includeDemo?: boolean }): CrmQuotation[] {
+  const includeDemo = options?.includeDemo ?? false;
+  return quotations.filter(q => includeDemo || !isRecordDemo(q, 'quotations'));
 }
 
 export function saveStoredQuotation(
@@ -3886,13 +3855,15 @@ export function convertQuotationToInvoice(quotationId: string): CrmInvoice | nul
       ? `${quotation.advancePercentage}% Advance Deposit Required, Balance on Delivery`
       : 'Net 15 Days from Invoice Date',
     currency: 'INR',
-    bankDetails: {
-      bankName: 'HDFC Bank Ltd',
-      accountHolder: 'Rohit Verma (RohitWork Studios)',
-      accountNumber: '917732869027',
-      ifsc: 'HDFC0001824',
-      upiId: '7732869027@paytm'
-    },
+    bankDetails: (settings.isPaymentDetailsVerified && settings.bankDetails?.bankName && settings.bankDetails?.accountNumber)
+      ? {
+          bankName: settings.bankDetails.bankName.trim(),
+          accountHolder: settings.bankDetails.accountName?.trim() || settings.ownerName || 'Rohit Verma',
+          accountNumber: settings.bankDetails.accountNumber.trim(),
+          ifsc: settings.bankDetails.ifsc?.trim() || '',
+          upiId: settings.upiId?.trim() || ''
+        }
+      : undefined,
     notes: `Converted from Scope Proposal ${quotation.quotationNumber}. ${quotation.notes || ''}`.trim(),
     activities: [
       {
@@ -3961,8 +3932,9 @@ export function getQuotationRelatedData(quotationId: string) {
 // -------------------------------------------------------------
 // INVOICES & RECONCILIATION CRUD
 // -------------------------------------------------------------
-export function getStoredInvoices(): CrmInvoice[] {
-  return [...invoices];
+export function getStoredInvoices(options?: { includeDemo?: boolean }): CrmInvoice[] {
+  const includeDemo = options?.includeDemo ?? false;
+  return invoices.filter(i => includeDemo || !isRecordDemo(i, 'invoices'));
 }
 
 export function reconcileInvoicePayments(invoiceId: string): void {
@@ -4115,13 +4087,17 @@ export function saveStoredInvoice(
       status: invoiceData.status || 'draft',
       paymentTerms: invoiceData.paymentTerms || 'Net 15 Days from Invoice Date',
       currency: 'INR',
-      bankDetails: {
-        bankName: 'HDFC Bank Ltd',
-        accountHolder: 'Rohit Verma (RohitWork Studios)',
-        accountNumber: '917732869027',
-        ifsc: 'HDFC0001824',
-        upiId: '7732869027@paytm'
-      },
+      bankDetails: invoiceData.bankDetails || (
+        (settings.isPaymentDetailsVerified && settings.bankDetails?.bankName && settings.bankDetails?.accountNumber)
+          ? {
+              bankName: settings.bankDetails.bankName.trim(),
+              accountHolder: settings.bankDetails.accountName?.trim() || settings.ownerName || 'Rohit Verma',
+              accountNumber: settings.bankDetails.accountNumber.trim(),
+              ifsc: settings.bankDetails.ifsc?.trim() || '',
+              upiId: settings.upiId?.trim() || ''
+            }
+          : undefined
+      ),
       notes: invoiceData.notes || 'Thank you for partnering with RohitWork Creative Studios.',
       activities: [
         {
@@ -4238,8 +4214,9 @@ export function getInvoiceRelatedData(invoiceId: string) {
 // -------------------------------------------------------------
 // CENTRALIZED PAYMENTS & PAYOUTS CRUD
 // -------------------------------------------------------------
-export function getStoredPayments(): CrmPayment[] {
-  return [...payments];
+export function getStoredPayments(options?: { includeDemo?: boolean }): CrmPayment[] {
+  const includeDemo = options?.includeDemo ?? false;
+  return payments.filter(p => includeDemo || !isRecordDemo(p, 'payments'));
 }
 
 export function reconcileFreelancerPayouts(freelancerId: string): void {
@@ -4453,8 +4430,9 @@ export function deleteStoredPayment(id: string): boolean {
 // -------------------------------------------------------------
 // EXPENSES & CASHFLOW CRUD
 // -------------------------------------------------------------
-export function getStoredExpenses(): CrmExpense[] {
-  return [...expenses];
+export function getStoredExpenses(options?: { includeDemo?: boolean }): CrmExpense[] {
+  const includeDemo = options?.includeDemo ?? false;
+  return expenses.filter(e => includeDemo || !isRecordDemo(e, 'expenses'));
 }
 
 export function saveStoredExpense(
@@ -4591,8 +4569,9 @@ export function getRealFinancialSummary() {
 // -------------------------------------------------------------
 // REMINDERS CRUD
 // -------------------------------------------------------------
-export function getStoredReminders(): CrmReminder[] {
-  return [...reminders];
+export function getStoredReminders(options?: { includeDemo?: boolean }): CrmReminder[] {
+  const includeDemo = options?.includeDemo ?? false;
+  return reminders.filter(r => includeDemo || !isRecordDemo(r, 'reminders'));
 }
 
 export function saveStoredReminder(reminder: Partial<CrmReminder> & { title: string }): CrmReminder {
@@ -4756,12 +4735,12 @@ export function snoozeReminder(id: string, days: number): CrmReminder | null {
 }
 
 export function getAllActiveRemindersWithDynamic(): CrmReminder[] {
-  const manual = [...reminders];
+  const manual = reminders.filter(r => !isRecordDemo(r, 'reminders'));
   const dynamicList: CrmReminder[] = [];
   const todayStr = new Date().toISOString().split('T')[0];
 
   // 1. Dynamic Overdue & Due Invoices
-  invoices.forEach(inv => {
+  invoices.filter(inv => !isRecordDemo(inv, 'invoices')).forEach(inv => {
     if (inv.status !== 'paid' && inv.status !== 'cancelled') {
       const isPastDue = inv.dueDate < todayStr;
       const isDueSoon = inv.dueDate <= new Date(Date.now() + 86400000 * 3).toISOString().split('T')[0];
@@ -4786,7 +4765,7 @@ export function getAllActiveRemindersWithDynamic(): CrmReminder[] {
   });
 
   // 2. Dynamic Project Deadlines
-  projects.forEach(proj => {
+  projects.filter(proj => !isRecordDemo(proj, 'projects')).forEach(proj => {
     if (proj.status !== 'completed' && proj.status !== 'cancelled' && proj.deadline) {
       const isOverdue = proj.deadline < todayStr;
       const isUpcoming = proj.deadline <= new Date(Date.now() + 86400000 * 4).toISOString().split('T')[0];
@@ -4810,7 +4789,7 @@ export function getAllActiveRemindersWithDynamic(): CrmReminder[] {
   });
 
   // 3. Dynamic Task Deadlines
-  tasks.forEach(tsk => {
+  tasks.filter(tsk => !isRecordDemo(tsk, 'tasks')).forEach(tsk => {
     if (tsk.status !== 'completed' && tsk.dueDate) {
       const isOverdue = tsk.dueDate < todayStr;
       const isDueToday = tsk.dueDate === todayStr;
@@ -4995,9 +4974,7 @@ Let me know if this aligns with your expectations, and I'll send over the formal
 Outstanding Balance: ₹{balanceDue}
 Due Date: {dueDate}
 
-Payment can be completed via:
-• UPI: 7732869027@paytm
-• Bank Transfer: HDFC Bank | A/C: 50200088912344 | IFSC: HDFC0001234
+Payment can be completed via UPI or Bank Transfer (coordinates provided on your invoice PDF).
 
 Please let us know once transferred so we can release the final high-resolution source masters. Thank you!`
   },
@@ -5073,18 +5050,19 @@ export function generateContextualWhatsAppReply(params: GenerateAiReplyParams): 
   } else if (params.context === 'payment_reminder') {
     const invNum = params.invoiceNumber || 'RW-INV-2026-001';
     const bal = params.balanceDue ? `₹${params.balanceDue.toLocaleString('en-IN')}` : 'outstanding balance';
+    const upiSnippet = (settings.isPaymentDetailsVerified && settings.upiId) ? `UPI (${settings.upiId})` : 'UPI';
     if (params.language === 'hi') {
       body = `नमस्ते ${name} जी, इनवॉइस ${invNum} के संबंध में यह एक विनम्र अनुस्मारक है।\n` +
         `बकाया राशि: ${bal}\n` +
-        `कृपया UPI (7732869027@paytm) अथवा बैंक ट्रांसफर के माध्यम से भुगतान संपन्न करें। धन्यवाद!`;
+        `कृपया ${upiSnippet} अथवा बैंक ट्रांसफर के माध्यम से भुगतान संपन्न करें। धन्यवाद!`;
     } else if (params.language === 'hinglish') {
       body = `Hi ${name}, gentle reminder regarding Invoice ${invNum} for ${params.projectTitle || service}.\n` +
         `Pending Amount: ${bal}.\n` +
-        `Aap UPI (7732869027@paytm) ya Netbanking se transfer karke confirmation screenshot share kar sakte hain. Thank you!`;
+        `Aap ${upiSnippet} ya Netbanking se transfer karke confirmation screenshot share kar sakte hain. Thank you!`;
     } else {
       body = `Hi ${name}, gentle follow-up regarding Invoice ${invNum} for ${params.projectTitle || service}.\n\n` +
         `Pending Balance: ${bal}\n` +
-        `Payment can be remitted via UPI (7732869027@paytm) or Bank Transfer.\n\n` +
+        `Payment can be remitted via ${upiSnippet} or Bank Transfer.\n\n` +
         `Please let us know once processed so we can promptly release final assets. Thank you!`;
     }
   } else if (params.context === 'project_milestone') {
@@ -5143,11 +5121,11 @@ export function getComprehensiveReports(dateRange: CrmReportDateRange = 'all') {
     return !isNaN(time) && now - time <= rangeMs;
   };
 
-  const filteredInvoices = invoices.filter(i => inRange(i.issueDate) && i.status !== 'cancelled');
-  const filteredPayments = payments.filter(p => inRange(p.paymentDate) && p.status === 'completed');
-  const filteredExpenses = expenses.filter(e => inRange(e.date));
-  const filteredLeads = leads.filter(l => inRange(l.createdAt || l.submittedAt));
-  const filteredProjects = projects.filter(p => inRange(p.createdAt));
+  const filteredInvoices = invoices.filter(i => inRange(i.issueDate) && i.status !== 'cancelled' && !isRecordDemo(i, 'invoices'));
+  const filteredPayments = payments.filter(p => inRange(p.paymentDate) && p.status === 'completed' && !isRecordDemo(p, 'payments'));
+  const filteredExpenses = expenses.filter(e => inRange(e.date) && !isRecordDemo(e, 'expenses'));
+  const filteredLeads = leads.filter(l => inRange(l.createdAt || l.submittedAt) && !isRecordDemo(l, 'leads'));
+  const filteredProjects = projects.filter(p => inRange(p.createdAt) && !isRecordDemo(p, 'projects'));
 
   // Revenue metrics
   const totalInvoiced = filteredInvoices.reduce((sum, i) => sum + (i.totalAmount ?? i.total ?? 0), 0);
@@ -5336,6 +5314,17 @@ export function resetAllCrmStorageToDefaults(): void {
   safeSetLocal(STORAGE_KEYS.REMINDERS, reminders);
   safeSetLocal(STORAGE_KEYS.SETTINGS, settings);
 
+  clients.forEach(c => { if (isRecordDemo(c, 'clients')) c.isDemo = true; });
+  projects.forEach(p => { if (isRecordDemo(p, 'projects')) p.isDemo = true; });
+  freelancers.forEach(f => { if (isRecordDemo(f, 'freelancers')) (f as any).isDemo = true; });
+  tasks.forEach(t => { if (isRecordDemo(t, 'tasks')) t.isDemo = true; });
+  quotations.forEach(q => { if (isRecordDemo(q, 'quotations')) q.isDemo = true; });
+  invoices.forEach(i => { if (isRecordDemo(i, 'invoices')) i.isDemo = true; });
+  payments.forEach(p => { if (isRecordDemo(p, 'payments')) p.isDemo = true; });
+  expenses.forEach(e => { if (isRecordDemo(e, 'expenses')) e.isDemo = true; });
+  reminders.forEach(r => { if (isRecordDemo(r, 'reminders')) (r as any).isDemo = true; });
+
+  initialized = true;
   notifyListeners();
 }
 
@@ -5533,6 +5522,100 @@ export async function deleteQuotationWithCloud(id: string): Promise<CrmCloudOper
     deleteStoredQuotation(id);
   }
   return cloudResult;
+}
+
+export async function updateQuotationStatusWithCloud(
+  id: string,
+  status: CrmQuotationStatus
+): Promise<{ success: boolean; quotation?: CrmQuotation; error?: string }> {
+  const quotation = quotations.find((q) => q.id === id);
+  if (!quotation) return { success: false, error: 'Quotation not found' };
+
+  const previousStatus = quotation.status;
+  const previousUpdatedAt = quotation.updatedAt;
+  const previousActivities = quotation.activities ? [...quotation.activities] : [];
+
+  const updated = updateQuotationStatus(id, status);
+  if (!updated) return { success: false, error: 'Failed to update quotation locally' };
+
+  if (isRecordDemo(updated, 'quotations')) {
+    return { success: true, quotation: updated };
+  }
+
+  const cloudResult = await saveQuotationToFirestore(updated);
+  if (!cloudResult.success) {
+    // Rollback
+    updated.status = previousStatus;
+    updated.updatedAt = previousUpdatedAt;
+    updated.activities = previousActivities;
+    safeSetLocal(STORAGE_KEYS.QUOTATIONS, quotations);
+    notifyListeners();
+    return { success: false, quotation: updated, error: cloudResult.error };
+  }
+
+  return { success: true, quotation: updated };
+}
+
+export async function convertQuotationToInvoiceWithCloud(
+  quotationId: string
+): Promise<{ success: boolean; invoice?: CrmInvoice; quotation?: CrmQuotation; error?: string }> {
+  const quotation = quotations.find((q) => q.id === quotationId);
+  if (!quotation) return { success: false, error: 'Quotation not found' };
+
+  // If already converted, return existing invoice
+  if (quotation.convertedToInvoiceId) {
+    const existing = invoices.find((i) => i.id === quotation.convertedToInvoiceId);
+    if (existing) {
+      return { success: true, invoice: existing, quotation };
+    }
+  }
+
+  const invoice = convertQuotationToInvoice(quotationId);
+  if (!invoice) return { success: false, error: 'Failed to convert quotation to invoice' };
+
+  if (isRecordDemo(invoice, 'invoices')) {
+    return { success: true, invoice, quotation };
+  }
+
+  // Sync new invoice to Firestore
+  const invCloudResult = await saveInvoiceToFirestore(invoice);
+  if (!invCloudResult.success) {
+    // Rollback: delete stored invoice and revert quotation state
+    deleteStoredInvoice(invoice.id);
+    quotation.status = 'sent';
+    quotation.convertedToInvoiceId = undefined;
+    quotation.convertedAt = undefined;
+    safeSetLocal(STORAGE_KEYS.QUOTATIONS, quotations);
+    notifyListeners();
+    return { success: false, error: invCloudResult.error || 'Failed to sync converted invoice to cloud' };
+  }
+
+  // Sync updated quotation status to Firestore
+  const quoteCloudResult = await saveQuotationToFirestore(quotation);
+  if (!quoteCloudResult.success) {
+    console.warn('[CRM Storage] Converted invoice synced, but quotation status update to cloud returned warning:', quoteCloudResult.error);
+  }
+
+  return { success: true, invoice, quotation };
+}
+
+export async function duplicateQuotationWithCloud(
+  id: string
+): Promise<{ success: boolean; quotation?: CrmQuotation; error?: string }> {
+  const duplicated = duplicateStoredQuotation(id);
+  if (!duplicated) return { success: false, error: 'Failed to duplicate quotation' };
+
+  if (isRecordDemo(duplicated, 'quotations')) {
+    return { success: true, quotation: duplicated };
+  }
+
+  const cloudResult = await saveQuotationToFirestore(duplicated);
+  if (!cloudResult.success) {
+    deleteStoredQuotation(duplicated.id);
+    return { success: false, error: cloudResult.error || 'Failed to sync duplicated quotation to cloud' };
+  }
+
+  return { success: true, quotation: duplicated };
 }
 
 export async function saveInvoiceWithCloud(

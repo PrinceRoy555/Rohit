@@ -17,11 +17,16 @@ import {
 import {
   assertEligibleForCloud
 } from '../src/services/crmFirestoreService';
+import {
+  resetAllCrmStorageToDefaults
+} from '../src/services/crmStorageService';
 
 async function runMigrationTests() {
   console.log('==================================================================');
   console.log('   ROHITWORK CRM — PHASE 6B.2 MIGRATION & SAFETY UNIT TESTS   ');
   console.log('==================================================================\n');
+
+  resetAllCrmStorageToDefaults();
 
   let passed = 0;
   let failed = 0;
