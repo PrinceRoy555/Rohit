@@ -1,0 +1,174 @@
+/**
+ * Animated Monkey Avatar Styles
+ * Based on Uiverse.io component by ilkhoeri (MIT License)
+ * Adapted for Rohitwork CRM with React state control, Tailwind CSS v4 harmony,
+ * and prefers-reduced-motion accessibility support.
+ */
+
+.avatarContainer {
+  --sz-avatar: 140px;
+  --sz-svg: calc(var(--sz-avatar) - 10px);
+
+  width: var(--sz-avatar);
+  min-width: var(--sz-avatar);
+  max-width: var(--sz-avatar);
+  height: var(--sz-avatar);
+  min-height: var(--sz-avatar);
+  max-height: var(--sz-avatar);
+
+  border-radius: 9999px;
+  background: linear-gradient(180deg, #ffffff 0%, #f5f3ff 100%);
+  border: 2.5px solid rgba(168, 85, 247, 0.4);
+  box-shadow: 0 0 20px rgba(124, 58, 237, 0.25), inset 0 2px 6px rgba(0, 0, 0, 0.06);
+
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  perspective: 80px;
+  margin: 0 auto;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.monkeySvg,
+.handsSvg {
+  position: absolute;
+  width: var(--sz-svg);
+  height: var(--sz-svg);
+  pointer-events: none;
+  transform-origin: 50% 100%;
+}
+
+.monkeySvg {
+  z-index: 1;
+  transition: transform 0.25s ease-in-out;
+}
+
+.handsSvg {
+  z-index: 2;
+  transform-style: preserve-3d;
+  transform-origin: 50% 100%;
+  transition: transform 0.28s cubic-bezier(0.34, 1.56, 0.64, 1);
+  transform: translateY(calc(var(--sz-avatar) / 1.25)) rotateX(-21deg);
+}
+
+/* Hands Covering Eyes (password-hidden state) */
+.handsCovering {
+  transform: translate3d(0, 0, 0) rotateX(0deg);
+}
+
+/* Hands Lowered / Peeking (password-visible state) */
+.handsPeeking {
+  transform: translateY(calc(var(--sz-avatar) / 1.35)) rotateX(-15deg);
+}
+
+/* Natural Blinking Animation on Idle */
+.eyeIdle {
+  animation: blink 10s 1s infinite;
+  transition: all 0.2s ease;
+}
+
+@keyframes blink {
+  0%, 2%, 4%, 26%, 28%, 71%, 73%, 100% {
+    ry: 4.5;
+    cy: 31.7;
+  }
+  1%, 3%, 27%, 72% {
+    ry: 0.5;
+    cy: 30;
+  }
+}
+
+/* Email Focus: Looking down toward input + subtle curious sway */
+.headLookingDown {
+  animation: slick 3s ease infinite 1s;
+}
+
+.eyeLookingDown {
+  ry: 3 !important;
+  cy: 35 !important;
+  animation: slickTranslate 3s ease infinite 1s;
+  transition: all 0.2s ease;
+}
+
+.noseLookingDown {
+  animation: slickTranslate 3s ease infinite 1s;
+  transition: all 0.2s ease;
+}
+
+@keyframes slick {
+  0%, 100% {
+    transform: rotateY(0deg);
+  }
+  25% {
+    transform: rotateY(-3.5deg);
+  }
+  75% {
+    transform: rotateY(3.5deg);
+  }
+}
+
+@keyframes slickTranslate {
+  0%, 100% {
+    transform: translateX(0);
+  }
+  25% {
+    transform: translateX(-0.6px);
+  }
+  75% {
+    transform: translateX(0.6px);
+  }
+}
+
+/* Password Hidden: Eyes closed / squinting shut behind hands */
+.eyeClosed {
+  ry: 0.5 !important;
+  cy: 30 !important;
+  transition: all 0.2s ease;
+}
+
+/* Password Visible: Eyes attentive / looking at password */
+.eyeOpenWide {
+  ry: 4.5 !important;
+  cy: 32 !important;
+  transition: all 0.2s ease;
+}
+
+/* Mouth Element */
+.mouth {
+  position: absolute;
+  bottom: 20%;
+  border-radius: 45%;
+  width: calc(var(--sz-svg) / 3.889);
+  height: calc(var(--sz-svg) / 5.833);
+  border: 0;
+  border-bottom: calc(var(--sz-svg) * (4 / 100)) solid #3c302a;
+  transition: all 0.2s ease;
+  z-index: 3;
+  pointer-events: none;
+}
+
+/* Mouth in password-hidden state: Small surprised 'O' / bashful smile */
+.mouthCovered {
+  width: calc(var(--sz-svg) * (9 / 100));
+  height: 0;
+  border-radius: 50%;
+  border-bottom: calc(var(--sz-svg) * (10 / 100)) solid #3c302a;
+}
+
+/* Prefers-reduced-motion accessibility support */
+@media (prefers-reduced-motion: reduce) {
+  .eyeIdle,
+  .headLookingDown,
+  .eyeLookingDown,
+  .noseLookingDown {
+    animation: none !important;
+  }
+  .handsSvg,
+  .monkeySvg,
+  .mouth {
+    transition-duration: 0.05s !important;
+  }
+}

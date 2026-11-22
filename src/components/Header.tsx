@@ -17,7 +17,7 @@ interface HeaderProps {
 
 const navLinks = [
   { label: 'Home', id: 'home' },
-  { label: 'About Rohit', id: 'about-rohit' },
+  { label: 'About', id: 'about' },
   { label: 'Services', id: 'services' },
   { label: 'Portfolio', id: 'portfolio' },
   { label: 'Experience', id: 'experience' },
@@ -98,7 +98,7 @@ export default function Header({ activeSection, theme: propTheme, toggleTheme: p
     if (linkId === 'home') {
       return isHomeRoute && (activeSection === 'home' || !activeSection);
     }
-    if (linkId === 'about-rohit') {
+    if (linkId === 'about' || linkId === 'about-rohit') {
       return activeSection === 'about-rohit' || activeSection === 'rohit-verma' || (isHomeRoute && activeSection === 'about');
     }
     if (linkId === 'services') {
@@ -146,6 +146,9 @@ export default function Header({ activeSection, theme: propTheme, toggleTheme: p
   };
 
   const scrollToSection = (id: string, e?: React.MouseEvent) => {
+    if (e) {
+      e.preventDefault();
+    }
     if (id === 'home') {
       handleHomeNavigation(e);
       return;
@@ -153,7 +156,7 @@ export default function Header({ activeSection, theme: propTheme, toggleTheme: p
 
     setIsMobileMenuOpen(false);
 
-    if (id === 'about-rohit') {
+    if (id === 'about-rohit' && !isHomeRoute) {
       if (onNavigate) {
         onNavigate('about-rohit');
       } else {

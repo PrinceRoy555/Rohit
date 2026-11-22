@@ -65,7 +65,7 @@ Transform the entire digital portfolio of Rohit Verma (https://www.rohitwork.in)
      - Specialty kicker: `Specializing in Brand Identity Designer • Jaipur, India`.
      - Bio description in balanced `#53627C`.
      - Dual CTAs: `Start a Project →` (solid Royal Blue) and `Explore Portfolio` (white pill with blue play icon and `#DCE7F8` border).
-     - Contact pills: WhatsApp, `workall724038@gmail.com`, `+91 9376569027` in soft white pills with blue icons.
+     - Contact pills: WhatsApp, `workall724038@gmail.com`, `+91 7732869027` in soft white pills with blue icons.
      - Triple value cards: `Brand Focused / MEANINGFUL DESIGN`, `Fast & Reliable / ON-TIME DELIVERY`, `Client Friendly / CLEAR COMMUNICATION`.
    - Right Column:
      - Rounded creative profile card with macOS dots: `CREATIVE PROFILE •••`.

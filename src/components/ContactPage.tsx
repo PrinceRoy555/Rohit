@@ -26,8 +26,8 @@ import { submitContactEnquiry } from '../services/firebase/firestore';
 
 interface ContactFormData {
   name: string;
-  email: string;
-  phone: string;
+  email?: string;
+  phone?: string;
   projectType: string;
   message: string;
 }
@@ -53,6 +53,7 @@ export default function ContactPage() {
     register,
     handleSubmit,
     reset,
+    watch,
     formState: { errors }
   } = useForm<ContactFormData>({
     mode: 'onTouched'
@@ -66,8 +67,8 @@ export default function ContactPage() {
       // 1. Submit to Firestore API
       const response = await submitContactEnquiry({
         name: data.name,
-        email: data.email,
-        phone: data.phone || 'Not provided',
+        email: data.email?.trim() || undefined,
+        phone: data.phone?.trim() || undefined,
         selectedService: data.projectType || 'General Creative Enquiry',
         budgetRange: 'Not specified',
         projectDescription: data.message,
@@ -81,14 +82,14 @@ export default function ContactPage() {
       } else {
         // Fallback: If Firebase offline, open pre-filled WhatsApp for guaranteed delivery
         const whatsappMsg = `Hi Rohit, my name is ${data.name}. I would like to discuss a project: ${data.projectType}. Message: ${data.message}`;
-        window.open(`https://wa.me/919376569027?text=${encodeURIComponent(whatsappMsg)}`, '_blank');
+        window.open(WHATSAPP_BUSINESS_URL, '_blank');
         setSubmitSuccess(true);
         reset();
       }
     } catch {
       // Fallback to direct WhatsApp
       const whatsappMsg = `Hi Rohit, my name is ${data.name}. Project: ${data.projectType}. Message: ${data.message}`;
-      window.open(`https://wa.me/919376569027?text=${encodeURIComponent(whatsappMsg)}`, '_blank');
+      window.open(WHATSAPP_BUSINESS_URL, '_blank');
       setSubmitSuccess(true);
       reset();
     } finally {
@@ -295,7 +296,7 @@ export default function ContactPage() {
                     {/* Email Address */}
                     <div>
                       <label className="block text-xs font-bold text-[#071B49] dark:text-white mb-2">
-                        Email Address <span className="text-red-500">*</span>
+                        Email Address {watch('phone') ? <span className="text-slate-400 font-normal">(Optional)</span> : <span className="text-red-500">*</span>}
                       </label>
                       <div className="relative">
                         <Mail className="w-4 h-4 text-[#94A3B8] absolute left-3.5 top-1/2 -translate-y-1/2" />
@@ -303,10 +304,18 @@ export default function ContactPage() {
                           type="email"
                           placeholder="Your Email"
                           {...register('email', {
-                            required: 'Please enter your email',
-                            pattern: {
-                              value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
-                              message: 'Please enter a valid email address'
+                            validate: (val) => {
+                              const phoneVal = watch('phone');
+                              if (!val || val.trim() === '') {
+                                if (!phoneVal || phoneVal.trim() === '') {
+                                  return 'Please enter your email or phone number';
+                                }
+                                return true;
+                              }
+                              if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val.trim())) {
+                                return 'Please enter a valid email address';
+                              }
+                              return true;
                             }
                           })}
                           className="w-full pl-10 pr-4 py-3 bg-[#F8FAFC] dark:bg-[#0A1A3A] border border-[#E2E8F0] dark:border-[#1E3A8A]/50 rounded-xl text-xs sm:text-sm text-[#071B49] dark:text-white placeholder-[#94A3B8] focus:outline-none focus:border-[#0866F5] focus:bg-white dark:focus:bg-[#071B49] transition-all"
@@ -325,17 +334,35 @@ export default function ContactPage() {
                     {/* Phone Number */}
                     <div>
                       <label className="block text-xs font-bold text-[#071B49] dark:text-white mb-2">
-                        Phone Number
+                        Phone Number {watch('email') ? <span className="text-slate-400 font-normal">(Optional)</span> : <span className="text-red-500">*</span>}
                       </label>
                       <div className="relative">
                         <Phone className="w-4 h-4 text-[#94A3B8] absolute left-3.5 top-1/2 -translate-y-1/2" />
                         <input
                           type="tel"
-                          placeholder="+91 93765 69027"
-                          {...register('phone')}
+                          placeholder="+91 77328 69027"
+                          {...register('phone', {
+                            validate: (val) => {
+                              const emailVal = watch('email');
+                              if (!val || val.trim() === '') {
+                                if (!emailVal || emailVal.trim() === '') {
+                                  return 'Please enter your email or phone number';
+                                }
+                                return true;
+                              }
+                              const cleaned = val.trim().replace(/[\s()+-]/g, '');
+                              if (cleaned.length < 7 || cleaned.length > 15) {
+                                return 'Please enter a valid phone number (7-15 digits)';
+                              }
+                              return true;
+                            }
+                          })}
                           className="w-full pl-10 pr-4 py-3 bg-[#F8FAFC] dark:bg-[#0A1A3A] border border-[#E2E8F0] dark:border-[#1E3A8A]/50 rounded-xl text-xs sm:text-sm text-[#071B49] dark:text-white placeholder-[#94A3B8] focus:outline-none focus:border-[#0866F5] focus:bg-white dark:focus:bg-[#071B49] transition-all"
                         />
                       </div>
+                      {errors.phone && (
+                        <p className="text-red-500 text-[11px] mt-1 font-medium">{errors.phone.message}</p>
+                      )}
                     </div>
 
                     {/* Project Type */}
@@ -521,7 +548,7 @@ export default function ContactPage() {
                 </div>
 
                 <a
-                  href={`https://wa.me/919376569027?text=${encodeURIComponent('Hi Rohit, I would like to book a free creative consultation for my project.')}`}
+                  href={WHATSAPP_BUSINESS_URL}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="bg-[#0866F5] hover:bg-[#0654ce] text-white font-bold text-xs px-4 sm:px-5 py-2.5 rounded-full shadow-md hover:shadow-lg transition-all cursor-pointer inline-flex items-center gap-1.5 shrink-0 active:scale-95"

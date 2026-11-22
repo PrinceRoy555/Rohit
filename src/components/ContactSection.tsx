@@ -12,8 +12,8 @@ import { validateAttachment } from '../lib/validation';
 
 interface ContactFormData {
   name: string;
-  email: string;
-  phone: string;
+  email?: string;
+  phone?: string;
   service: string;
   budget: string;
   description: string;
@@ -38,6 +38,7 @@ export default function ContactSection() {
     handleSubmit,
     reset,
     setValue,
+    watch,
     formState: { errors },
   } = useForm<ContactFormData>({
     mode: 'onTouched',
@@ -147,7 +148,7 @@ export default function ContactSection() {
       // Step 3: Write enquiry directly to Firestore collection 'contactEnquiries'
       const fbRes = await submitContactEnquiry({
         name: data.name.trim(),
-        email: data.email.trim(),
+        email: data.email?.trim() || undefined,
         phone: data.phone?.trim() || undefined,
         selectedService: data.service,
         budgetRange: data.budget,
@@ -489,17 +490,25 @@ export default function ContactSection() {
                 {/* Your Email */}
                 <div>
                   <label className="block text-xs font-semibold text-text-secondary mb-1.5" htmlFor="email">
-                    Your Email *
+                    Your Email {watch('phone') ? '(Optional)' : '*'}
                   </label>
                   <input
                     id="email"
                     type="email"
                     {...register('email', {
-                      required: 'Email is required',
-                      pattern: {
-                        value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-                        message: 'Invalid email address',
-                      },
+                      validate: (val) => {
+                        const phoneVal = watch('phone');
+                        if (!val || val.trim() === '') {
+                          if (!phoneVal || phoneVal.trim() === '') {
+                            return 'Please provide either an email or phone number';
+                          }
+                          return true;
+                        }
+                        if (!/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i.test(val.trim())) {
+                          return 'Please enter a valid email address';
+                        }
+                        return true;
+                      }
                     })}
                     className={`w-full bg-bg-primary border rounded-lg px-3.5 h-10 sm:h-11 text-sm text-text-primary focus:outline-none transition-colors duration-150 ${
                       errors.email ? 'border-red-500 focus:border-red-500' : 'border-border-color focus:border-accent-primary focus:ring-2 focus:ring-accent-primary/20'
@@ -516,16 +525,22 @@ export default function ContactSection() {
                 {/* Phone Number */}
                 <div>
                   <label className="block text-xs font-semibold text-text-secondary mb-1.5" htmlFor="phone">
-                    Phone Number
+                    Phone / WhatsApp {watch('email') ? '(Optional)' : '*'}
                   </label>
                   <input
                     id="phone"
                     type="tel"
                     {...register('phone', {
                       validate: (val) => {
-                        if (!val || val.trim() === '') return true;
-                        const cleaned = val.trim().replace(/[\s\-()]/g, '');
-                        if (!/^[+]?[0-9]{7,15}$/.test(cleaned)) {
+                        const emailVal = watch('email');
+                        if (!val || val.trim() === '') {
+                          if (!emailVal || emailVal.trim() === '') {
+                            return 'Please provide either an email or phone number';
+                          }
+                          return true;
+                        }
+                        const cleaned = val.trim().replace(/[\s()+-]/g, '');
+                        if (cleaned.length < 7 || cleaned.length > 15) {
                           return 'Please enter a valid phone number';
                         }
                         return true;

@@ -76,6 +76,28 @@ export function validatePhone(phone?: string, required = false): ValidationResul
   return { isValid: true };
 }
 
+// Validate contact method (at least one valid method required: phone or email)
+export function validateContactMethod(email?: string, phone?: string): ValidationResult {
+  const hasEmail = Boolean(email && email.trim());
+  const hasPhone = Boolean(phone && phone.trim());
+
+  if (!hasEmail && !hasPhone) {
+    return { isValid: false, error: 'Please provide either an email address or a phone / WhatsApp number.' };
+  }
+
+  if (hasEmail) {
+    const emailRes = validateEmail(email!);
+    if (!emailRes.isValid) return emailRes;
+  }
+
+  if (hasPhone) {
+    const phoneRes = validatePhone(phone!, false);
+    if (!phoneRes.isValid) return phoneRes;
+  }
+
+  return { isValid: true };
+}
+
 // Validate project description (10 - 5000 chars)
 export function validateProjectDescription(description: string, minLength = 10): ValidationResult {
   const sanitized = sanitizeText(description, 5000);

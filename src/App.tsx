@@ -2,7 +2,7 @@ import { useState, useEffect, ReactNode, lazy, Suspense } from 'react';
 import { motion } from 'motion/react';
 import Header from './components/Header';
 import HeroSection from './components/HeroSection';
-import AboutSection from './components/AboutSection';
+import AboutAgencySection from './components/AboutAgencySection';
 import SkillsSection from './components/SkillsSection';
 import ServicesSection from './components/ServicesSection';
 import ExperienceSection from './components/ExperienceSection';
@@ -63,9 +63,26 @@ function SubpageFallback() {
 
 export default function App() {
   const [activeSection, setActiveSection] = useState('home');
-  const [currentRoute, setCurrentRoute] = useState<string>('home');
+  const [currentRoute, setCurrentRoute] = useState<string>(() => {
+    if (typeof window === 'undefined') return 'home';
+    const rawPath = window.location.pathname.replace(/^\/|\/$/g, '').toLowerCase();
+    const topPath = rawPath.split('/')[0] || '';
+    const rawHash = window.location.hash.replace('#', '').replace(/^\/|\/$/g, '').toLowerCase();
+    const topHash = rawHash.split('/')[0] || '';
+    if (topPath === 'admin' || topPath === 'crm' || topHash === 'admin' || topHash === 'crm') return 'admin';
+    return 'home';
+  });
   const [activeInsight, setActiveInsight] = useState<Insight | null>(null);
-  const [isAdminOpen, setIsAdminOpen] = useState<boolean>(false);
+  const [isAdminOpen, setIsAdminOpen] = useState<boolean>(() => {
+    if (typeof window === 'undefined') return false;
+    const rawPath = window.location.pathname.replace(/^\/|\/$/g, '').toLowerCase();
+    const topPath = rawPath.split('/')[0] || '';
+    const rawHash = window.location.hash.replace('#', '').replace(/^\/|\/$/g, '').toLowerCase();
+    const topHash = rawHash.split('/')[0] || '';
+    const params = new URLSearchParams(window.location.search);
+    const isCrmSubdomain = window.location.hostname.toLowerCase().startsWith('crm.') || window.location.hostname.toLowerCase().includes('crm.rohitwork');
+    return isCrmSubdomain || topPath === 'admin' || topPath === 'crm' || topHash === 'admin' || topHash === 'crm' || params.get('view') === 'crm' || params.get('crm') === 'true' || params.get('mode') === 'resetPassword' || Boolean(params.get('oobCode'));
+  });
   const { resolvedTheme: theme, toggleTheme } = useTheme();
   const { activeConfig } = useSiteConfig();
 
@@ -88,22 +105,69 @@ export default function App() {
     const sections = ['home', 'about', 'services', 'portfolio', 'experience', 'contact'];
 
     const updateActiveSection = () => {
-      const scrollPosition = window.scrollY + 160;
+      const scrollY = window.scrollY || window.pageYOffset;
+      const windowHeight = window.innerHeight;
+      const docHeight = document.documentElement.scrollHeight;
+      const headerHeight = window.innerWidth < 768 ? 70 : 85;
+
+      // 1. Top of page: always 'home'
+      if (scrollY < 100) {
+        if (currentActive !== 'home') {
+          currentActive = 'home';
+          setActiveSection('home');
+        }
+        ticking = false;
+        return;
+      }
+
+      // 2. Bottom of page: always 'contact'
+      if (scrollY + windowHeight >= docHeight - 80) {
+        if (currentActive !== 'contact') {
+          currentActive = 'contact';
+          setActiveSection('contact');
+        }
+        ticking = false;
+        return;
+      }
+
+      // 3. Scan sections in document order using viewport-relative bounding rects
+      const refY = headerHeight + Math.min(windowHeight * 0.28, 220);
+      let foundSection = null;
 
       for (const section of sections) {
         const el = document.getElementById(section);
         if (el) {
-          const top = el.offsetTop;
-          const height = el.offsetHeight;
-          if (scrollPosition >= top && scrollPosition < top + height) {
-            if (currentActive !== section) {
-              currentActive = section;
-              setActiveSection(section);
-            }
+          const rect = el.getBoundingClientRect();
+          if (rect.top <= refY && rect.bottom > refY) {
+            foundSection = section;
             break;
           }
         }
       }
+
+      // Fallback: closest section above refY
+      if (!foundSection) {
+        let minDiff = Infinity;
+        for (const section of sections) {
+          const el = document.getElementById(section);
+          if (el) {
+            const rect = el.getBoundingClientRect();
+            if (rect.top <= refY) {
+              const diff = refY - rect.top;
+              if (diff < minDiff) {
+                minDiff = diff;
+                foundSection = section;
+              }
+            }
+          }
+        }
+      }
+
+      if (foundSection && currentActive !== foundSection) {
+        currentActive = foundSection;
+        setActiveSection(foundSection);
+      }
+
       ticking = false;
     };
 
@@ -147,8 +211,19 @@ export default function App() {
       const mode = urlParams.get('mode');
       const oobCode = urlParams.get('oobCode') || urlParams.get('resetToken');
 
-      // Check if Admin route or Password Reset action
-      if (topPath === 'admin' || topHash === 'admin' || mode === 'resetPassword' || oobCode) {
+      // Check if Admin route or CRM portal or Password Reset action
+      const isCrmSubdomain = typeof window !== 'undefined' &&
+        (window.location.hostname.toLowerCase().startsWith('crm.') || window.location.hostname.toLowerCase().includes('crm.rohitwork'));
+
+      const isCrmRoute =
+        topPath === 'crm' ||
+        topHash === 'crm' ||
+        topPath === 'admin' ||
+        topHash === 'admin' ||
+        urlParams.get('view') === 'crm' ||
+        urlParams.get('crm') === 'true';
+
+      if (isCrmSubdomain || isCrmRoute || mode === 'resetPassword' || oobCode) {
         setIsAdminOpen(true);
       }
 
@@ -203,6 +278,7 @@ export default function App() {
         'terms': 'terms',
         'terms-and-conditions': 'terms',
         'admin': 'admin',
+        'crm': 'admin',
         '404': '404'
       };
 
@@ -312,7 +388,7 @@ export default function App() {
         window.location.hash = '404';
       }
       window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
-    } else if (cleanRoute === 'admin') {
+    } else if (cleanRoute === 'admin' || cleanRoute === 'crm') {
       setIsAdminOpen(true);
     } else {
       setCurrentRoute(cleanRoute);
@@ -344,6 +420,34 @@ export default function App() {
       window.scrollTo(0, 0);
     }
   }, [currentRoute]);
+
+  // Dedicated Full-Screen Rohitwork CRM Portal (Isolated from public website layout)
+  if (isAdminOpen || currentRoute === 'admin') {
+    return (
+      <div className="min-h-screen bg-slate-950 text-slate-100 selection:bg-indigo-600 selection:text-white" id="crm-app-root">
+        <Suspense fallback={<SubpageFallback />}>
+          <AdminPanel
+            onClose={() => {
+              if (typeof window !== 'undefined' && window.location.hostname.toLowerCase().startsWith('crm.')) {
+                window.location.href = 'https://rohitwork.in';
+                return;
+              }
+              setIsAdminOpen(false);
+              if (currentRoute === 'admin') handleNavigate('home');
+            }}
+            onLogout={() => {
+              if (typeof window !== 'undefined' && window.location.hostname.toLowerCase().startsWith('crm.')) {
+                window.location.href = 'https://rohitwork.in';
+                return;
+              }
+              setIsAdminOpen(false);
+              if (currentRoute === 'admin') handleNavigate('home');
+            }}
+          />
+        </Suspense>
+      </div>
+    );
+  }
 
   // Handle Maintenance Mode for public visitors (Admin portal access remains available)
   if (isMaintenanceMode && !isAdminOpen && currentRoute !== 'admin') {
@@ -434,9 +538,9 @@ export default function App() {
           {/* 1. Hero Section */}
           <HeroSection />
 
-          {/* 2. Featured Portfolio Section (Main Focus) */}
+          {/* 2. About Section (Approved Creative Agency & Team Content) */}
           <AnimatedSection>
-            <PortfolioSection />
+            <AboutAgencySection onNavigate={handleNavigate} />
           </AnimatedSection>
 
           {/* 3. Featured Services & Explore All Categories Section */}
@@ -444,9 +548,9 @@ export default function App() {
             <ServicesSection />
           </AnimatedSection>
 
-          {/* 4. About Section */}
+          {/* 4. Featured Portfolio Section */}
           <AnimatedSection>
-            <AboutSection onNavigate={handleNavigate} />
+            <PortfolioSection />
           </AnimatedSection>
 
           {/* 5. Work Experience Section */}
@@ -503,21 +607,7 @@ export default function App() {
         </div>
       )}
 
-      {/* Full-Featured Admin Panel & CMS Management Overlay */}
-      {(isAdminOpen || currentRoute === 'admin') && (
-        <Suspense fallback={<SubpageFallback />}>
-          <AdminPanel
-            onClose={() => {
-              setIsAdminOpen(false);
-              if (currentRoute === 'admin') handleNavigate('home');
-            }}
-            onLogout={() => {
-              setIsAdminOpen(false);
-              if (currentRoute === 'admin') handleNavigate('home');
-            }}
-          />
-        </Suspense>
-      )}
+
 
       {/* 4-Column Detailed Footer */}
       <Footer onNavigate={handleNavigate} />

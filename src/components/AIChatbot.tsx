@@ -172,7 +172,7 @@ const QUICK_ACTION_RESPONSES: Record<string, { response: string; cta: ActionCTA;
     suggestions: ["Graphic Designer", "Video Editor", "UI/UX Designer"]
   },
   "Contact Rohit": {
-    response: "You can connect directly with Rohit Verma! Expected response time is within 1–2 hours.\n\n• Email: workall724038@gmail.com\n• Phone / WhatsApp: +91 9376569027\n• Location: Jaipur, Rajasthan, India",
+    response: "You can connect directly with Rohit Verma! Expected response time is within 1–2 hours.\n\n• Email: workall724038@gmail.com\n• Phone / WhatsApp: +91 7732869027\n• Location: Jaipur, Rajasthan, India",
     cta: {
       label: "Send Direct Email",
       actionType: "email"
@@ -345,7 +345,7 @@ export default function AIChatbot() {
       addSystemAIMessage(`Navigating to Rohit's Portfolio... You can explore recent project case studies below.`);
     } else if (cta.actionType === 'samples') {
       const sampleText = encodeURIComponent(`Hi Rohit! I saw your thumbnail designs on Uni AI and would like to request sample thumbnails for my channel.`);
-      window.open(`${WHATSAPP_BUSINESS_URL}?text=${sampleText}`, '_blank', 'noopener,noreferrer');
+      window.open(WHATSAPP_BUSINESS_URL, '_blank', 'noopener,noreferrer');
       addSystemAIMessage(`Opening WhatsApp to send you thumbnail samples...`);
     } else if (cta.actionType === 'rates') {
       startLeadCollectionFlow(messages, cta.payload || 'Video Editing');
@@ -353,7 +353,7 @@ export default function AIChatbot() {
       startLeadCollectionFlow(messages, cta.payload || 'Technical SEO Audit');
     } else if (cta.actionType === 'meeting') {
       const meetingText = encodeURIComponent(`Hi Rohit, I would like to schedule a Growth Strategy Meeting for my brand.`);
-      window.open(`${WHATSAPP_BUSINESS_URL}?text=${meetingText}`, '_blank', 'noopener,noreferrer');
+      window.open(WHATSAPP_BUSINESS_URL, '_blank', 'noopener,noreferrer');
       addSystemAIMessage(`Opening WhatsApp to schedule your Growth Strategy Meeting with Rohit!`);
     } else if (cta.actionType === 'whatsapp') {
       window.open(WHATSAPP_BUSINESS_URL, '_blank', 'noopener,noreferrer');

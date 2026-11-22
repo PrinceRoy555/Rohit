@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'motion/react';
-import { Wrench, Phone, Mail, Clock, ShieldAlert } from 'lucide-react';
+import { Wrench, Phone, Mail, Clock } from 'lucide-react';
 import { contactConfig } from '../data';
 import { useSiteConfig } from '../context/SiteConfigContext';
 
@@ -96,19 +96,6 @@ export default function MaintenancePage({ onAdminBypass }: MaintenancePageProps)
             Email Rohit
           </a>
         </motion.div>
-
-        {/* Hidden/Subtle Admin Access button for site owners */}
-        {onAdminBypass && (
-          <div className="mt-12">
-            <button
-              onClick={onAdminBypass}
-              className="text-[11px] text-text-muted hover:text-text-secondary inline-flex items-center gap-1.5 transition-colors font-medium cursor-pointer"
-            >
-              <ShieldAlert className="w-3.5 h-3.5" />
-              Admin Portal Access
-            </button>
-          </div>
-        )}
       </div>
 
       {/* Decorative Footer note */}

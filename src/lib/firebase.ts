@@ -10,7 +10,7 @@ export const FIREBASE_INTEGRATION_ENABLED = true;
 
 // Exact Firebase Web App Configuration
 export const FIREBASE_CONFIG = {
-  apiKey: "AIzaSyB_TS7hxSqENHMERmVhfPY-myZW5crYEig",
+  apiKey: "AIzaSyB_TS7hxSqENHMERmVhFPY-myZW5crYEig",
   authDomain: "rohit-72bfa.firebaseapp.com",
   projectId: "rohit-72bfa",
   storageBucket: "rohit-72bfa.firebasestorage.app",
@@ -21,10 +21,10 @@ export const FIREBASE_CONFIG = {
 
 // Central contact fallbacks when Firebase is unavailable
 export const FIREBASE_FALLBACK_CONTACT = {
-  whatsapp: 'https://wa.me/919376569027',
+  whatsapp: 'https://wa.me/message/H4JLHPJ3NNGOK1',
   email: 'mailto:workall724038@gmail.com',
-  phone: 'tel:+919376569027',
-  phoneDisplay: '+91 9376569027',
+  phone: 'tel:+917732869027',
+  phoneDisplay: '+91 7732869027',
   emailDisplay: 'workall724038@gmail.com',
   message: 'Online enquiry submission is temporarily unavailable. Please contact Rohit through WhatsApp, email or phone.'
 };
@@ -46,18 +46,19 @@ function cleanEnvVal(val: unknown): string {
 // Retrieve environment or config values
 const getFirebaseConfig = () => {
   const metaEnv = typeof import.meta !== 'undefined' && import.meta?.env ? import.meta.env : (process.env as unknown as Record<string, string>);
-  const envKey = cleanEnvVal(metaEnv?.VITE_FIREBASE_API_KEY);
-  const envProjectId = cleanEnvVal(metaEnv?.VITE_FIREBASE_PROJECT_ID);
+  const rawEnvKey = cleanEnvVal(metaEnv?.VITE_FIREBASE_API_KEY);
+  const envKey = (rawEnvKey && rawEnvKey.startsWith('AIza')) ? rawEnvKey : FIREBASE_CONFIG.apiKey;
+  const envProjectId = cleanEnvVal(metaEnv?.VITE_FIREBASE_PROJECT_ID) || FIREBASE_CONFIG.projectId;
 
   if (envKey && envProjectId && envProjectId !== 'gen-lang-client-0536814422' && envProjectId !== 'rohit-portfolio-e5225') {
     return {
       apiKey: envKey,
-      authDomain: cleanEnvVal(metaEnv.VITE_FIREBASE_AUTH_DOMAIN) || `${envProjectId}.firebaseapp.com`,
+      authDomain: cleanEnvVal(metaEnv?.VITE_FIREBASE_AUTH_DOMAIN) || `${envProjectId}.firebaseapp.com`,
       projectId: envProjectId,
-      storageBucket: cleanEnvVal(metaEnv.VITE_FIREBASE_STORAGE_BUCKET) || `${envProjectId}.firebasestorage.app`,
-      messagingSenderId: cleanEnvVal(metaEnv.VITE_FIREBASE_MESSAGING_SENDER_ID) || FIREBASE_CONFIG.messagingSenderId,
-      appId: cleanEnvVal(metaEnv.VITE_FIREBASE_APP_ID) || FIREBASE_CONFIG.appId,
-      measurementId: cleanEnvVal(metaEnv.VITE_FIREBASE_MEASUREMENT_ID) || FIREBASE_CONFIG.measurementId,
+      storageBucket: cleanEnvVal(metaEnv?.VITE_FIREBASE_STORAGE_BUCKET) || `${envProjectId}.firebasestorage.app`,
+      messagingSenderId: cleanEnvVal(metaEnv?.VITE_FIREBASE_MESSAGING_SENDER_ID) || FIREBASE_CONFIG.messagingSenderId,
+      appId: cleanEnvVal(metaEnv?.VITE_FIREBASE_APP_ID) || FIREBASE_CONFIG.appId,
+      measurementId: cleanEnvVal(metaEnv?.VITE_FIREBASE_MEASUREMENT_ID) || FIREBASE_CONFIG.measurementId,
       firestoreDatabaseId: '(default)'
     };
   }

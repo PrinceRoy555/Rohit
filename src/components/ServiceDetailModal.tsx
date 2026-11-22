@@ -255,7 +255,7 @@ export default function ServiceDetailModal({ service, onClose, onGetQuote }: Ser
               </div>
               <div className="flex items-center gap-2.5 w-full sm:w-auto">
                 <a
-                  href={whatsappLink}
+                  href={WHATSAPP_BUSINESS_URL}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex-1 sm:flex-none inline-flex items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-xs px-4 h-11 rounded-xl transition-colors cursor-pointer shadow-xs min-h-[44px]"

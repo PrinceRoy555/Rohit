@@ -36,7 +36,8 @@ export interface PasswordRequirementsStatus {
 }
 
 export const SUPER_ADMIN_EMAIL = 'workall724038@gmail.com';
-export const SUPER_ADMIN_UID = '7wupZnpLh1MPTYpci5keNIS1Fyt1';
+export const SUPER_ADMIN_UID = 'F7Ccp4AfuxPpw8YTGWMLo7dv5Do2';
+export const SUPER_ADMIN_UIDS = ['F7Ccp4AfuxPpw8YTGWMLo7dv5Do2', '7wupZnpLh1MPTYpci5keNIS1Fyt1'];
 
 /**
  * Validates password against enterprise strong-password policy:
@@ -103,6 +104,12 @@ export function getFriendlyAuthErrorMessage(errorCodeOrMessage: string): string 
   if (errorCodeOrMessage.includes('auth/unauthorized-domain')) {
     return 'Current domain is not authorized in Firebase Auth settings.';
   }
+  if (errorCodeOrMessage.includes('auth/operation-not-allowed')) {
+    return 'This sign-in method is not enabled in Firebase Authentication settings.';
+  }
+  if (errorCodeOrMessage.includes('auth/api-key-not-valid')) {
+    return 'Firebase API key is invalid or restricted.';
+  }
 
   return 'Authentication failed. Please verify your administrator credentials.';
 }
@@ -110,34 +117,63 @@ export function getFriendlyAuthErrorMessage(errorCodeOrMessage: string): string 
 /**
  * Sign in via Firebase Auth with Email and Password.
  */
-export async function signInAdmin(email: string, pass: string): Promise<{ success: boolean; user?: User; error?: string }> {
+export async function signInAdmin(
+  email: string,
+  pass: string
+): Promise<{ success: boolean; user?: User; error?: string; errorCode?: string }> {
   if (!isFirebaseConfigured() || !auth) {
-    return { success: false, error: 'Firebase Auth is not configured on this project.' };
+    return {
+      success: false,
+      error: 'Firebase Auth is not configured on this project.',
+      errorCode: 'auth/not-configured'
+    };
   }
   try {
-    const cred = await signInWithEmailAndPassword(auth, email.trim(), pass);
+    const cred = await signInWithEmailAndPassword(auth, email.trim().toLowerCase(), pass);
     return { success: true, user: cred.user };
-  } catch (err) {
+  } catch (err: any) {
     const error = err as AuthError;
-    return { success: false, error: getFriendlyAuthErrorMessage(error.code || error.message) };
+    const rawCode = error.code || 'auth/unknown-error';
+    if (import.meta.env?.DEV) {
+      // Diagnostic log only reports the Firebase error code - never passwords or tokens
+      console.warn(`[Firebase Auth Diagnostic] Email sign-in failed with error code: ${rawCode}`);
+    }
+    return {
+      success: false,
+      error: getFriendlyAuthErrorMessage(rawCode || error.message),
+      errorCode: rawCode
+    };
   }
 }
 
 /**
  * Sign in via Firebase Auth with Google Provider.
  */
-export async function signInAdminWithGoogle(): Promise<{ success: boolean; user?: User; error?: string }> {
+export async function signInAdminWithGoogle(): Promise<{ success: boolean; user?: User; error?: string; errorCode?: string }> {
   if (!isFirebaseConfigured() || !auth) {
-    return { success: false, error: 'Firebase Auth is not configured on this project.' };
+    return {
+      success: false,
+      error: 'Firebase Auth is not configured on this project.',
+      errorCode: 'auth/not-configured'
+    };
   }
   try {
     const provider = new GoogleAuthProvider();
     provider.setCustomParameters({ prompt: 'select_account' });
     const cred = await signInWithPopup(auth, provider);
     return { success: true, user: cred.user };
-  } catch (err) {
+  } catch (err: any) {
     const error = err as AuthError;
-    return { success: false, error: getFriendlyAuthErrorMessage(error.code || error.message) };
+    const rawCode = error.code || 'auth/unknown-error';
+    if (import.meta.env?.DEV) {
+      // Diagnostic log only reports the Firebase error code - never passwords or tokens
+      console.warn(`[Firebase Auth Diagnostic] Google sign-in failed with error code: ${rawCode}`);
+    }
+    return {
+      success: false,
+      error: getFriendlyAuthErrorMessage(rawCode || error.message),
+      errorCode: rawCode
+    };
   }
 }
 
@@ -160,60 +196,89 @@ export async function verifyAdminRole(user: User | null): Promise<AdminRoleResul
 
   const cleanEmail = (user.email || '').toLowerCase().trim();
 
-  // 1. Primary Super Admin by UID or Email
-  if (
-    (user.uid && user.uid === SUPER_ADMIN_UID) ||
-    cleanEmail === SUPER_ADMIN_EMAIL ||
-    cleanEmail === 'workall724038@gmail.com'
-  ) {
-    return {
-      authorized: true,
-      role: 'super_admin',
-      email: cleanEmail || SUPER_ADMIN_EMAIL
-    };
-  }
-
-  // 2. Check Firestore Role records if database is configured
+  // 1. First, verify whether Firestore profile explicitly deactivates or assigns roles to the user
   if (isFirebaseConfigured() && db && user.uid) {
     try {
+      // Check adminProfiles collection (primary RBAC)
+      const profileDoc = await getDoc(doc(db, 'adminProfiles', user.uid));
+      if (profileDoc.exists()) {
+        const data = profileDoc.data();
+        if (data?.status === 'inactive' || data?.status === 'disabled') {
+          return {
+            authorized: false,
+            role: 'editor',
+            email: cleanEmail,
+            error: 'Administrator profile has been deactivated or disabled by security policy.'
+          };
+        }
+        // Strict role validation: valid roles only
+        if (data?.role === 'super_admin' || data?.role === 'admin' || data?.role === 'editor') {
+          return {
+            authorized: true,
+            role: data.role,
+            email: cleanEmail
+          };
+        }
+      }
+
       // Check exact 'Admin Portal' collection from Firestore Console
       const adminPortalDoc = await getDoc(doc(db, 'Admin Portal', user.uid));
       if (adminPortalDoc.exists()) {
         const data = adminPortalDoc.data();
-        const role = (data?.role === 'super_admin' || data?.role === 'admin' || data?.role === 'editor') ? data.role : 'super_admin';
-        return {
-          authorized: true,
-          role,
-          email: cleanEmail || data?.['Admin Email'] || data?.adminEmail || SUPER_ADMIN_EMAIL
-        };
-      }
-
-      // Check adminProfiles collection (RBAC)
-      const profileDoc = await getDoc(doc(db, 'adminProfiles', user.uid));
-      if (profileDoc.exists()) {
-        const data = profileDoc.data();
-        const role = (data?.role === 'super_admin' || data?.role === 'admin' || data?.role === 'editor') ? data.role : 'editor';
-        return {
-          authorized: true,
-          role,
-          email: cleanEmail
-        };
+        if (data?.status === 'inactive' || data?.status === 'disabled') {
+          return {
+            authorized: false,
+            role: 'editor',
+            email: cleanEmail,
+            error: 'Administrator account has been deactivated by security policy.'
+          };
+        }
+        if (data?.role === 'super_admin' || data?.role === 'admin' || data?.role === 'editor') {
+          return {
+            authorized: true,
+            role: data.role,
+            email: cleanEmail || data?.['Admin Email'] || data?.adminEmail || SUPER_ADMIN_EMAIL
+          };
+        }
       }
 
       // Check legacy admins collection
       const adminDoc = await getDoc(doc(db, 'admins', user.uid));
       if (adminDoc.exists()) {
         const data = adminDoc.data();
-        const role = (data?.role === 'super_admin' || data?.role === 'admin') ? data.role : 'admin';
-        return {
-          authorized: true,
-          role,
-          email: cleanEmail
-        };
+        if (data?.status === 'inactive' || data?.status === 'disabled') {
+          return {
+            authorized: false,
+            role: 'editor',
+            email: cleanEmail,
+            error: 'Administrator account has been deactivated by security policy.'
+          };
+        }
+        if (data?.role === 'super_admin' || data?.role === 'admin') {
+          return {
+            authorized: true,
+            role: data.role,
+            email: cleanEmail
+          };
+        }
       }
     } catch (e) {
       console.warn('[Firebase Auth] Firestore admin role check error:', e);
     }
+  }
+
+  // 2. Primary Super Admin bootstrap: allowed only for verified UID or verified email when not disabled
+  const isGoogleProvider = user.providerData?.some(p => p.providerId === 'google.com');
+  const isVerifiedEmail = user.emailVerified || isGoogleProvider;
+  if (
+    (user.uid && SUPER_ADMIN_UIDS.includes(user.uid)) ||
+    ((cleanEmail === SUPER_ADMIN_EMAIL || cleanEmail === 'workall724038@gmail.com') && isVerifiedEmail)
+  ) {
+    return {
+      authorized: true,
+      role: 'super_admin',
+      email: cleanEmail || SUPER_ADMIN_EMAIL
+    };
   }
 
   // Unauthorized
@@ -231,8 +296,17 @@ export async function verifyAdminRole(user: User | null): Promise<AdminRoleResul
 export async function syncAdminFirestoreProfile(user: User): Promise<void> {
   if (!isFirebaseConfigured() || !db || !user?.uid) return;
   try {
-    const isSuper = user.uid === SUPER_ADMIN_UID || (user.email || '').toLowerCase().trim() === SUPER_ADMIN_EMAIL;
+    const cleanEmail = (user.email || '').toLowerCase().trim();
+    const isGoogleProvider = user.providerData?.some(p => p.providerId === 'google.com');
+    const isVerified = Boolean(user.emailVerified || isGoogleProvider);
+    const isSuper = (user.uid && SUPER_ADMIN_UIDS.includes(user.uid)) || (cleanEmail === SUPER_ADMIN_EMAIL && isVerified);
     if (isSuper) {
+      // Safety Check: If profile exists and is disabled, never overwrite back to active
+      const existingProfile = await getDoc(doc(db, 'adminProfiles', user.uid));
+      if (existingProfile.exists() && existingProfile.data()?.status === 'disabled') {
+        console.warn('[Firebase Auth] Account is disabled in adminProfiles; skipping active status profile sync.');
+        return;
+      }
       // Keep 'Admin Portal' collection in sync with exact field names
       await setDoc(doc(db, 'Admin Portal', user.uid), {
         'Admin Email': user.email || SUPER_ADMIN_EMAIL,

@@ -655,7 +655,7 @@ export const ACHIEVEMENT_CARDS: AchievementCard[] = [
   { title: 'Jaipur-Based Professional', subtitle: 'Based in Rajasthan, India', icon: 'MapPin' }
 ];
 
-export const WHATSAPP_BUSINESS_URL = "https://wa.me/919376569027";
+export const WHATSAPP_BUSINESS_URL = "https://wa.me/message/H4JLHPJ3NNGOK1";
 export const RESUME_PDF_URL = "https://ik.imagekit.io/auhuory9w/website%20work/resume/Rohit%20Verma%20(2)%20(3).pdf";
 export const RESUME_DRIVE_PREVIEW_FALLBACK = "https://ik.imagekit.io/auhuory9w/website%20work/resume/Rohit%20Verma%20(2)%20(3).pdf";
 export const RESUME_FILE_NAME = "Rohit-Verma-Resume.pdf";
@@ -664,8 +664,8 @@ export const RESUME_URL = RESUME_PDF_URL;
 export const contactConfig = {
   emailDisplay: "workall724038@gmail.com",
   emailHref: "mailto:workall724038@gmail.com",
-  phoneDisplay: "+91 9376569027",
-  phoneHref: "tel:+919376569027",
+  phoneDisplay: "+91 7732869027",
+  phoneHref: "tel:+917732869027",
   whatsappBusinessUrl: WHATSAPP_BUSINESS_URL,
   resumePdfUrl: RESUME_PDF_URL,
   resumeDrivePreviewFallback: RESUME_DRIVE_PREVIEW_FALLBACK,
@@ -682,7 +682,7 @@ export const AVAILABILITY_INFO = {
 };
 
 export const WHATSAPP_CONFIG = {
-  phoneNumber: '919376569027',
+  phoneNumber: '917732869027',
   defaultMessage: 'Hi Rohit, I visited your portfolio and would like to discuss a project.',
   url: WHATSAPP_BUSINESS_URL
 };

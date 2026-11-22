@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'motion/react';
-import { Instagram, Linkedin, Github, MessageSquare, ArrowRight, CheckCircle2, X, Phone, Mail, Lock, FileText } from 'lucide-react';
+import { Instagram, Linkedin, Github, MessageSquare, ArrowRight, CheckCircle2, X, Phone, Mail, FileText } from 'lucide-react';
 import { WHATSAPP_BUSINESS_URL, contactConfig, ROHIT_PROFILE_IMAGE_URL, getAuthoritativeProfileImage } from '../data';
 import { useBodyScrollLock } from '../lib/scrollLock';
 import WhatsAppIcon from './WhatsAppIcon';
@@ -323,29 +323,6 @@ export default function Footer({ onNavigate }: FooterProps = {}) {
           >
             Terms and Conditions
           </button>
-          <a
-            href="/admin"
-            id="footer-admin-portal-link"
-            onClick={(e) => {
-              e.preventDefault();
-              if (onNavigate) {
-                onNavigate('admin');
-              } else {
-                if (window.history && window.history.pushState) {
-                  window.history.pushState(null, '', '/admin');
-                  window.dispatchEvent(new Event('popstate'));
-                } else {
-                  window.location.hash = 'admin';
-                }
-              }
-            }}
-            className="inline-flex items-center gap-1.5 py-2 px-2.5 rounded-lg text-text-secondary hover:text-accent-primary hover:bg-accent-primary/10 transition-all cursor-pointer font-medium min-h-[44px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-primary/50"
-            aria-label="Admin Portal - Secure Administrator Login"
-            title="Administrator Portal Login"
-          >
-            <Lock className="w-3.5 h-3.5 text-accent-primary/80 flex-shrink-0" aria-hidden="true" />
-            <span>Admin Portal</span>
-          </a>
         </div>
       </div>
 

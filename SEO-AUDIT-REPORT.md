@@ -224,7 +224,7 @@ The website has strong aesthetic execution, excellent visual performance, valid 
 - **Status: Excellent (92/100)**
 - Multi-channel direct outreach:
   - 1-click WhatsApp Business button with pre-filled message.
-  - Direct click-to-call (`tel:+919376569027`).
+  - Direct click-to-call (`tel:+917732869027`).
   - Direct mailto link.
   - Structured Project Inquiry Form with budget selection and file attachment support.
   - Floating WhatsApp button and AI assistant.

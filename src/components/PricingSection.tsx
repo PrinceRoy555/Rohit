@@ -288,7 +288,7 @@ export default function PricingSection() {
                 </button>
 
                 <a
-                  href={`https://wa.me/919376569027?text=${encodeURIComponent(`Hi Rohit, I would like to discuss the ${pkg.title} package (${pkg.price}).`)}`}
+                  href={WHATSAPP_BUSINESS_URL}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="w-full flex items-center justify-center gap-1.5 font-medium text-xs text-text-secondary hover:text-accent-primary py-1.5 text-center transition-colors"
@@ -356,7 +356,7 @@ export default function PricingSection() {
                     <span>→</span>
                   </button>
                   <a
-                    href={`https://wa.me/919376569027?text=${encodeURIComponent(`Hi Rohit, I would like to enquire about ${service.name} (${service.startingRate}).`)}`}
+                    href={WHATSAPP_BUSINESS_URL}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-[11px] text-text-muted hover:text-text-primary transition-colors"

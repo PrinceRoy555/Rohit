@@ -21,6 +21,7 @@ import {
   validateEmail,
   validateName,
   validatePhone,
+  validateContactMethod,
   validateProjectDescription
 } from '../../lib/validation';
 import { Insight, InsightAutomationSettings } from '../../types';
@@ -42,7 +43,7 @@ export interface ContactEnquiryPayload {
   submissionId?: string;
   name: string;
   businessName?: string;
-  email: string;
+  email?: string;
   phone?: string;
   selectedService: string;
   budgetRange?: string;
@@ -62,7 +63,7 @@ export interface ContactEnquiryPayload {
 export interface ChatbotLeadPayload {
   name: string;
   businessName?: string;
-  email: string;
+  email?: string;
   phone?: string;
   requiredService?: string;
   projectDescription?: string;
@@ -78,7 +79,7 @@ export interface ChatbotLeadPayload {
 export interface QuoteRequestPayload {
   name: string;
   businessName?: string;
-  email: string;
+  email?: string;
   phone?: string;
   packageName?: string;
   requiredService?: string;
@@ -119,7 +120,9 @@ export async function submitContactEnquiry(payload: ContactEnquiryPayload): Prom
   const nameVal = validateName(payload.name);
   if (!nameVal.isValid) return { success: false, errorCode: 'invalid-argument', error: nameVal.error };
 
-  const emailVal = validateEmail(payload.email);
+  const contactVal = validateContactMethod(payload.email, payload.phone);
+  if (!contactVal.isValid) return { success: false, errorCode: 'invalid-argument', error: contactVal.error };
+  const emailVal = { isValid: true, error: undefined };
   if (!emailVal.isValid) return { success: false, errorCode: 'invalid-argument', error: emailVal.error };
 
   const phoneVal = validatePhone(payload.phone, false);
@@ -153,7 +156,7 @@ export async function submitContactEnquiry(payload: ContactEnquiryPayload): Prom
 
   const docData: Record<string, unknown> = {
     name: sanitizeText(payload.name, 100),
-    email: normalizeEmail(payload.email),
+    ...(payload.email && payload.email.trim() ? { email: normalizeEmail(payload.email) } : {}),
     selectedService: sanitizeText(payload.selectedService, 100),
     projectDescription: sanitizeText(payload.projectDescription, 5000),
     consentAccepted: true,
@@ -245,12 +248,14 @@ export async function submitChatbotLead(payload: ChatbotLeadPayload): Promise<Se
     };
   }
 
-  const emailVal = validateEmail(payload.email);
+  const contactVal = validateContactMethod(payload.email, payload.phone);
+  if (!contactVal.isValid) return { success: false, errorCode: 'invalid-argument', error: contactVal.error };
+  const emailVal = { isValid: true, error: undefined };
   if (!emailVal.isValid) return { success: false, error: emailVal.error };
 
   const docData: Record<string, unknown> = {
     name: sanitizeText(payload.name || 'Anonymous Visitor', 100),
-    email: normalizeEmail(payload.email),
+    ...(payload.email && payload.email.trim() ? { email: normalizeEmail(payload.email) } : {}),
     source: 'uni-ai-chatbot',
     status: 'new',
     createdAt: serverTimestamp(),
@@ -292,7 +297,9 @@ export async function submitQuoteRequest(payload: QuoteRequestPayload): Promise<
     };
   }
 
-  const emailVal = validateEmail(payload.email);
+  const contactVal = validateContactMethod(payload.email, payload.phone);
+  if (!contactVal.isValid) return { success: false, errorCode: 'invalid-argument', error: contactVal.error };
+  const emailVal = { isValid: true, error: undefined };
   if (!emailVal.isValid) return { success: false, error: emailVal.error };
 
   const nameVal = validateName(payload.name);
@@ -300,7 +307,7 @@ export async function submitQuoteRequest(payload: QuoteRequestPayload): Promise<
 
   const docData: Record<string, unknown> = {
     name: sanitizeText(payload.name, 100),
-    email: normalizeEmail(payload.email),
+    ...(payload.email && payload.email.trim() ? { email: normalizeEmail(payload.email) } : {}),
     source: 'website-pricing',
     status: 'new',
     createdAt: serverTimestamp(),
@@ -374,7 +381,7 @@ export async function subscribeToNewsletter(email: string): Promise<ServiceRespo
 export interface UnifiedLeadPayload {
   id?: string;
   name: string;
-  email: string;
+  email?: string;
   phone?: string;
   businessName?: string;
   service?: string;
@@ -400,7 +407,9 @@ export async function submitUnifiedLead(payload: UnifiedLeadPayload): Promise<Se
     };
   }
 
-  const emailVal = validateEmail(payload.email);
+  const contactVal = validateContactMethod(payload.email, payload.phone);
+  if (!contactVal.isValid) return { success: false, errorCode: 'invalid-argument', error: contactVal.error };
+  const emailVal = { isValid: true, error: undefined };
   if (!emailVal.isValid) return { success: false, error: emailVal.error };
 
   const nameVal = validateName(payload.name);
@@ -411,7 +420,7 @@ export async function submitUnifiedLead(payload: UnifiedLeadPayload): Promise<Se
 
   const docData: Record<string, unknown> = {
     name: sanitizeText(payload.name, 100),
-    email: normalizeEmail(payload.email),
+    ...(payload.email && payload.email.trim() ? { email: normalizeEmail(payload.email) } : {}),
     source: sanitizeText(payload.source || 'website-contact-form', 50),
     status: payload.status || 'new',
     createdAt: serverTimestamp(),
@@ -707,6 +716,46 @@ export async function updateLeadCrmDataInFirestore(leadId: string, updates: Reco
   }
 }
 
+/**
+ * Create a new manual lead (e.g. from WhatsApp, phone call, or referral) in Firestore 'leads' collection.
+ */
+export async function createManualLeadInFirestore(leadData: Record<string, unknown>): Promise<ServiceResponse> {
+  if (!isFirebaseConfigured() || !db) return { success: false, error: 'Database unconfigured' };
+  try {
+    const colRef = collection(db, 'leads');
+    const docData: Record<string, unknown> = {
+      name: sanitizeText((leadData.name as string) || 'Anonymous Lead', 100),
+      email: leadData.email ? normalizeEmail(leadData.email as string) : '',
+      phone: leadData.phone ? sanitizeText(leadData.phone as string, 30) : '',
+      businessName: sanitizeText((leadData.company as string) || (leadData.businessName as string) || '', 150),
+      service: sanitizeText((leadData.service as string) || 'General Inquiry', 100),
+      message: sanitizeText((leadData.message as string) || '', 5000),
+      budget: sanitizeText((leadData.budget as string) || (leadData.budgetRange as string) || '', 100),
+      budgetRange: sanitizeText((leadData.budget as string) || (leadData.budgetRange as string) || '', 100),
+      timeline: sanitizeText((leadData.timeline as string) || '', 100),
+      status: (leadData.status as string) || 'new',
+      pipelineStage: (leadData.pipelineStage as string) || 'new',
+      priority: (leadData.priority as string) || 'medium',
+      source: (leadData.source as string) || 'whatsapp',
+      assignedTo: sanitizeText((leadData.assignedTo as string) || 'Rohit Verma', 100),
+      followUpAt: leadData.followUpAt || null,
+      notes: sanitizeText((leadData.notes as string) || '', 5000),
+      createdAt: serverTimestamp(),
+      createdAtIso: new Date().toISOString()
+    };
+
+    if (Array.isArray(leadData.activities)) {
+      docData.activities = leadData.activities;
+    }
+
+    const docRef = await addDoc(colRef, removeUndefinedValues(docData));
+    return { success: true, id: docRef.id };
+  } catch (err: any) {
+    console.error('[Firestore] Error creating manual lead:', err);
+    return { success: false, error: err.message || 'Failed to save lead in Firestore' };
+  }
+}
+
 export async function deleteLeadFromFirestore(leadId: string, sourceCollection?: string, sourceDocumentId?: string): Promise<ServiceResponse> {
   if (!isFirebaseConfigured() || !db) return { success: false, error: 'Database unconfigured' };
   try {
@@ -745,6 +794,38 @@ export async function deleteLeadFromFirestore(leadId: string, sourceCollection?:
   } catch (err) {
     console.error('[Firestore] Error deleting lead:', err);
     return { success: false, error: 'Failed to delete lead' };
+  }
+}
+
+/**
+ * Safe client synchronization helpers for Firestore.
+ * Implements strict non-destructive fallback:
+ * If Firestore is offline, unauthenticated, or security rules disallow client collection access,
+ * it returns safely without throwing or corrupting client state.
+ */
+export async function fetchClientsFromFirestore(): Promise<any[]> {
+  if (!isFirebaseConfigured() || !db) return [];
+  try {
+    const clientsRef = collection(db, 'clients');
+    const snapshot = await getDocs(clientsRef);
+    return snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+  } catch (err: any) {
+    return [];
+  }
+}
+
+export async function syncClientToFirestore(clientData: Record<string, unknown>): Promise<ServiceResponse> {
+  if (!isFirebaseConfigured() || !db) return { success: false, error: 'Database unconfigured' };
+  try {
+    const clientId = (clientData.id as string) || `cli_${Date.now()}`;
+    const clientRef = doc(db, 'clients', clientId);
+    await setDoc(clientRef, {
+      ...clientData,
+      updatedAt: new Date().toISOString()
+    }, { merge: true });
+    return { success: true, id: clientId };
+  } catch (err: any) {
+    return { success: false, error: err.message || 'Firestore client sync skipped' };
   }
 }
 
@@ -1209,7 +1290,7 @@ export async function fetchInsightBySlug(slug: string): Promise<Insight | null> 
 
   try {
     const colRef = collection(db, 'insights');
-    const q = query(colRef, where('slug', '==', cleanSlug));
+    const q = query(colRef, where('slug', '==', cleanSlug), where('status', '==', 'published'));
     const snap = await getDocs(q);
     if (!snap.empty) {
       const docSnap = snap.docs[0];

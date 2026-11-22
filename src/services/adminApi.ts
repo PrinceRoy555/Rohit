@@ -164,8 +164,19 @@ export async function checkAdminSession(): Promise<AdminSessionInfo> {
       credentials: 'include'
     });
 
-    if (!res.ok) {
+    if (res.status === 401) {
       setAdminToken(null);
+      return { authenticated: false };
+    }
+
+    if (!res.ok) {
+      const token = getAdminToken();
+      if (token) {
+        return {
+          authenticated: true,
+          adminEmail: (typeof window !== 'undefined' ? (sessionStorage.getItem('admin_user_email') || localStorage.getItem('admin_user_email')) : null) || 'workall724038@gmail.com'
+        };
+      }
       return { authenticated: false };
     }
 
@@ -177,6 +188,13 @@ export async function checkAdminSession(): Promise<AdminSessionInfo> {
       timeRemainingMs: data.timeRemainingMs
     };
   } catch {
+    const token = getAdminToken();
+    if (token) {
+      return {
+        authenticated: true,
+        adminEmail: (typeof window !== 'undefined' ? (sessionStorage.getItem('admin_user_email') || localStorage.getItem('admin_user_email')) : null) || 'workall724038@gmail.com'
+      };
+    }
     return { authenticated: false };
   }
 }

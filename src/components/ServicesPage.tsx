@@ -162,7 +162,7 @@ export default function ServicesPage({ onNavigate }: ServicesPageProps) {
 
   const handleGetQuote = (serviceTitle: string) => {
     const msg = `Hi Rohit, I am interested in getting a quote for ${serviceTitle}. Can you share package details and delivery timelines?`;
-    window.open(`https://wa.me/919376569027?text=${encodeURIComponent(msg)}`, '_blank');
+    window.open(WHATSAPP_BUSINESS_URL, '_blank');
   };
 
   return (

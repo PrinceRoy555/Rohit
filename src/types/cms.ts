@@ -287,7 +287,7 @@ export interface AdminUser {
   name: string;
   role: AdminRole;
   password?: string;
-  status?: 'active' | 'inactive';
+  status?: 'active' | 'inactive' | 'disabled';
   lastLogin?: string;
   createdAt?: string;
 }

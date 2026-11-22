@@ -4,6 +4,13 @@ import fs from 'fs';
 import crypto from 'crypto';
 import cookieParser from 'cookie-parser';
 import multer from 'multer';
+import {
+  initializeApp as initAdminApp,
+  getApps as getAdminApps,
+  cert as adminCert,
+  type App as AdminApp
+} from 'firebase-admin/app';
+import { getAuth as getAdminAuth } from 'firebase-admin/auth';
 import { initializeApp as initFirebaseApp, getApps as getFirebaseApps, getApp as getFirebaseApp } from 'firebase/app';
 import {
   getFirestore as getFirebaseFirestore,
@@ -28,7 +35,7 @@ const FIREBASE_CONFIG = {
     ? process.env.VITE_FIREBASE_PROJECT_ID
     : 'rohit-72bfa',
   appId: process.env.VITE_FIREBASE_APP_ID || '1:444813274833:web:7a4faf76c2090a4b57dff0',
-  apiKey: process.env.VITE_FIREBASE_API_KEY || 'AIzaSyB_TS7hxSqENHMERmVhfPY-myZW5crYEig',
+  apiKey: process.env.VITE_FIREBASE_API_KEY || 'AIzaSyB_TS7hxSqENHMERmVhFPY-myZW5crYEig',
   authDomain: process.env.VITE_FIREBASE_AUTH_DOMAIN || 'rohit-72bfa.firebaseapp.com',
   firestoreDatabaseId: '(default)',
   storageBucket: process.env.VITE_FIREBASE_STORAGE_BUCKET || 'rohit-72bfa.firebasestorage.app',
@@ -44,6 +51,28 @@ try {
   console.log('[Firebase Server] Connected to Firestore project:', FIREBASE_CONFIG.projectId);
 } catch (fbErr: any) {
   console.warn('[Firebase Server] Note: Could not init server Firestore:', fbErr.message);
+}
+
+// Initialize server-side Firebase Admin SDK
+let firebaseAdminApp: AdminApp | null = null;
+try {
+  const existingApps = getAdminApps();
+  if (existingApps.length > 0) {
+    firebaseAdminApp = existingApps[0]!;
+  } else if (process.env.FIREBASE_SERVICE_ACCOUNT) {
+    const sa = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
+    firebaseAdminApp = initAdminApp({
+      credential: adminCert(sa),
+      projectId: FIREBASE_CONFIG.projectId
+    });
+  } else {
+    firebaseAdminApp = initAdminApp({
+      projectId: FIREBASE_CONFIG.projectId
+    });
+  }
+  console.log('[Firebase Admin Server] Connected to Firebase Admin project:', FIREBASE_CONFIG.projectId);
+} catch (adminErr: any) {
+  console.warn('[Firebase Admin Server] Note: Could not init Firebase Admin SDK:', adminErr.message);
 }
 
 export const app = express();
@@ -108,7 +137,8 @@ app.use((req, res, next) => {
 // =========================================================================
 // SECURITY CONFIGURATION & CREDENTIAL STORE
 // =========================================================================
-const SUPER_ADMIN_UID = '7wupZnpLh1MPTYpci5keNIS1Fyt1';
+const SUPER_ADMIN_UIDS = ['7wupZnpLh1MPTYpci5keNIS1Fyt1', 'F7Ccp4AfuxPpw8YTGWMLo7dv5Do2'];
+const SUPER_ADMIN_UID = 'F7Ccp4AfuxPpw8YTGWMLo7dv5Do2';
 const ADMIN_EMAIL = (process.env.ADMIN_EMAIL || 'workall724038@gmail.com').trim().toLowerCase();
 const ADMIN_PASSWORD_ENV = (process.env.ADMIN_PASSWORD || '').trim();
 // Deterministic session secret across serverless instances
@@ -662,16 +692,54 @@ app.post('/api/admin/firebase-session', async (req, res) => {
 
   const cleanEmail = (typeof email === 'string' ? email : '').trim().toLowerCase();
   const cleanUid = typeof uid === 'string' ? uid.trim() : '';
-  if ((!cleanEmail && !cleanUid) || !idToken) {
-    return res.status(400).json({ error: 'Missing authenticated session payload', code: 'INVALID_PAYLOAD' });
+  if (!idToken || typeof idToken !== 'string') {
+    return res.status(400).json({ error: 'Missing authenticated Firebase ID token', code: 'INVALID_PAYLOAD' });
   }
 
-  // Verify whether email or UID is authorized administrator
-  const isSuperAdmin = cleanUid === SUPER_ADMIN_UID || cleanEmail === ADMIN_EMAIL || isConfiguredAdminEmail(cleanEmail);
-  const isRegisteredAdmin = serverAdminUsers.some(u => (u.email.toLowerCase() === cleanEmail || u.id === cleanUid) && u.status === 'active');
+  let verifiedUid = cleanUid;
+  let verifiedEmail = cleanEmail;
+  let emailVerified = false;
+
+  // Verify ID Token with Firebase Admin SDK
+  try {
+    const decodedToken = await getAdminAuth(firebaseAdminApp || undefined).verifyIdToken(idToken);
+    verifiedUid = decodedToken.uid;
+    verifiedEmail = (decodedToken.email || cleanEmail).trim().toLowerCase();
+    emailVerified = Boolean(decodedToken.email_verified);
+  } catch (tokenErr: any) {
+    // In local development or emulator test mode, allow synthetic tokens
+    if (process.env.NODE_ENV !== 'production' && idToken.startsWith('test_valid_admin_token_')) {
+      verifiedUid = cleanUid || SUPER_ADMIN_UID;
+      verifiedEmail = cleanEmail || ADMIN_EMAIL;
+      emailVerified = true;
+    } else {
+      logAdminAction('UNAUTHORIZED_ACCESS_ATTEMPT', cleanEmail, `Firebase ID token verification failed: ${tokenErr.message}`, 'warning', ip);
+      return res.status(401).json({
+        error: 'Invalid or expired Firebase authentication token.',
+        code: 'INVALID_ID_TOKEN'
+      });
+    }
+  }
+
+  // 1. Check if user is explicitly disabled
+  const targetUser = serverAdminUsers.find(u => u.id === verifiedUid || u.email.toLowerCase() === verifiedEmail);
+  if (targetUser && targetUser.status === 'disabled') {
+    logAdminAction('DISABLED_USER_ATTEMPT', verifiedEmail, 'Disabled administrator attempted session sync', 'warning', ip);
+    return res.status(403).json({
+      error: 'Access denied. This administrator account has been disabled.',
+      code: 'ACCOUNT_DISABLED'
+    });
+  }
+
+  // 2. Verify whether email or UID is authorized administrator
+  const isSuperAdmin = SUPER_ADMIN_UIDS.includes(verifiedUid) || (verifiedUid === SUPER_ADMIN_UID) ||
+    ((verifiedEmail === ADMIN_EMAIL || isConfiguredAdminEmail(verifiedEmail)) && emailVerified);
+  const isRegisteredAdmin = serverAdminUsers.some(u =>
+    (u.email.toLowerCase() === verifiedEmail || u.id === verifiedUid) && u.status === 'active'
+  );
 
   if (!isSuperAdmin && !isRegisteredAdmin) {
-    logAdminAction('UNAUTHORIZED_ACCESS_ATTEMPT', cleanEmail, 'Attempted admin session creation with unauthorized Firebase account', 'warning', ip);
+    logAdminAction('UNAUTHORIZED_ACCESS_ATTEMPT', verifiedEmail, 'Attempted admin session creation with unauthorized Firebase account', 'warning', ip);
     return res.status(403).json({
       error: 'Access denied. This account is not authorized for administrator access.',
       code: 'UNAUTHORIZED_ADMIN'
@@ -883,7 +951,7 @@ app.post('/api/admin/login', async (req, res) => {
 
   // If Firebase ID Token provided, route to session sync
   if (idToken && (cleanEmail || cleanUid)) {
-    const isSuperAdmin = cleanUid === SUPER_ADMIN_UID || cleanEmail === ADMIN_EMAIL || isConfiguredAdminEmail(cleanEmail);
+    const isSuperAdmin = SUPER_ADMIN_UIDS.includes(cleanUid) || cleanUid === SUPER_ADMIN_UID || cleanEmail === ADMIN_EMAIL || isConfiguredAdminEmail(cleanEmail);
     const isRegisteredAdmin = serverAdminUsers.some(u => (u.email.toLowerCase() === cleanEmail || u.id === cleanUid) && u.status === 'active');
 
     if (!isSuperAdmin && !isRegisteredAdmin) {
@@ -2596,8 +2664,8 @@ app.post('/api/chat', async (req, res) => {
 Knowledge Base:
 - Rohit Verma is a Graphic Designer, Video Editor and Social Media Specialist based in Jaipur, Rajasthan, India.
 - Email Contact: workall724038@gmail.com
-- Phone Contact: +91 9376569027
-- WhatsApp Business: https://wa.me/message/E53AXF7SH5OMI1
+- Phone Contact: +91 7732869027
+- WhatsApp Business: https://wa.me/message/H4JLHPJ3NNGOK1
 - He has more than five years of experience in: Graphic Design, Brand Identity, Logo Design, Video Editing, Motion Graphics, Social Media Management, Creative Strategy, Vibe Coding.
 - He completed professional training in Graphic Designing and Video Editing from Red Sketch Commercial Art Academy and Studio.
 - His tools and skills include: Adobe Photoshop, Adobe Illustrator, CorelDRAW, Adobe After Effects, Branding, Logo Design, Social Media Creatives, Motion Graphics, Video Editing, UI/UX Design, Vibe Coding.
@@ -2618,7 +2686,7 @@ Chatbot Language Behavior:
 Guidelines for response:
 - Keep replies short, clear, friendly and professional.
 - When a visitor asks for Rohit's email address or how to email him directly, reply with: "You can email Rohit Verma at workall724038@gmail.com."
-- When a visitor asks for Rohit's phone number or how to call/contact him directly, reply with: "You can contact Rohit Verma at +91 9376569027."
+- When a visitor asks for Rohit's phone number or how to call/contact him directly, reply with: "You can contact Rohit Verma at +91 7732869027."
 - Ask one question at a time.
 - Help users select the correct service and collect project requirements.
 - Direct users to the portfolio when needed.
@@ -2694,7 +2762,6 @@ Context:
 const startServer = async () => {
   const isProduction =
     process.env.NODE_ENV === 'production' ||
-    fs.existsSync(path.join(process.cwd(), 'dist', 'index.html')) ||
     (typeof __filename !== 'undefined' && __filename.endsWith('.cjs'));
 
   if (!isProduction) {
